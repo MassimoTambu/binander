@@ -1,0 +1,3 @@
+enum EmitterCategories {
+  bot,
+}

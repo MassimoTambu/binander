@@ -7,8 +7,8 @@ import 'package:http/http.dart';
 import 'dart:convert';
 import 'package:crypto/crypto.dart';
 
-part 'api_exception.dart';
-part 'api_security_level.dart';
+part 'api.exception.dart';
+part 'api_security_level.enum.dart';
 part 'api_utils.dart';
 
 part 'spot/spot.dart';
