@@ -2,7 +2,7 @@ library api;
 
 import 'dart:io';
 
-import 'package:bottino_fortino/services/settings.service.dart';
+import 'package:bottino_fortino/services/services.dart';
 import 'package:http/http.dart';
 import 'dart:convert';
 import 'package:crypto/crypto.dart';

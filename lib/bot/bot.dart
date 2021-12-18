@@ -1,6 +1,6 @@
 library bot;
 
-import 'package:bottino_fortino/models/emitter_categories.enum.dart';
+import 'package:bottino_fortino/models/models.dart';
 import 'package:eventify/eventify.dart';
 
 part 'bots/minimize_losses/minimize_losses.config.dart';
