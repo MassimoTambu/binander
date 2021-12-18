@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
+part of dashboard_module;
 
-class Dashboard extends StatelessWidget {
-  const Dashboard({Key? key}) : super(key: key);
+class DashboardPage extends StatelessWidget {
+  const DashboardPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -9,6 +9,12 @@ class Dashboard extends StatelessWidget {
         appBar: AppBar(
           title: const Text('Dashboard'),
           centerTitle: true,
+          actions: [
+            IconButton(
+              onPressed: () => context.router.push(const SettingsRoute()),
+              icon: const Icon(Icons.settings),
+            ),
+          ],
         ),
         body: Container(),
         floatingActionButton: FloatingActionButton(
