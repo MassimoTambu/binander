@@ -1,12 +1,12 @@
 part of settings_module;
 
 class SettingsNotifier extends ChangeNotifier {
-  var _themeMode = ThemeMode.dark;
+  final _settingsService = SettingsService();
 
-  ThemeMode get themeMode => _themeMode;
+  ThemeMode get themeMode => _settingsService.themeMode;
 
   set themeMode(ThemeMode themeMode) {
-    _themeMode = themeMode;
+    _settingsService.themeMode = themeMode;
     notifyListeners();
   }
 }

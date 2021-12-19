@@ -5,7 +5,7 @@ class SettingsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final themeMode = context.watch<SettingsNotifier>()._themeMode;
+    final themeMode = context.watch<SettingsNotifier>().themeMode;
     return Scaffold(
       body: Column(
         children: [
