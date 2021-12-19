@@ -5,4 +5,4 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 
 part 'models/dashboard.model.dart';
-part 'screens/dashboard.page.dart';
+part 'pages/dashboard.page.dart';

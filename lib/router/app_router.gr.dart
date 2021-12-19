@@ -22,13 +22,18 @@ class _$AppRouter extends RootStackRouter {
     SettingsRoute.name: (routeData) {
       return MaterialPageX<dynamic>(
           routeData: routeData, child: const SettingsPage());
+    },
+    InfoRoute.name: (routeData) {
+      return MaterialPageX<dynamic>(
+          routeData: routeData, child: const InfoPage());
     }
   };
 
   @override
   List<RouteConfig> get routes => [
         RouteConfig(DashboardRoute.name, path: '/'),
-        RouteConfig(SettingsRoute.name, path: '/settings-page')
+        RouteConfig(SettingsRoute.name, path: '/settings-page'),
+        RouteConfig(InfoRoute.name, path: '/info-page')
       ];
 }
 
@@ -46,4 +51,12 @@ class SettingsRoute extends PageRouteInfo<void> {
   const SettingsRoute() : super(SettingsRoute.name, path: '/settings-page');
 
   static const String name = 'SettingsRoute';
+}
+
+/// generated route for
+/// [InfoPage]
+class InfoRoute extends PageRouteInfo<void> {
+  const InfoRoute() : super(InfoRoute.name, path: '/info-page');
+
+  static const String name = 'InfoRoute';
 }
