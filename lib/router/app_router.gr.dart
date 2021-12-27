@@ -26,6 +26,12 @@ class _$AppRouter extends RootStackRouter {
     InfoRoute.name: (routeData) {
       return MaterialPageX<dynamic>(
           routeData: routeData, child: const InfoPage());
+    },
+    AddBotRoute.name: (routeData) {
+      final args = routeData.argsAs<AddBotRouteArgs>(
+          orElse: () => const AddBotRouteArgs());
+      return MaterialPageX<dynamic>(
+          routeData: routeData, child: AddBotPage(key: args.key));
     }
   };
 
@@ -33,7 +39,8 @@ class _$AppRouter extends RootStackRouter {
   List<RouteConfig> get routes => [
         RouteConfig(DashboardRoute.name, path: '/'),
         RouteConfig(SettingsRoute.name, path: '/settings-page'),
-        RouteConfig(InfoRoute.name, path: '/info-page')
+        RouteConfig(InfoRoute.name, path: '/info-page'),
+        RouteConfig(AddBotRoute.name, path: '/add-bot-page')
       ];
 }
 
@@ -59,4 +66,25 @@ class InfoRoute extends PageRouteInfo<void> {
   const InfoRoute() : super(InfoRoute.name, path: '/info-page');
 
   static const String name = 'InfoRoute';
+}
+
+/// generated route for
+/// [AddBotPage]
+class AddBotRoute extends PageRouteInfo<AddBotRouteArgs> {
+  AddBotRoute({Key? key})
+      : super(AddBotRoute.name,
+            path: '/add-bot-page', args: AddBotRouteArgs(key: key));
+
+  static const String name = 'AddBotRoute';
+}
+
+class AddBotRouteArgs {
+  const AddBotRouteArgs({this.key});
+
+  final Key? key;
+
+  @override
+  String toString() {
+    return 'AddBotRouteArgs{key: $key}';
+  }
 }

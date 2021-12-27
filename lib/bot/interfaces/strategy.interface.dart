@@ -1,8 +1,7 @@
 part of bot;
 
 abstract class Strategy {
-  final String name;
-  final String description;
-
-  Strategy({required this.name, required this.description});
+  late final String name;
+  late final String publicName;
+  late final String description;
 }

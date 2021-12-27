@@ -1,11 +1,19 @@
-part of bot;
+part of minimize_losses_bot;
 
 class MinimizeLossesStrategy implements Strategy {
   @override
-  String name;
+  late final String name;
 
   @override
-  String description;
+  late final String publicName;
 
-  MinimizeLossesStrategy({required this.name, required this.description});
+  @override
+  late final String description;
+
+  MinimizeLossesStrategy.create() {
+    name = 'MinimizeLossesStrategy';
+    publicName = 'Minimize losses';
+    //TODO desc
+    description = '';
+  }
 }

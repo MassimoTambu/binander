@@ -13,6 +13,7 @@ part 'app_router.gr.dart';
     AutoRoute(page: DashboardPage, initial: true),
     AutoRoute(page: SettingsPage),
     AutoRoute(page: InfoPage),
+    AutoRoute(page: AddBotPage),
   ],
 )
 class AppRouter extends _$AppRouter {}

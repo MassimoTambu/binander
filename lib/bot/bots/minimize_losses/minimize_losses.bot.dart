@@ -1,11 +1,11 @@
-part of bot;
+part of minimize_losses_bot;
 
 class MinimizeLossesBot implements Bot {
   @override
-  final MinimizeLossesConfig config;
+  late final MinimizeLossesConfig config;
   @override
   final String name;
-  final MinimizeLossesStrategy strategy;
+  late final MinimizeLossesStrategy strategy;
   late final EventEmitter _eventEmitter;
   late final String _senderName;
 
@@ -16,6 +16,23 @@ class MinimizeLossesBot implements Bot {
   }) {
     _eventEmitter = EventEmitter();
     _senderName = 'Bot_' + name;
+  }
+
+  MinimizeLossesBot.create({
+    required this.name,
+    required int dailyLossSellOrders,
+    required int maxInvestmentPerOrder,
+    required double percentageSellOrder,
+    required Duration timerBuyOrder,
+  }) {
+    _eventEmitter = EventEmitter();
+    _senderName = 'Bot_' + name;
+    config = MinimizeLossesConfig.create(
+        dailyLossSellOrders: dailyLossSellOrders,
+        maxInvestmentPerOrder: maxInvestmentPerOrder,
+        percentageSellOrder: percentageSellOrder,
+        timerBuyOrder: timerBuyOrder);
+    strategy = MinimizeLossesStrategy.create();
   }
 
   @override
