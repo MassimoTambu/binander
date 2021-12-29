@@ -3,6 +3,7 @@ import 'package:bottino_fortino/modules/settings/settings.dart';
 import 'package:bottino_fortino/router/app_router.dart';
 import 'package:bottino_fortino/services/services.dart';
 import 'package:flutter/material.dart';
+import 'package:form_builder_validators/localization/l10n.dart';
 import 'package:provider/provider.dart';
 
 void main() {
@@ -28,6 +29,9 @@ class BottinoFortino extends StatelessWidget {
                   routerDelegate: _router.delegate(),
                   routeInformationProvider: _router.routeInfoProvider(),
                   routeInformationParser: _router.defaultRouteParser(),
+                  localizationsDelegates: const [
+                    FormBuilderLocalizations.delegate
+                  ],
                   theme: themeLight,
                   darkTheme: themeDark,
                   themeMode: context.watch<SettingsNotifier>().themeMode,

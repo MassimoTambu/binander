@@ -1,20 +1,21 @@
 part of bot;
 
-class BotConfigField<T> {
+class ConfigField<T> {
   final String publicName;
   final String name;
   final String description;
-  late final Type type;
   T? value;
   final T? defaultValue;
+  final ConfigFieldTypes configFieldTypes;
+  final List<ConfigFieldValidatorsTypes> validators;
 
-  BotConfigField({
+  ConfigField({
     required this.publicName,
     required this.name,
     required this.description,
     required this.value,
+    required this.configFieldTypes,
+    required this.validators,
     this.defaultValue,
-  }) {
-    type = T;
-  }
+  });
 }

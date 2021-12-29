@@ -3,11 +3,13 @@ part of dashboard_module;
 class AddBotPage extends StatelessWidget {
   AddBotPage({Key? key}) : super(key: key);
 
-  final _formKey = GlobalKey<FormState>();
+  final _formKey = GlobalKey<FormBuilderState>();
 
-  void onCreate(BuildContext context) {
+  void onCreateBot(BuildContext context) {
     if (_formKey.currentState!.validate()) {
-      // Process data.
+      context
+          .read<AddBotModel>()
+          .createBot(context, _formKey.currentState!.fields);
     }
   }
 
@@ -20,32 +22,38 @@ class AddBotPage extends StatelessWidget {
       ),
       body: ChangeNotifierProvider<AddBotModel>(
         create: (context) => AddBotModel(),
-        child: Form(
+        builder: (context, child) => FormBuilder(
           key: _formKey,
-          child: Center(
-            child: SizedBox(
-              width: MediaQueryUtils.resizeBy(
-                percValue: 80,
-                currentSize: MediaQuery.of(context).size.width,
-              ),
-              child: Column(
-                children: [
-                  const SizedBox(height: 30),
-                  const SelectBotField(),
-                  TextFormField(
-                    decoration: const InputDecoration(
-                      labelText: 'Name',
-                      hintText: 'Bob',
+          autovalidateMode: AutovalidateMode.disabled,
+          child: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            child: Center(
+              child: Container(
+                width: MediaQueryUtils.resizeBy(
+                  percValue: 80,
+                  currentSize: MediaQuery.of(context).size.width,
+                ),
+                padding: const EdgeInsets.symmetric(vertical: 30),
+                child: Column(
+                  children: [
+                    const SelectBotField(),
+                    FormBuilderTextField(
+                      name: 'bot_name',
+                      decoration: const InputDecoration(
+                        labelText: 'Name',
+                        hintText: 'Bob',
+                      ),
+                      validator: FormBuilderValidators.compose(
+                        [FormBuilderValidators.required(context)],
+                      ),
                     ),
-                    validator: (value) =>
-                        ValidatorUtils.required(value, name: 'Name'),
-                  ),
-                  const BotConfigContainer(),
-                  TextButton(
-                    onPressed: () => onCreate(context),
-                    child: const Text('Create'),
-                  ),
-                ],
+                    const BotConfigContainer(),
+                    TextButton(
+                      onPressed: () => onCreateBot(context),
+                      child: const Text('Create'),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -60,28 +68,18 @@ class SelectBotField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FormField<BotTypes>(
-      builder: (FormFieldState<BotTypes> state) {
-        return InputDecorator(
-          decoration: const InputDecoration(),
-          child: DropdownButtonHideUnderline(
-            child: DropdownButton<BotTypes>(
-              value: context.watch<AddBotModel>().selectedBotType,
-              isDense: true,
-              onChanged: (BotTypes? newBotType) {
-                newBotType ??= BotTypes.minimizeLosses;
-                context.read<AddBotModel>().selectedBotType = newBotType;
-                state.didChange(newBotType);
-              },
-              items: BotTypes.values.map((BotTypes botType) {
-                return DropdownMenuItem<BotTypes>(
-                  value: botType,
-                  child: Text(botType.name),
-                );
-              }).toList(),
-            ),
-          ),
+    return FormBuilderDropdown(
+      name: 'bot_type',
+      initialValue: context.read<AddBotModel>().selectedBotType,
+      items: BotTypes.values.map((BotTypes botType) {
+        return DropdownMenuItem<BotTypes>(
+          value: botType,
+          child: Text(botType.name),
         );
+      }).toList(),
+      onChanged: (BotTypes? newBotType) {
+        newBotType ??= BotTypes.minimizeLosses;
+        context.read<AddBotModel>().selectedBotType = newBotType;
       },
     );
   }
@@ -92,7 +90,7 @@ class BotConfigContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    late final Map<String, BotConfigField> configFields;
+    late final Map<String, ConfigField> configFields;
     switch (context.watch<AddBotModel>().selectedBotType) {
       case BotTypes.minimizeLosses:
         configFields = MinimizeLossesConfig.configFields;
@@ -120,7 +118,7 @@ class BotConfigContainer extends StatelessWidget {
 }
 
 class BotConfigFormField extends StatelessWidget {
-  final BotConfigField configField;
+  final ConfigField configField;
 
   const BotConfigFormField({
     Key? key,
@@ -129,7 +127,8 @@ class BotConfigFormField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TextFormField(
+    return FormBuilderTextField(
+      name: configField.name,
       decoration: InputDecoration(
         label: Tooltip(
           message: configField.description,
@@ -137,7 +136,12 @@ class BotConfigFormField extends StatelessWidget {
         ),
       ),
       initialValue: configField.defaultValue?.toString(),
-      validator: (value) => ValidatorUtils.required(value),
+      validator: FormBuilderValidators.compose(
+        ConfigFieldUtils.toFormBuilderValidators(
+          context,
+          configField.validators,
+        ),
+      ),
     );
   }
 }
