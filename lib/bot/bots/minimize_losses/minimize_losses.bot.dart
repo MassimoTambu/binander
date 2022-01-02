@@ -15,10 +15,11 @@ class MinimizeLossesBot implements Bot {
     required Duration timerBuyOrder,
   }) {
     config = MinimizeLossesConfig.create(
-        dailyLossSellOrders: dailyLossSellOrders,
-        maxInvestmentPerOrder: maxInvestmentPerOrder,
-        percentageSellOrder: percentageSellOrder,
-        timerBuyOrder: timerBuyOrder);
+      dailyLossSellOrders: dailyLossSellOrders,
+      maxInvestmentPerOrder: maxInvestmentPerOrder,
+      percentageSellOrder: percentageSellOrder,
+      timerBuyOrder: timerBuyOrder,
+    );
     strategy = MinimizeLossesStrategy.create();
   }
 

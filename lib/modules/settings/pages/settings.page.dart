@@ -1,11 +1,14 @@
 part of settings_module;
 
-class SettingsPage extends StatelessWidget {
+class SettingsPage extends ConsumerWidget {
   const SettingsPage({Key? key}) : super(key: key);
 
+  void _navigateToApiSettingsPage(BuildContext context) {
+    context.router.push(BinanceApiSettingsRoute());
+  }
+
   @override
-  Widget build(BuildContext context) {
-    final themeMode = context.watch<SettingsNotifier>().themeMode;
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Settings'),
@@ -13,13 +16,19 @@ class SettingsPage extends StatelessWidget {
       ),
       body: Column(
         children: [
+          ListTile(
+            title: const Text('Binance Api'),
+            subtitle: const Text('Change Binance Api settings'),
+            onTap: () => _navigateToApiSettingsPage(context),
+          ),
           SwitchListTile(
-            value: themeMode == ThemeMode.dark,
+            value: ref.watch(settingsProvider).themeMode == ThemeMode.dark,
             title: const Text('Dark theme'),
             subtitle: const Text('Enable dark theme'),
             onChanged: (value) {
-              context.read<SettingsNotifier>().themeMode =
-                  value ? ThemeMode.dark : ThemeMode.light;
+              ref
+                  .read(settingsProvider.notifier)
+                  .updateThemeMode(value ? ThemeMode.dark : ThemeMode.light);
             },
           ),
           ListTile(

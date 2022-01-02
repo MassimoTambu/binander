@@ -1,13 +1,14 @@
 part of api;
 
+final _spotProvider = Provider<Spot>((ref) {
+  return Spot(ref);
+});
+
 class Spot {
-  static final Spot _singleton = Spot._internal();
+  final Ref ref;
+  late Trade trade;
 
-  final trade = Trade();
-
-  factory Spot() {
-    return _singleton;
+  Spot(this.ref) {
+    trade = ref.watch(_tradeProvider);
   }
-
-  Spot._internal();
 }

@@ -1,4 +1,4 @@
-part of bot;
+part of models;
 
 enum ConfigFieldValidatorsTypes {
   required,

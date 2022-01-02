@@ -1,9 +1,15 @@
 part of api;
 
-class ApiUtils {
-  static final settingsService = SettingsService();
+final _apiUtilsProvider = Provider<ApiUtils>((ref) {
+  return ApiUtils(ref.read);
+});
 
-  static String createQueryWithSecurity(
+class ApiUtils {
+  final Reader read;
+
+  const ApiUtils(this.read);
+
+  String createQueryWithSecurity(
     Map<String, String> query,
     API_SECURITY_TYPE securityType,
   ) {
@@ -22,9 +28,8 @@ class ApiUtils {
     return _mapToString(query);
   }
 
-  static void addSecurityToHeader(
-      Request request, API_SECURITY_TYPE securityType) {
-    final apiKey = settingsService.apiKey;
+  void addSecurityToHeader(Request request, API_SECURITY_TYPE securityType) {
+    final apiKey = read(settingsProvider).apiKey;
 
     switch (securityType) {
       case API_SECURITY_TYPE.trade:
@@ -45,20 +50,20 @@ class ApiUtils {
     }
   }
 
-  static void _addTimestamp(Map<String, String> query) {
+  void _addTimestamp(Map<String, String> query) {
     query['timestamp'] = _generateTimeStamp().toString();
   }
 
-  static void _addSignature(Map<String, String> query) {
+  void _addSignature(Map<String, String> query) {
     query['signature'] = _generateSignature(query);
   }
 
-  static int _generateTimeStamp() {
+  int _generateTimeStamp() {
     return DateTime.now().millisecondsSinceEpoch;
   }
 
-  static String _generateSignature(Map<String, String> queryParams) {
-    final apiSecret = settingsService.apiSecret;
+  String _generateSignature(Map<String, String> queryParams) {
+    final apiSecret = read(settingsProvider).apiSecret;
 
     var queryString = "";
 
@@ -79,7 +84,7 @@ class ApiUtils {
     return signature.toString();
   }
 
-  static String _mapToString(Map<String, String> query) {
+  String _mapToString(Map<String, String> query) {
     String str = '';
     query.forEach((key, value) {
       if (key == query.keys.last) {
@@ -92,7 +97,7 @@ class ApiUtils {
     return str;
   }
 
-  static void throwApiException(String method, String? reasonPhrase) {
+  void throwApiException(String method, String? reasonPhrase) {
     if (reasonPhrase != null) {
       throw ApiException(reasonPhrase);
     }

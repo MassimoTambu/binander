@@ -1,32 +1,32 @@
 part of api;
 
+final _tradeProvider = Provider<Trade>((ref) {
+  return Trade(ref.read);
+});
+
 class Trade {
-  static final Trade _singleton = Trade._internal();
+  final Reader read;
 
-  factory Trade() {
-    return _singleton;
-  }
-
-  Trade._internal();
+  const Trade(this.read);
 
   Future<String> getOrders(String symbol) async {
     final query = {'symbol': symbol};
     // 'symbol=$symbol&timestamp=$timestamp&signature=';
 
-    final settingsService = SettingsService();
-    final url = settingsService.apiUrl;
+    final url = read(settingsProvider).apiUrl;
+    final apiUtils = read(_apiUtilsProvider);
 
     final secureQuery =
-        ApiUtils.createQueryWithSecurity(query, API_SECURITY_TYPE.userData);
+        apiUtils.createQueryWithSecurity(query, API_SECURITY_TYPE.userData);
 
     final request = Request('GET', Uri.parse('$url/allOrders?$secureQuery'));
 
-    ApiUtils.addSecurityToHeader(request, API_SECURITY_TYPE.userData);
+    apiUtils.addSecurityToHeader(request, API_SECURITY_TYPE.userData);
 
     StreamedResponse response = await request.send();
 
     if (response.statusCode != HttpStatus.ok) {
-      ApiUtils.throwApiException('getOrders', response.reasonPhrase);
+      apiUtils.throwApiException('getOrders', response.reasonPhrase);
     }
 
     return await response.stream.bytesToString();

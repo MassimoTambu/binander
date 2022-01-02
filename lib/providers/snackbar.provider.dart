@@ -1,14 +1,10 @@
-part of services;
+part of providers;
 
-class SnackBarService {
-  static final _singleton = SnackBarService._internal();
+final snackBarProvider = Provider<SnackBarProvider>((ref) {
+  return SnackBarProvider();
+});
 
-  factory SnackBarService() {
-    return _singleton;
-  }
-
-  SnackBarService._internal();
-
+class SnackBarProvider {
   void show(BuildContext context, String message, {bool dismissable = false}) {
     final snackBar = SnackBar(
       duration: const Duration(seconds: 3),

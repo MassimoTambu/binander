@@ -1,4 +1,4 @@
-part of bot;
+part of models;
 
 class ConfigFieldUtils {
   static List<String? Function(String?)> toFormBuilderValidators(

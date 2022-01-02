@@ -13,7 +13,8 @@ part 'app_router.gr.dart';
     AutoRoute(page: DashboardPage, initial: true),
     AutoRoute(page: SettingsPage),
     AutoRoute(page: InfoPage),
-    AutoRoute(page: AddBotPage),
+    AutoRoute(page: CreateBotPage),
+    AutoRoute(page: BinanceApiSettingsPage),
   ],
 )
 class AppRouter extends _$AppRouter {}

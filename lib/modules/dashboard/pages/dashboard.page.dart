@@ -1,14 +1,15 @@
 part of dashboard_module;
 
-class DashboardPage extends StatelessWidget {
+class DashboardPage extends ConsumerWidget {
   const DashboardPage({Key? key}) : super(key: key);
 
-  void navigateToAddBotPage(BuildContext context) {
-    context.router.push(AddBotRoute());
+  void _navigateToAddBotPage(BuildContext context) {
+    context.router.push(CreateBotRoute());
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final bots = ref.watch(botProvider);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Dashboard'),
@@ -20,9 +21,17 @@ class DashboardPage extends StatelessWidget {
           ),
         ],
       ),
-      body: Container(),
+      body: ListView.builder(
+        itemCount: bots.length,
+        itemBuilder: (context, index) {
+          final bot = bots[index];
+          return ListTile(
+            title: Text(bot.name),
+          );
+        },
+      ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => navigateToAddBotPage(context),
+        onPressed: () => _navigateToAddBotPage(context),
         child: const Icon(Icons.add),
         backgroundColor: Theme.of(context).colorScheme.primary,
         foregroundColor: Theme.of(context).colorScheme.onPrimary,

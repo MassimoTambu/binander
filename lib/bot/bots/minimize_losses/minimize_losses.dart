@@ -2,7 +2,6 @@ library minimize_losses_bot;
 
 import 'package:bottino_fortino/bot/bot.dart';
 import 'package:bottino_fortino/models/models.dart';
-import 'package:bottino_fortino/services/services.dart';
 
 part 'minimize_losses.config.dart';
 part 'minimize_losses.strategy.dart';

@@ -1,4 +1,4 @@
-part of services;
+part of providers;
 
 enum StorageKeys {
   themeMode,

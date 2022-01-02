@@ -1,43 +1,38 @@
 import 'package:bottino_fortino/models/models.dart';
 import 'package:bottino_fortino/modules/settings/settings.dart';
 import 'package:bottino_fortino/router/app_router.dart';
-import 'package:bottino_fortino/services/services.dart';
+import 'package:bottino_fortino/providers/providers.dart';
+import 'package:bottino_fortino/utils/utils.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:form_builder_validators/localization/l10n.dart';
-import 'package:provider/provider.dart';
 
-void main() {
-  runApp(BottinoFortino());
+Future<void> main() async {
+  runApp(ProviderScope(
+    child: BottinoFortino(),
+    observers: [ProviderLoggerUtils()],
+  ));
 }
 
-class BottinoFortino extends StatelessWidget {
+class BottinoFortino extends ConsumerWidget {
   BottinoFortino({Key? key}) : super(key: key);
 
   final _router = AppRouter();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return FutureBuilder(
-      future: MemoryStorageService().init(),
+      future: ref.watch(memoryStorageProvider.notifier).init(),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          return ChangeNotifierProvider(
-            create: (context) => SettingsNotifier(),
-            child: Consumer(
-              builder: (context, value, child) {
-                return MaterialApp.router(
-                  routerDelegate: _router.delegate(),
-                  routeInformationProvider: _router.routeInfoProvider(),
-                  routeInformationParser: _router.defaultRouteParser(),
-                  localizationsDelegates: const [
-                    FormBuilderLocalizations.delegate
-                  ],
-                  theme: themeLight,
-                  darkTheme: themeDark,
-                  themeMode: context.watch<SettingsNotifier>().themeMode,
-                );
-              },
-            ),
+          return MaterialApp.router(
+            routerDelegate: _router.delegate(),
+            routeInformationProvider: _router.routeInfoProvider(),
+            routeInformationParser: _router.defaultRouteParser(),
+            localizationsDelegates: const [FormBuilderLocalizations.delegate],
+            theme: themeLight,
+            darkTheme: themeDark,
+            themeMode: ref.watch(settingsProvider).themeMode,
           );
         }
 

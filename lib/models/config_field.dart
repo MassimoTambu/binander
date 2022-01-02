@@ -1,11 +1,11 @@
-part of bot;
+part of models;
 
-class ConfigField<T> {
+class ConfigField {
   final String publicName;
   final String name;
   final String description;
-  T? value;
-  final T? defaultValue;
+  String? value;
+  final String? defaultValue;
   final ConfigFieldTypes configFieldTypes;
   final List<ConfigFieldValidatorsTypes> validators;
 

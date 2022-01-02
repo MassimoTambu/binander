@@ -27,11 +27,17 @@ class _$AppRouter extends RootStackRouter {
       return MaterialPageX<dynamic>(
           routeData: routeData, child: const InfoPage());
     },
-    AddBotRoute.name: (routeData) {
-      final args = routeData.argsAs<AddBotRouteArgs>(
-          orElse: () => const AddBotRouteArgs());
+    CreateBotRoute.name: (routeData) {
+      final args = routeData.argsAs<CreateBotRouteArgs>(
+          orElse: () => const CreateBotRouteArgs());
       return MaterialPageX<dynamic>(
-          routeData: routeData, child: AddBotPage(key: args.key));
+          routeData: routeData, child: CreateBotPage(key: args.key));
+    },
+    BinanceApiSettingsRoute.name: (routeData) {
+      final args = routeData.argsAs<BinanceApiSettingsRouteArgs>(
+          orElse: () => const BinanceApiSettingsRouteArgs());
+      return MaterialPageX<dynamic>(
+          routeData: routeData, child: BinanceApiSettingsPage(key: args.key));
     }
   };
 
@@ -40,7 +46,9 @@ class _$AppRouter extends RootStackRouter {
         RouteConfig(DashboardRoute.name, path: '/'),
         RouteConfig(SettingsRoute.name, path: '/settings-page'),
         RouteConfig(InfoRoute.name, path: '/info-page'),
-        RouteConfig(AddBotRoute.name, path: '/add-bot-page')
+        RouteConfig(CreateBotRoute.name, path: '/create-bot-page'),
+        RouteConfig(BinanceApiSettingsRoute.name,
+            path: '/binance-api-settings-page')
       ];
 }
 
@@ -69,22 +77,45 @@ class InfoRoute extends PageRouteInfo<void> {
 }
 
 /// generated route for
-/// [AddBotPage]
-class AddBotRoute extends PageRouteInfo<AddBotRouteArgs> {
-  AddBotRoute({Key? key})
-      : super(AddBotRoute.name,
-            path: '/add-bot-page', args: AddBotRouteArgs(key: key));
+/// [CreateBotPage]
+class CreateBotRoute extends PageRouteInfo<CreateBotRouteArgs> {
+  CreateBotRoute({Key? key})
+      : super(CreateBotRoute.name,
+            path: '/create-bot-page', args: CreateBotRouteArgs(key: key));
 
-  static const String name = 'AddBotRoute';
+  static const String name = 'CreateBotRoute';
 }
 
-class AddBotRouteArgs {
-  const AddBotRouteArgs({this.key});
+class CreateBotRouteArgs {
+  const CreateBotRouteArgs({this.key});
 
   final Key? key;
 
   @override
   String toString() {
-    return 'AddBotRouteArgs{key: $key}';
+    return 'CreateBotRouteArgs{key: $key}';
+  }
+}
+
+/// generated route for
+/// [BinanceApiSettingsPage]
+class BinanceApiSettingsRoute
+    extends PageRouteInfo<BinanceApiSettingsRouteArgs> {
+  BinanceApiSettingsRoute({Key? key})
+      : super(BinanceApiSettingsRoute.name,
+            path: '/binance-api-settings-page',
+            args: BinanceApiSettingsRouteArgs(key: key));
+
+  static const String name = 'BinanceApiSettingsRoute';
+}
+
+class BinanceApiSettingsRouteArgs {
+  const BinanceApiSettingsRouteArgs({this.key});
+
+  final Key? key;
+
+  @override
+  String toString() {
+    return 'BinanceApiSettingsRouteArgs{key: $key}';
   }
 }

@@ -1,8 +1,37 @@
+// ignore_for_file: prefer_initializing_formals
+
 part of minimize_losses_bot;
 
 class MinimizeLossesConfig implements Config {
-  static final Map<String, ConfigField> configFields = {
-    dailyLossSellOrdersName: ConfigField<int>(
+  int? dailyLossSellOrders;
+  double? maxInvestmentPerOrder;
+  double? percentageSellOrder;
+  Duration? timerBuyOrder;
+
+  MinimizeLossesConfig();
+
+  MinimizeLossesConfig.create({
+    required int dailyLossSellOrders,
+    required double maxInvestmentPerOrder,
+    required double percentageSellOrder,
+    required Duration timerBuyOrder,
+  }) {
+    this.dailyLossSellOrders = dailyLossSellOrders;
+    this.maxInvestmentPerOrder = maxInvestmentPerOrder;
+    this.percentageSellOrder = percentageSellOrder;
+    this.timerBuyOrder = timerBuyOrder;
+    configFields[dailyLossSellOrdersName]!.value =
+        dailyLossSellOrders.toString();
+    configFields[maxInvestmentPerOrderName]!.value =
+        maxInvestmentPerOrder.toString();
+    configFields[percentageSellOrderName]!.value =
+        percentageSellOrder.toString();
+    configFields[timerBuyOrderName]!.value = timerBuyOrder.inMinutes.toString();
+  }
+
+  @override
+  final Map<String, ConfigField> configFields = {
+    dailyLossSellOrdersName: ConfigField(
       name: dailyLossSellOrdersName,
       publicName: dailyLossSellOrdersPublicName,
       description: dailyLossSellOrdersDescription,
@@ -14,7 +43,7 @@ class MinimizeLossesConfig implements Config {
         ConfigFieldValidatorsTypes.positiveNumbers,
       ],
     ),
-    maxInvestmentPerOrderName: ConfigField<double>(
+    maxInvestmentPerOrderName: ConfigField(
       name: maxInvestmentPerOrderName,
       publicName: maxInvestmentPerOrderPublicName,
       description: maxInvestmentPerOrderDescription,
@@ -26,7 +55,7 @@ class MinimizeLossesConfig implements Config {
         ConfigFieldValidatorsTypes.positiveNumbers,
       ],
     ),
-    percentageSellOrderName: ConfigField<double>(
+    percentageSellOrderName: ConfigField(
       name: percentageSellOrderName,
       publicName: percentageSellOrderPublicName,
       description: percentageSellOrderDescription,
@@ -38,7 +67,7 @@ class MinimizeLossesConfig implements Config {
         ConfigFieldValidatorsTypes.positiveNumbers,
       ],
     ),
-    timerBuyOrderName: ConfigField<Duration>(
+    timerBuyOrderName: ConfigField(
       name: timerBuyOrderName,
       publicName: timerBuyOrderPublicName,
       description: timerBuyOrderDescription,
@@ -51,21 +80,6 @@ class MinimizeLossesConfig implements Config {
       ],
     ),
   };
-
-  MinimizeLossesConfig.create({
-    required int dailyLossSellOrders,
-    required double maxInvestmentPerOrder,
-    required double percentageSellOrder,
-    required Duration timerBuyOrder,
-  }) {
-    configFields[dailyLossSellOrdersName]!.value = dailyLossSellOrders;
-    configFields[maxInvestmentPerOrderName]!.value = maxInvestmentPerOrder;
-    configFields[percentageSellOrderName]!.value = percentageSellOrder;
-    configFields[timerBuyOrderName]!.value = timerBuyOrder;
-  }
-
-  @override
-  Map<String, ConfigField> get configFieldsData => configFields;
 
   // Data
   static const String dailyLossSellOrdersName = 'daily_loss_sell_orders';
