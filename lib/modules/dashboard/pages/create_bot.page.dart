@@ -7,9 +7,6 @@ class CreateBotPage extends ConsumerWidget {
 
   void onCreateBot(BuildContext context, WidgetRef ref) {
     if (_formKey.currentState!.validate()) {
-      // context
-      //     .read<CreateBotModel>()
-      //     .createBot(context, _formKey.currentState!.fields);
       ref
           .read(createBotProvider.notifier)
           .createBot(context, _formKey.currentState!.fields);

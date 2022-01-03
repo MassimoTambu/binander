@@ -8,7 +8,6 @@ class BinanceApiSettingsPage extends ConsumerWidget {
   void onSave(BuildContext context, WidgetRef ref) {
     if (_formKey.currentState!.validate()) {
       final fields = _formKey.currentState!.fields;
-      print(fields);
       ref.read(settingsProvider.notifier).updateFromForm(
             apiKey: fields[SettingsConfig.apiKeyName]!.value,
             apiSecret: fields[SettingsConfig.apiSecretName]!.value,

@@ -50,6 +50,10 @@ class ApiUtils {
     }
   }
 
+  Map<String, dynamic> _toJson(String body) {
+    return json.decode(body);
+  }
+
   void _addTimestamp(Map<String, String> query) {
     query['timestamp'] = _generateTimeStamp().toString();
   }
@@ -98,10 +102,10 @@ class ApiUtils {
   }
 
   void throwApiException(String method, String? reasonPhrase) {
-    if (reasonPhrase != null) {
-      throw ApiException(reasonPhrase);
+    if (reasonPhrase != null && reasonPhrase.isNotEmpty) {
+      throw ApiException('$reasonPhrase. Method: $method');
     }
 
-    throw ApiException('An error occurred');
+    throw ApiException('An error occurred at method $method');
   }
 }

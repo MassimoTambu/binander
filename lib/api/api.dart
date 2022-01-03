@@ -11,9 +11,11 @@ import 'package:crypto/crypto.dart';
 part 'api.exception.dart';
 part 'api_security_level.enum.dart';
 part 'api_utils.dart';
+part 'api_response.dart';
 
 part 'spot/spot.dart';
 part 'spot/trade/trade.dart';
+part 'spot/wallet/wallet.dart';
 
 final apiProvider = Provider<Api>((ref) {
   final settings = ref.watch(settingsProvider);
