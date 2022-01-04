@@ -8,6 +8,15 @@ class ProviderLoggerUtils extends ProviderObserver {
     Object? newValue,
     ProviderContainer container,
   ) {
-    print('[${provider.name ?? provider.runtimeType}] value: $newValue');
+    if (kDebugMode) {
+      print('[${provider.name ?? provider.runtimeType}] value: $newValue');
+    }
+  }
+
+  @override
+  void didDisposeProvider(ProviderBase provider, ProviderContainer containers) {
+    if (kDebugMode) {
+      print('[${provider.name ?? provider.runtimeType}] disposed');
+    }
   }
 }

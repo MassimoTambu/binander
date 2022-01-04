@@ -22,10 +22,23 @@ class Wallet {
 
     apiUtils.addSecurityToHeader(request, API_SECURITY_TYPE.userData);
 
-    StreamedResponse response = await request.send();
+    late final StreamedResponse response;
+    try {
+      response = await request.send();
+    } catch (e) {
+      return Future.error(
+        {e.toString()},
+        StackTrace.fromString('getApiKeyPermission'),
+      );
+    }
 
     if (response.statusCode != HttpStatus.ok) {
-      apiUtils.throwApiException('getApiKeyPermission', response.reasonPhrase);
+      // apiUtils.throwApiException('getApiKeyPermission', response.reasonPhrase);
+      // final res = ApiResponse('getApiKeyPermission', response.statusCode);
+      return Future.error(
+        {response.reasonPhrase},
+        StackTrace.fromString('getApiKeyPermission'),
+      );
     }
 
     final body = await response.stream.bytesToString();

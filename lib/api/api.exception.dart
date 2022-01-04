@@ -1,6 +1,11 @@
 part of api;
 
 class ApiException implements Exception {
-  String cause;
-  ApiException(this.cause);
+  final String cause;
+  const ApiException(this.cause);
+
+  @override
+  String toString() {
+    return cause;
+  }
 }
