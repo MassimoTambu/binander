@@ -1,4 +1,4 @@
-part of settings_module;
+part of providers;
 
 final binanceStatusProvider =
     FutureProvider.autoDispose<ApiResponse>((ref) async {

@@ -10,10 +10,13 @@ class BinanceStatusIndicator extends ConsumerWidget {
     return Container(
       child: res.when(
         data: (data) {
-          return const Icon(Icons.check_circle);
+          return const Icon(Icons.check_circle, color: Colors.green);
         },
         loading: () {
-          return const CircularProgressIndicator(strokeWidth: 2);
+          return const Padding(
+            padding: EdgeInsets.all(8.0),
+            child: CircularProgressIndicator(),
+          );
         },
         error: (error, stackTrace) {
           return Row(

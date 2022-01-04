@@ -20,7 +20,7 @@ class SettingsPage extends ConsumerWidget {
             title: const Text('Binance Api'),
             subtitle: const Text('Change Binance Api settings'),
             trailing: const Padding(
-              padding: EdgeInsets.only(right: 8),
+              padding: EdgeInsets.only(right: 9),
               child: BinanceStatusIndicator(),
             ),
             onTap: () => _navigateToApiSettingsPage(context),

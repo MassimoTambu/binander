@@ -50,6 +50,14 @@ class SettingsProvider extends StateNotifier<Settings> {
       apiSecret: apiSecret,
       apiUrl: apiUrl,
     );
+
+    ref.read(memoryStorageProvider.notifier).write(StorageKeys.apiKey, apiKey);
+
+    ref
+        .read(memoryStorageProvider.notifier)
+        .write(StorageKeys.apiSecret, apiSecret);
+
+    ref.read(memoryStorageProvider.notifier).write(StorageKeys.apiUrl, apiUrl);
   }
 
   static Settings _init(Ref ref) {
