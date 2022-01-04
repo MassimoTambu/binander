@@ -8,17 +8,9 @@ final settingsProvider =
 class SettingsProvider extends StateNotifier<Settings> {
   final Ref ref;
   static const defaultThemeMode = ThemeMode.dark;
+  static const defaultApiUrl = 'https://api.binance.com';
 
-  SettingsProvider(this.ref)
-      : super(
-          Settings(
-            apiKey: ref.read(memoryStorageProvider)[StorageKeys.apiKey] ?? '',
-            apiSecret:
-                ref.read(memoryStorageProvider)[StorageKeys.apiSecret] ?? '',
-            apiUrl: ref.read(memoryStorageProvider)[StorageKeys.apiUrl] ?? '',
-            themeMode: _setDefaultThemeMode(ref),
-          ),
-        );
+  SettingsProvider(this.ref) : super(_init(ref));
 
   void updateApiKey(String apiKey) {
     state = state.copyWith(apiKey: apiKey);
@@ -60,6 +52,15 @@ class SettingsProvider extends StateNotifier<Settings> {
     );
   }
 
+  static Settings _init(Ref ref) {
+    return Settings(
+      apiKey: ref.read(memoryStorageProvider)[StorageKeys.apiKey] ?? '',
+      apiSecret: ref.read(memoryStorageProvider)[StorageKeys.apiSecret] ?? '',
+      apiUrl: _setDefaultApiUrl(ref),
+      themeMode: _setDefaultThemeMode(ref),
+    );
+  }
+
   static ThemeMode _setDefaultThemeMode(Ref ref) {
     return ThemeMode.values.firstWhere(
         (key) =>
@@ -70,5 +71,19 @@ class SettingsProvider extends StateNotifier<Settings> {
           .write(StorageKeys.themeMode, defaultThemeMode.name);
       return defaultThemeMode;
     });
+  }
+
+  static String _setDefaultApiUrl(Ref ref) {
+    var apiUrl = ref.read(memoryStorageProvider)[StorageKeys.apiUrl];
+
+    if (apiUrl == null || apiUrl.isEmpty) {
+      ref
+          .read(memoryStorageProvider.notifier)
+          .write(StorageKeys.apiUrl, defaultApiUrl);
+
+      apiUrl = defaultApiUrl;
+    }
+
+    return apiUrl;
   }
 }

@@ -11,7 +11,9 @@ class MemoryStorageProvider extends StateNotifier<Map<String, String>> {
   MemoryStorageProvider(this.ref) : super({});
 
   Future<bool> init() async {
-    print('init');
+    if (kDebugMode) {
+      print('init');
+    }
     state = await ref.watch(_secureStorageProvider).readAll();
 
     return true;
