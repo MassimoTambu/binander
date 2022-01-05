@@ -7,7 +7,7 @@ final _secureStorageProvider = Provider<SecureStorageProvider>((ref) {
 class SecureStorageProvider {
   final _secureStorage = const FlutterSecureStorage();
 
-  Future<String?> read(StorageKeys key) {
+  Future<String?> read(SecureStorageKey key) {
     return _secureStorage.read(key: key.name);
   }
 
@@ -15,11 +15,11 @@ class SecureStorageProvider {
     return _secureStorage.readAll();
   }
 
-  Future<void> write(StorageKeys key, String value) {
+  Future<void> write(SecureStorageKey key, String value) {
     return _secureStorage.write(key: key.name, value: value);
   }
 
-  Future<void> delete(StorageKeys key) {
+  Future<void> delete(SecureStorageKey key) {
     return _secureStorage.delete(key: key.name);
   }
 

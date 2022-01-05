@@ -21,28 +21,33 @@ class BottinoFortino extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return FutureBuilder(
-      future: ref.watch(memoryStorageProvider.notifier).init(),
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          return MaterialApp.router(
-            routerDelegate: _router.delegate(),
-            routeInformationProvider: _router.routeInfoProvider(),
-            routeInformationParser: _router.defaultRouteParser(),
-            localizationsDelegates: const [FormBuilderLocalizations.delegate],
-            theme: themeLight,
-            darkTheme: themeDark,
-            themeMode: ref.watch(settingsProvider).themeMode,
-          );
-        }
-
-        return Container(
-          color: Colors.white,
-          child: const Center(
-            child: CircularProgressIndicator(),
+    return Container(
+      child: ref.watch(initProvider).when(
+            data: (_) => MaterialApp.router(
+              routerDelegate: _router.delegate(),
+              routeInformationProvider: _router.routeInfoProvider(),
+              routeInformationParser: _router.defaultRouteParser(),
+              localizationsDelegates: const [FormBuilderLocalizations.delegate],
+              theme: themeLight,
+              darkTheme: themeDark,
+              themeMode: ref.watch(settingsProvider).themeMode,
+            ),
+            error: (error, st) => Container(
+              color: Colors.white,
+              child: Center(
+                child: Text(
+                  error.toString(),
+                  style: const TextStyle(color: Colors.red),
+                ),
+              ),
+            ),
+            loading: () => Container(
+              color: Colors.white,
+              child: const Center(
+                child: CircularProgressIndicator(),
+              ),
+            ),
           ),
-        );
-      },
     );
   }
 }

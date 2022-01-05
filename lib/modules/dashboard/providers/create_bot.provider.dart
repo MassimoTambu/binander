@@ -13,7 +13,7 @@ class CreateBotProvider extends StateNotifier<BotTypes> {
       BuildContext context,
       Map<String, FormBuilderFieldState<FormBuilderField<dynamic>, dynamic>>
           fields) {
-    final bot = ref.read(botProvider.notifier).createBot(fields);
+    final bot = ref.read(botProvider.notifier).createBotFromForm(fields);
 
     ref.read(snackBarProvider).show(context, 'Bot ${bot.name} created!');
   }

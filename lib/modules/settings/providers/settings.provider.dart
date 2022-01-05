@@ -15,7 +15,9 @@ class SettingsProvider extends StateNotifier<Settings> {
   void updateApiKey(String apiKey) {
     state = state.copyWith(apiKey: apiKey);
 
-    ref.read(memoryStorageProvider.notifier).write(StorageKeys.apiKey, apiKey);
+    ref
+        .read(memoryStorageProvider.notifier)
+        .write(SecureStorageKey.apiKey(), apiKey);
   }
 
   void updateApiSecret(String apiSecret) {
@@ -23,13 +25,15 @@ class SettingsProvider extends StateNotifier<Settings> {
 
     ref
         .read(memoryStorageProvider.notifier)
-        .write(StorageKeys.apiSecret, apiSecret);
+        .write(SecureStorageKey.apiSecret(), apiSecret);
   }
 
   void updateApiUrl(String apiUrl) {
     state = state.copyWith(apiUrl: apiUrl);
 
-    ref.read(memoryStorageProvider.notifier).write(StorageKeys.apiUrl, apiUrl);
+    ref
+        .read(memoryStorageProvider.notifier)
+        .write(SecureStorageKey.apiUrl(), apiUrl);
   }
 
   void updateThemeMode(ThemeMode themeMode) {
@@ -37,7 +41,7 @@ class SettingsProvider extends StateNotifier<Settings> {
 
     ref
         .read(memoryStorageProvider.notifier)
-        .write(StorageKeys.themeMode, themeMode.name);
+        .write(SecureStorageKey.themeMode(), themeMode.name);
   }
 
   void updateFromForm({
@@ -51,19 +55,24 @@ class SettingsProvider extends StateNotifier<Settings> {
       apiUrl: apiUrl,
     );
 
-    ref.read(memoryStorageProvider.notifier).write(StorageKeys.apiKey, apiKey);
+    ref
+        .read(memoryStorageProvider.notifier)
+        .write(SecureStorageKey.apiKey(), apiKey);
 
     ref
         .read(memoryStorageProvider.notifier)
-        .write(StorageKeys.apiSecret, apiSecret);
+        .write(SecureStorageKey.apiSecret(), apiSecret);
 
-    ref.read(memoryStorageProvider.notifier).write(StorageKeys.apiUrl, apiUrl);
+    ref
+        .read(memoryStorageProvider.notifier)
+        .write(SecureStorageKey.apiUrl(), apiUrl);
   }
 
   static Settings _init(Ref ref) {
     return Settings(
-      apiKey: ref.read(memoryStorageProvider)[StorageKeys.apiKey] ?? '',
-      apiSecret: ref.read(memoryStorageProvider)[StorageKeys.apiSecret] ?? '',
+      apiKey: ref.read(memoryStorageProvider)[SecureStorageKey.apiKey] ?? '',
+      apiSecret:
+          ref.read(memoryStorageProvider)[SecureStorageKey.apiSecret] ?? '',
       apiUrl: _setDefaultApiUrl(ref),
       themeMode: _setDefaultThemeMode(ref),
     );
@@ -72,22 +81,23 @@ class SettingsProvider extends StateNotifier<Settings> {
   static ThemeMode _setDefaultThemeMode(Ref ref) {
     return ThemeMode.values.firstWhere(
         (key) =>
-            key.name == ref.read(memoryStorageProvider)[StorageKeys.themeMode],
+            key.name ==
+            ref.read(memoryStorageProvider)[SecureStorageKey.themeMode],
         orElse: () {
       ref
           .read(memoryStorageProvider.notifier)
-          .write(StorageKeys.themeMode, defaultThemeMode.name);
+          .write(SecureStorageKey.themeMode(), defaultThemeMode.name);
       return defaultThemeMode;
     });
   }
 
   static String _setDefaultApiUrl(Ref ref) {
-    var apiUrl = ref.read(memoryStorageProvider)[StorageKeys.apiUrl];
+    var apiUrl = ref.read(memoryStorageProvider)[SecureStorageKey.apiUrl];
 
     if (apiUrl == null || apiUrl.isEmpty) {
       ref
           .read(memoryStorageProvider.notifier)
-          .write(StorageKeys.apiUrl, defaultApiUrl);
+          .write(SecureStorageKey.apiUrl(), defaultApiUrl);
 
       apiUrl = defaultApiUrl;
     }

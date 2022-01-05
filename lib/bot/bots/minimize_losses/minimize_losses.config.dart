@@ -2,13 +2,19 @@
 
 part of minimize_losses_bot;
 
+@JsonSerializable()
 class MinimizeLossesConfig implements Config {
   int? dailyLossSellOrders;
   double? maxInvestmentPerOrder;
   double? percentageSellOrder;
   Duration? timerBuyOrder;
 
-  MinimizeLossesConfig();
+  MinimizeLossesConfig({
+    this.dailyLossSellOrders,
+    this.maxInvestmentPerOrder,
+    this.percentageSellOrder,
+    this.timerBuyOrder,
+  });
 
   MinimizeLossesConfig.create({
     required int dailyLossSellOrders,
@@ -96,4 +102,9 @@ class MinimizeLossesConfig implements Config {
   static const String timerBuyOrderName = 'timer_buy_order_name';
   static const String timerBuyOrderPublicName = 'Buy order timer';
   static const String timerBuyOrderDescription = '';
+
+  factory MinimizeLossesConfig.fromJson(Map<String, dynamic> json) =>
+      _$MinimizeLossesConfigFromJson(json);
+
+  Map<String, dynamic> toJson() => _$MinimizeLossesConfigToJson(this);
 }

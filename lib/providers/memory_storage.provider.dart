@@ -12,14 +12,14 @@ class MemoryStorageProvider extends StateNotifier<Map<String, String>> {
 
   Future<bool> init() async {
     if (kDebugMode) {
-      print('init');
+      print('init memoryStorage');
     }
     state = await ref.watch(_secureStorageProvider).readAll();
 
     return true;
   }
 
-  String? read(StorageKeys key) {
+  String? read(SecureStorageKey key) {
     return state[key.name];
   }
 
@@ -27,12 +27,12 @@ class MemoryStorageProvider extends StateNotifier<Map<String, String>> {
     return state;
   }
 
-  void write(StorageKeys key, String value) {
+  void write(SecureStorageKey key, String value) {
     ref.watch(_secureStorageProvider).write(key, value);
     state[key.name] = value;
   }
 
-  String? delete(StorageKeys key) {
+  String? delete(SecureStorageKey key) {
     ref.watch(_secureStorageProvider).delete(key);
     return state.remove(key);
   }
