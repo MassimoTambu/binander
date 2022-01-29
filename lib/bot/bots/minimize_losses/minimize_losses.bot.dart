@@ -12,13 +12,15 @@ class MinimizeLossesBot implements Bot {
   late final MinimizeLossesConfig config;
   @override
   final String name;
+  @override
+  @JsonKey(ignore: true)
+  BotStatus status = BotStatus(BotPhases.offline, 'offline');
 
   @JsonKey(ignore: true)
   Ref? ref;
   @JsonKey(ignore: true)
   Timer? timer;
-  @JsonKey(ignore: true)
-  var botStatus = BotStatus(BotPhases.offline, 'offline');
+
   double? buyOrderPrice;
   double? lastOrderPrice;
   dynamic? cryptoInfo;
@@ -45,7 +47,7 @@ class MinimizeLossesBot implements Bot {
 
   @override
   void start(Ref ref) async {
-    botStatus = BotStatus(BotPhases.loading, 'loading');
+    status = BotStatus(BotPhases.loading, 'loading');
     this.ref = ref;
 
     if (timer != null) timer!.cancel();
@@ -62,7 +64,7 @@ class MinimizeLossesBot implements Bot {
       timer = Timer.periodic(const Duration(seconds: 10), _runBotPipeline);
     }
 
-    botStatus = BotStatus(BotPhases.loading, 'submitting order price');
+    status = BotStatus(BotPhases.loading, 'submitting order price');
 
     /// TODO create order price
   }
@@ -70,7 +72,7 @@ class MinimizeLossesBot implements Bot {
   @override
   void stop() async {
     timer?.cancel();
-    botStatus = BotStatus(BotPhases.offline, 'turned off');
+    status = BotStatus(BotPhases.offline, 'turned off');
 
     /// TODO notify
   }

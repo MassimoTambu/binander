@@ -25,9 +25,7 @@ class DashboardPage extends ConsumerWidget {
         itemCount: bots.length,
         itemBuilder: (context, index) {
           final bot = bots[index];
-          return ListTile(
-            title: Text(bot.name),
-          );
+          return BotTile(bot: bot);
         },
       ),
       floatingActionButton: FloatingActionButton(

@@ -7,7 +7,9 @@ abstract class Bot {
   final bool testNet;
   final Config config;
 
-  const Bot(
+  var status = BotStatus(BotPhases.offline, 'offline');
+
+  Bot(
     this.uuid,
     this.type, {
     required this.name,
@@ -15,11 +17,11 @@ abstract class Bot {
     required this.testNet,
   });
 
-  static String botNameName = "bot_name";
-  static String testNetName = "test_net";
-
   void start(Ref ref);
   void stop();
+
+  static String botNameName = "bot_name";
+  static String testNetName = "test_net";
 
   factory Bot.fromJson(Map<String, dynamic> json) {
     if (json['type']! == BotTypes.minimizeLosses.name) {
