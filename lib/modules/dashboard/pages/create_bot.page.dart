@@ -37,7 +37,7 @@ class CreateBotPage extends ConsumerWidget {
                 children: [
                   const SelectBotField(),
                   FormBuilderTextField(
-                    name: 'bot_name',
+                    name: Bot.botNameName,
                     decoration: const InputDecoration(
                       labelText: 'Name',
                       hintText: 'Bob',
@@ -45,6 +45,14 @@ class CreateBotPage extends ConsumerWidget {
                     validator: FormBuilderValidators.compose(
                       [FormBuilderValidators.required(context)],
                     ),
+                  ),
+                  FormBuilderSwitch(
+                    name: Bot.testNetName,
+                    title: Text(
+                      'Run on TestNet',
+                      style: Theme.of(context).textTheme.subtitle1,
+                    ),
+                    initialValue: true,
                   ),
                   const BotConfigContainer(),
                   TextButton(
