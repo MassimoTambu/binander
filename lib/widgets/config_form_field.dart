@@ -2,10 +2,12 @@ part of widgets;
 
 class ConfigFormField extends StatelessWidget {
   final ConfigField configField;
+  final bool enabled;
 
   const ConfigFormField({
     Key? key,
     required this.configField,
+    this.enabled = true,
   }) : super(key: key);
 
   @override
@@ -17,6 +19,7 @@ class ConfigFormField extends StatelessWidget {
           message: configField.description,
           child: Text(configField.publicName),
         ),
+        filled: !enabled,
       ),
       initialValue: configField.value ?? configField.defaultValue?.toString(),
       validator: FormBuilderValidators.compose(
@@ -25,6 +28,7 @@ class ConfigFormField extends StatelessWidget {
           configField.validators,
         ),
       ),
+      enabled: enabled,
     );
   }
 }
