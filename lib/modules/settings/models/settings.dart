@@ -1,28 +1,24 @@
 part of settings_module;
 
 class Settings {
-  final String apiKey;
-  final String apiSecret;
-  final String apiUrl;
+  final ApiConnection pubNetConnection;
+  final ApiConnection testNetConnection;
   final ThemeMode themeMode;
 
   const Settings({
-    required this.apiKey,
-    required this.apiSecret,
-    required this.apiUrl,
+    required this.pubNetConnection,
+    required this.testNetConnection,
     required this.themeMode,
   });
 
   Settings copyWith({
-    String? apiKey,
-    String? apiSecret,
-    String? apiUrl,
+    ApiConnection? pubNetConnection,
+    ApiConnection? testNetConnection,
     ThemeMode? themeMode,
   }) {
     return Settings(
-      apiKey: apiKey ?? this.apiKey,
-      apiSecret: apiSecret ?? this.apiSecret,
-      apiUrl: apiUrl ?? this.apiUrl,
+      pubNetConnection: pubNetConnection ?? this.pubNetConnection,
+      testNetConnection: testNetConnection ?? this.testNetConnection,
       themeMode: themeMode ?? this.themeMode,
     );
   }

@@ -37,16 +37,12 @@ part 'spot/trade/trade.dart';
 part 'spot/wallet/wallet.dart';
 
 final apiProvider = Provider<Api>((ref) {
-  final settings = ref.watch(settingsProvider);
   final spot = ref.watch(_spotProvider);
-  return Api(settings.apiKey, settings.apiSecret, settings.apiUrl, spot);
+  return Api(spot);
 });
 
 class Api {
-  final String apiKey;
-  final String apiSecret;
-  final String url;
   final Spot spot;
 
-  const Api(this.apiKey, this.apiSecret, this.url, this.spot);
+  const Api(this.spot);
 }

@@ -1,14 +1,11 @@
 part of providers;
 
 final fileStorageProvider = Provider<FileStorageProvider>((ref) {
-  return FileStorageProvider(ref);
+  return FileStorageProvider();
 });
 
 class FileStorageProvider {
-  final Ref _ref;
   Map<String, dynamic> data = {};
-
-  FileStorageProvider(this._ref);
 
   Future<bool> init() async {
     if (kDebugMode) {

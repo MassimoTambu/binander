@@ -5,7 +5,7 @@ class BinanceStatusIndicator extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final res = ref.watch(binanceStatusProvider);
+    final res = ref.watch(binancePubNetStatusProvider);
 
     return Container(
       child: res.when(
@@ -23,7 +23,7 @@ class BinanceStatusIndicator extends ConsumerWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               IconButton(
-                onPressed: () => ref.refresh(binanceStatusProvider),
+                onPressed: () => ref.refresh(binancePubNetStatusProvider),
                 icon: const Icon(Icons.refresh),
                 hoverColor: Colors.transparent,
               ),

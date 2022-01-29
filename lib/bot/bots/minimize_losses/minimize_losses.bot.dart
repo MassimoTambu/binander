@@ -7,6 +7,8 @@ class MinimizeLossesBot implements Bot {
   @override
   late final BotTypes type;
   @override
+  late final bool testNet;
+  @override
   late final MinimizeLossesConfig config;
   @override
   final String name;
@@ -21,10 +23,11 @@ class MinimizeLossesBot implements Bot {
   double? lastOrderPrice;
   dynamic? cryptoInfo;
 
-  MinimizeLossesBot(this.name, this.config);
+  MinimizeLossesBot(this.name, this.testNet, this.config);
 
   MinimizeLossesBot.create({
     required this.name,
+    required this.testNet,
     required int dailyLossSellOrders,
     required double maxInvestmentPerOrder,
     required double percentageSellOrder,

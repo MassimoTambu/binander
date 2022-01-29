@@ -8,33 +8,10 @@ final settingsProvider =
 class SettingsProvider extends StateNotifier<Settings> {
   final Ref ref;
   static const defaultThemeMode = ThemeMode.dark;
-  static const defaultApiUrl = 'https://api.binance.com';
+  static const pubNetUrl = 'https://api.binance.com';
+  static const testNetUrl = 'https://testnet.binance.vision';
 
   SettingsProvider(this.ref) : super(_init(ref));
-
-  void updateApiKey(String apiKey) {
-    state = state.copyWith(apiKey: apiKey);
-
-    ref
-        .read(memoryStorageProvider.notifier)
-        .write(SecureStorageKey.apiKey(), apiKey);
-  }
-
-  void updateApiSecret(String apiSecret) {
-    state = state.copyWith(apiSecret: apiSecret);
-
-    ref
-        .read(memoryStorageProvider.notifier)
-        .write(SecureStorageKey.apiSecret(), apiSecret);
-  }
-
-  void updateApiUrl(String apiUrl) {
-    state = state.copyWith(apiUrl: apiUrl);
-
-    ref
-        .read(memoryStorageProvider.notifier)
-        .write(SecureStorageKey.apiUrl(), apiUrl);
-  }
 
   void updateThemeMode(ThemeMode themeMode) {
     state = state.copyWith(themeMode: themeMode);
@@ -45,35 +22,59 @@ class SettingsProvider extends StateNotifier<Settings> {
   }
 
   void updateFromForm({
-    required String apiKey,
-    required String apiSecret,
-    required String apiUrl,
+    required String pubNetApiKey,
+    required String pubNetApiSecret,
+    required String? testNetApiKey,
+    required String? testNetApiSecret,
   }) {
     state = state.copyWith(
-      apiKey: apiKey,
-      apiSecret: apiSecret,
-      apiUrl: apiUrl,
+      pubNetConnection: ApiConnection(
+        url: pubNetUrl,
+        apiKey: pubNetApiKey,
+        apiSecret: pubNetApiSecret,
+      ),
+      testNetConnection: ApiConnection(
+        url: testNetUrl,
+        apiKey: testNetApiKey ?? '',
+        apiSecret: testNetApiSecret ?? '',
+      ),
     );
 
     ref
         .read(memoryStorageProvider.notifier)
-        .write(SecureStorageKey.apiKey(), apiKey);
+        .write(SecureStorageKey.pubNetApiKey(), pubNetApiKey);
 
     ref
         .read(memoryStorageProvider.notifier)
-        .write(SecureStorageKey.apiSecret(), apiSecret);
+        .write(SecureStorageKey.pubNetApiSecret(), pubNetApiSecret);
 
-    ref
-        .read(memoryStorageProvider.notifier)
-        .write(SecureStorageKey.apiUrl(), apiUrl);
+    if (testNetApiKey != null) {
+      ref
+          .read(memoryStorageProvider.notifier)
+          .write(SecureStorageKey.testNetApiKey(), testNetApiKey);
+    }
+
+    if (testNetApiSecret != null) {
+      ref
+          .read(memoryStorageProvider.notifier)
+          .write(SecureStorageKey.testNetApiSecret(), testNetApiSecret);
+    }
   }
 
   static Settings _init(Ref ref) {
+    final data = ref.read(memoryStorageProvider);
+
+    final pubNetConnection = ApiConnection(
+        url: pubNetUrl,
+        apiKey: data[SecureStorageKey.pubNetApiKey().name] ?? '',
+        apiSecret: data[SecureStorageKey.pubNetApiSecret().name] ?? '');
+    final testNetConnection = ApiConnection(
+        url: testNetUrl,
+        apiKey: data[SecureStorageKey.testNetApiKey().name] ?? '',
+        apiSecret: data[SecureStorageKey.testNetApiSecret().name] ?? '');
     return Settings(
-      apiKey: ref.read(memoryStorageProvider)[SecureStorageKey.apiKey] ?? '',
-      apiSecret:
-          ref.read(memoryStorageProvider)[SecureStorageKey.apiSecret] ?? '',
-      apiUrl: _setDefaultApiUrl(ref),
+      pubNetConnection: pubNetConnection,
+      testNetConnection: testNetConnection,
       themeMode: _setDefaultThemeMode(ref),
     );
   }
@@ -89,19 +90,5 @@ class SettingsProvider extends StateNotifier<Settings> {
           .write(SecureStorageKey.themeMode(), defaultThemeMode.name);
       return defaultThemeMode;
     });
-  }
-
-  static String _setDefaultApiUrl(Ref ref) {
-    var apiUrl = ref.read(memoryStorageProvider)[SecureStorageKey.apiUrl];
-
-    if (apiUrl == null || apiUrl.isEmpty) {
-      ref
-          .read(memoryStorageProvider.notifier)
-          .write(SecureStorageKey.apiUrl(), defaultApiUrl);
-
-      apiUrl = defaultApiUrl;
-    }
-
-    return apiUrl;
   }
 }

@@ -10,6 +10,7 @@ class ApiUtils {
   const ApiUtils(this.read);
 
   String createQueryWithSecurity(
+    String apiSecret,
     Map<String, String> query,
     API_SECURITY_TYPE securityType,
   ) {
@@ -18,7 +19,7 @@ class ApiUtils {
       case API_SECURITY_TYPE.margin:
       case API_SECURITY_TYPE.userData:
         _addTimestamp(query);
-        _addSignature(query);
+        _addSignature(apiSecret, query);
         break;
       // No security query needed for none, userStream and marketData types
       default:
@@ -28,9 +29,11 @@ class ApiUtils {
     return _mapToString(query);
   }
 
-  void addSecurityToHeader(Request request, API_SECURITY_TYPE securityType) {
-    final apiKey = read(settingsProvider).apiKey;
-
+  void addSecurityToHeader(
+    String apiKey,
+    Request request,
+    API_SECURITY_TYPE securityType,
+  ) {
     switch (securityType) {
       case API_SECURITY_TYPE.trade:
       case API_SECURITY_TYPE.margin:
@@ -58,17 +61,15 @@ class ApiUtils {
     query['timestamp'] = _generateTimeStamp().toString();
   }
 
-  void _addSignature(Map<String, String> query) {
-    query['signature'] = _generateSignature(query);
+  void _addSignature(String apiSecret, Map<String, String> query) {
+    query['signature'] = _generateSignature(apiSecret, query);
   }
 
   int _generateTimeStamp() {
     return DateTime.now().millisecondsSinceEpoch;
   }
 
-  String _generateSignature(Map<String, String> queryParams) {
-    final apiSecret = read(settingsProvider).apiSecret;
-
+  String _generateSignature(String apiSecret, Map<String, String> queryParams) {
     var queryString = "";
 
     queryParams.forEach((key, value) {

@@ -9,9 +9,11 @@ class BinanceApiSettingsPage extends ConsumerWidget {
     if (_formKey.currentState!.validate()) {
       final fields = _formKey.currentState!.fields;
       ref.read(settingsProvider.notifier).updateFromForm(
-            apiKey: fields[SettingsConfig.apiKeyName]!.value,
-            apiSecret: fields[SettingsConfig.apiSecretName]!.value,
-            apiUrl: fields[SettingsConfig.apiUrlName]!.value,
+            pubNetApiKey: fields[SettingsConfig.pubNetApiKeyName]!.value,
+            pubNetApiSecret: fields[SettingsConfig.pubNetApiSecretName]!.value,
+            testNetApiKey: fields[SettingsConfig.testNetApiKeyName]!.value,
+            testNetApiSecret:
+                fields[SettingsConfig.testNetApiSecretName]!.value,
           );
       context.router.navigateBack();
     }
@@ -60,20 +62,51 @@ class ConfigContainer extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final settings = ref.watch(settingsProvider);
     final settingsConfig = SettingsConfig.create(
-      apiKey: settings.apiKey,
-      apiSecret: settings.apiSecret,
-      apiUrl: settings.apiUrl,
+      pubNetConnection: settings.pubNetConnection,
+      testNetConnection: settings.testNetConnection,
     );
+
+    final pubNetConfigs = settingsConfig.configFields.entries
+        .where((c) => c.key.startsWith('pub_net'));
+    final testNetConfigs = settingsConfig.configFields.entries
+        .where((c) => c.key.startsWith('test_net'));
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 30),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          ...settingsConfig.configFields.entries
-              .map((e) => ConfigFormField(configField: e.value)),
+          ConfigGroup(
+              configFields: pubNetConfigs, title: 'Public Network Connection'),
+          const SizedBox(height: 40),
+          ConfigGroup(
+              configFields: testNetConfigs, title: 'Test Network Connection'),
         ],
       ),
+    );
+  }
+}
+
+class ConfigGroup extends StatelessWidget {
+  final Iterable<MapEntry<String, ConfigField>> configFields;
+  final String title;
+
+  const ConfigGroup({Key? key, required this.configFields, required this.title})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: Theme.of(context).textTheme.headline6,
+        ),
+        ...configFields.map((e) {
+          return ConfigFormField(configField: e.value);
+        }),
+      ],
     );
   }
 }

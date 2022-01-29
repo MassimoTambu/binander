@@ -1,6 +1,11 @@
 part of providers;
 
-final binanceStatusProvider =
+final binancePubNetStatusProvider =
     FutureProvider.autoDispose<ApiResponse>((ref) async {
-  return await ref.read(apiProvider).spot.wallet.getApiKeyPermission();
+  final pubConn = ref.watch(settingsProvider.select((p) => p.pubNetConnection));
+  return await ref
+      .read(apiProvider)
+      .spot
+      .wallet
+      .getPubNetApiKeyPermission(pubConn);
 });

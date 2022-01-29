@@ -9,15 +9,21 @@ class SecureStorageKey {
     return const SecureStorageKey('theme_mode');
   }
 
-  factory SecureStorageKey.apiUrl() {
-    return const SecureStorageKey('api_url');
+  // PUBNET
+  factory SecureStorageKey.pubNetApiKey() {
+    return const SecureStorageKey('pub_net_api_key');
   }
 
-  factory SecureStorageKey.apiKey() {
-    return const SecureStorageKey('api_key');
+  factory SecureStorageKey.pubNetApiSecret() {
+    return const SecureStorageKey('pub_net_api_secret');
   }
 
-  factory SecureStorageKey.apiSecret() {
-    return const SecureStorageKey('api_secret');
+  // TESTNET
+  factory SecureStorageKey.testNetApiKey() {
+    return const SecureStorageKey('test_net_api_key');
+  }
+
+  factory SecureStorageKey.testNetApiSecret() {
+    return const SecureStorageKey('test_net_api_secret');
   }
 }

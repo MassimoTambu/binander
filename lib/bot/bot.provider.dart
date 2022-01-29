@@ -24,7 +24,8 @@ class BotProvider extends StateNotifier<List<Bot>> {
     switch (fields['bot_type']!.value) {
       case BotTypes.minimizeLosses:
         bot = createMinimizeLossesBot(
-          name: fields['bot_name']!.value,
+          name: fields[Bot.botNameName]!.value,
+          testNet: fields[Bot.testNetName]!.value,
           dailyLossSellOrders: int.parse(
               fields[MinimizeLossesConfig.dailyLossSellOrdersName]!.value),
           maxInvestmentPerOrder: double.parse(
@@ -39,7 +40,8 @@ class BotProvider extends StateNotifier<List<Bot>> {
         break;
       default:
         bot = createMinimizeLossesBot(
-          name: fields['bot_name']!.value,
+          name: fields[Bot.botNameName]!.value,
+          testNet: fields[Bot.testNetName]!.value,
           dailyLossSellOrders: int.parse(
               fields[MinimizeLossesConfig.dailyLossSellOrdersName]!.value),
           maxInvestmentPerOrder: double.parse(
@@ -79,6 +81,7 @@ class BotProvider extends StateNotifier<List<Bot>> {
 
   MinimizeLossesBot createMinimizeLossesBot({
     required String name,
+    required bool testNet,
     required int dailyLossSellOrders,
     required double maxInvestmentPerOrder,
     required double percentageSellOrder,
@@ -86,6 +89,7 @@ class BotProvider extends StateNotifier<List<Bot>> {
   }) {
     final bot = MinimizeLossesBot.create(
       name: name,
+      testNet: testNet,
       dailyLossSellOrders: dailyLossSellOrders,
       maxInvestmentPerOrder: maxInvestmentPerOrder,
       percentageSellOrder: percentageSellOrder,

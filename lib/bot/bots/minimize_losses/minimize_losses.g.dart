@@ -30,6 +30,7 @@ Map<String, dynamic> _$MinimizeLossesConfigToJson(
 MinimizeLossesBot _$MinimizeLossesBotFromJson(Map<String, dynamic> json) =>
     MinimizeLossesBot(
       json['name'] as String,
+      json['testNet'] as bool,
       MinimizeLossesConfig.fromJson(json['config'] as Map<String, dynamic>),
     )
       ..uuid = json['uuid'] as String
@@ -42,6 +43,7 @@ Map<String, dynamic> _$MinimizeLossesBotToJson(MinimizeLossesBot instance) =>
     <String, dynamic>{
       'uuid': instance.uuid,
       'type': _$BotTypesEnumMap[instance.type],
+      'testNet': instance.testNet,
       'config': instance.config,
       'name': instance.name,
       'buyOrderPrice': instance.buyOrderPrice,

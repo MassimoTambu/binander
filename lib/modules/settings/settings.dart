@@ -16,3 +16,4 @@ part 'pages/binance_api_settings.page.dart';
 part 'providers/settings.provider.dart';
 part 'models/settings.dart';
 part 'models/settings.config.dart';
+part 'models/api_connection.dart';

@@ -3,30 +3,29 @@
 part of settings_module;
 
 class SettingsConfig implements Config {
-  String? apiKey;
-  String? apiSecret;
-  String? apiUrl;
-
-  SettingsConfig();
+  ApiConnection pubNetConnection;
+  ApiConnection testNetConnection;
 
   SettingsConfig.create({
-    required String apiKey,
-    required String apiSecret,
-    required String apiUrl,
+    required this.pubNetConnection,
+    required this.testNetConnection,
   }) {
-    this.apiKey = apiKey;
-    this.apiSecret = apiSecret;
-    this.apiUrl = apiUrl;
-    configFields[apiKeyName]!.value = apiKey;
-    configFields[apiSecretName]!.value = apiSecret;
-    configFields[apiUrlName]!.value = apiUrl;
+    // PubNet
+    configFields[pubNetApiKeyName]!.value = pubNetConnection.apiKey;
+    configFields[pubNetApiSecretName]!.value = pubNetConnection.apiSecret;
+    configFields[pubNetUrlName]!.value = pubNetConnection.url;
+    // TestNet
+    configFields[testNetApiKeyName]!.value = testNetConnection.apiKey;
+    configFields[testNetApiSecretName]!.value = testNetConnection.apiSecret;
+    configFields[testNetUrlName]!.value = testNetConnection.url;
   }
 
   @override
   final Map<String, ConfigField> configFields = {
-    apiKeyName: ConfigField(
-      name: apiKeyName,
-      publicName: apiKeyPublicName,
+    // PubNet
+    pubNetApiKeyName: ConfigField(
+      name: pubNetApiKeyName,
+      publicName: apiKeyPublicName + ' *',
       description: apiKeyDescription,
       value: null,
       configFieldTypes: ConfigFieldTypes.textField,
@@ -34,9 +33,9 @@ class SettingsConfig implements Config {
         ConfigFieldValidatorsTypes.required,
       ],
     ),
-    apiSecretName: ConfigField(
-      name: apiSecretName,
-      publicName: apiSecretPublicName,
+    pubNetApiSecretName: ConfigField(
+      name: pubNetApiSecretName,
+      publicName: apiSecretPublicName + ' *',
       description: apiSecretDescription,
       value: null,
       configFieldTypes: ConfigFieldTypes.textField,
@@ -44,9 +43,9 @@ class SettingsConfig implements Config {
         ConfigFieldValidatorsTypes.required,
       ],
     ),
-    apiUrlName: ConfigField(
-      name: apiUrlName,
-      publicName: apiUrlPublicName,
+    pubNetUrlName: ConfigField(
+      name: pubNetUrlName,
+      publicName: apiUrlPublicName + ' *',
       description: apiUrlDescription,
       value: null,
       configFieldTypes: ConfigFieldTypes.textField,
@@ -54,16 +53,44 @@ class SettingsConfig implements Config {
         ConfigFieldValidatorsTypes.required,
       ],
     ),
+    // TestNet
+    testNetApiKeyName: ConfigField(
+      name: testNetApiKeyName,
+      publicName: apiKeyPublicName,
+      description: apiKeyDescription,
+      value: null,
+      configFieldTypes: ConfigFieldTypes.textField,
+      validators: [],
+    ),
+    testNetApiSecretName: ConfigField(
+      name: testNetApiSecretName,
+      publicName: apiSecretPublicName,
+      description: apiSecretDescription,
+      value: null,
+      configFieldTypes: ConfigFieldTypes.textField,
+      validators: [],
+    ),
+    testNetUrlName: ConfigField(
+      name: testNetUrlName,
+      publicName: apiUrlPublicName,
+      description: apiUrlDescription,
+      value: null,
+      configFieldTypes: ConfigFieldTypes.textField,
+      validators: [],
+    ),
   };
 
   // Data
-  static const String apiKeyName = 'api_key';
+  static const String pubNetApiKeyName = 'pub_net_api_key';
+  static const String testNetApiKeyName = 'test_net_api_key';
   static const String apiKeyPublicName = 'Api key';
   static const String apiKeyDescription = '';
-  static const String apiSecretName = 'api_secret';
+  static const String pubNetApiSecretName = 'pub_net_api_secret';
+  static const String testNetApiSecretName = 'test_net_api_secret';
   static const String apiSecretPublicName = 'Api secret';
   static const String apiSecretDescription = '';
-  static const String apiUrlName = 'api_url';
-  static const String apiUrlPublicName = 'Api url';
+  static const String pubNetUrlName = 'pub_net_url';
+  static const String testNetUrlName = 'test_net_url';
+  static const String apiUrlPublicName = 'Url';
   static const String apiUrlDescription = '';
 }

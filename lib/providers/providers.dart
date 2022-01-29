@@ -6,6 +6,7 @@ import 'dart:io';
 import 'package:bottino_fortino/api/api.dart';
 import 'package:bottino_fortino/bot/bot.dart';
 import 'package:bottino_fortino/bot/bots/minimize_losses/minimize_losses.dart';
+import 'package:bottino_fortino/modules/settings/settings.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

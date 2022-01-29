@@ -10,17 +10,17 @@ class Wallet {
   const Wallet(this.read);
 
   /// Check Api status
-  Future<ApiResponse> getApiKeyPermission() async {
-    final url = read(settingsProvider).apiUrl;
+  Future<ApiResponse> getPubNetApiKeyPermission(ApiConnection conn) async {
     final apiUtils = read(_apiUtilsProvider);
 
-    final secureQuery =
-        apiUtils.createQueryWithSecurity({}, API_SECURITY_TYPE.userData);
+    final secureQuery = apiUtils.createQueryWithSecurity(
+        conn.apiSecret, {}, API_SECURITY_TYPE.userData);
 
-    final request = Request(
-        'GET', Uri.parse('$url/sapi/v1/account/apiRestrictions?$secureQuery'));
+    final request = Request('GET',
+        Uri.parse('${conn.url}/sapi/v1/account/apiRestrictions?$secureQuery'));
 
-    apiUtils.addSecurityToHeader(request, API_SECURITY_TYPE.userData);
+    apiUtils.addSecurityToHeader(
+        conn.apiKey, request, API_SECURITY_TYPE.userData);
 
     late final StreamedResponse response;
     try {
