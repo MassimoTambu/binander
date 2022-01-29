@@ -16,13 +16,28 @@ class SettingsPage extends ConsumerWidget {
       ),
       body: Column(
         children: [
+          Padding(
+            padding: const EdgeInsets.only(top: 10),
+            child: ListTile(
+              title: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  BinanceStatusIndicator(
+                    title: 'Public Network',
+                    futureProvider: binancePubNetStatusProvider,
+                  ),
+                  const SizedBox(width: 30),
+                  BinanceStatusIndicator(
+                    title: 'Test Network',
+                    futureProvider: binanceTestNetStatusProvider,
+                  ),
+                ],
+              ),
+            ),
+          ),
           ListTile(
             title: const Text('Binance Api'),
             subtitle: const Text('Change Binance Api settings'),
-            trailing: const Padding(
-              padding: EdgeInsets.only(right: 9),
-              child: BinanceStatusIndicator(),
-            ),
             onTap: () => _navigateToApiSettingsPage(context),
           ),
           SwitchListTile(

@@ -1,39 +1,46 @@
 part of widgets;
 
 class BinanceStatusIndicator extends ConsumerWidget {
-  const BinanceStatusIndicator({Key? key}) : super(key: key);
+  final String title;
+  final AutoDisposeFutureProvider<ApiResponse> futureProvider;
+
+  const BinanceStatusIndicator({
+    Key? key,
+    required this.title,
+    required this.futureProvider,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final res = ref.watch(binancePubNetStatusProvider);
+    final res = ref.watch(futureProvider);
 
-    return Container(
-      child: res.when(
-        data: (data) {
-          return const Icon(Icons.check_circle, color: Colors.green);
-        },
-        loading: () {
-          return const Padding(
-            padding: EdgeInsets.all(8.0),
-            child: CircularProgressIndicator(),
-          );
-        },
-        error: (error, stackTrace) {
-          return Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              IconButton(
-                onPressed: () => ref.refresh(binancePubNetStatusProvider),
-                icon: const Icon(Icons.refresh),
-                hoverColor: Colors.transparent,
-              ),
-              const Icon(
+    return InkWell(
+      onTap: () => ref.refresh(futureProvider),
+      child: Column(
+        children: [
+          Text(title),
+          const SizedBox(height: 5),
+          res.when(
+            data: (data) {
+              return const Icon(Icons.check_circle, color: Colors.green);
+            },
+            loading: () {
+              return const SizedBox(
+                child: CircularProgressIndicator(
+                  strokeWidth: 3,
+                ),
+                width: 24,
+                height: 24,
+              );
+            },
+            error: (error, stackTrace) {
+              return const Icon(
                 Icons.cancel,
                 color: Colors.red,
-              ),
-            ],
-          );
-        },
+              );
+            },
+          ),
+        ],
       ),
     );
   }

@@ -6,11 +6,11 @@ final _tradeProvider = Provider<Trade>((ref) {
 
 class Trade {
   final Ref ref;
+  late final ApiUtils apiUtils = ref.read(_apiUtilsProvider);
 
   Trade(this.ref);
 
   Future<String> getOrders(ApiConnection conn, String symbol) async {
-    late final ApiUtils apiUtils = ref.read(_apiUtilsProvider);
     final query = {'symbol': symbol};
     // 'symbol=$symbol&timestamp=$timestamp&signature=';
 
@@ -26,7 +26,10 @@ class Trade {
     StreamedResponse response = await request.send();
 
     if (response.statusCode != HttpStatus.ok) {
-      apiUtils.throwApiException('getOrders', response.reasonPhrase);
+      return Future.error(
+        {response.reasonPhrase},
+        StackTrace.fromString('getOrders'),
+      );
     }
 
     return await response.stream.bytesToString();
@@ -61,4 +64,30 @@ class Trade {
 //       return "";
 //     }
 //   }
+
+  Future<ApiResponse> getAccountInformation(ApiConnection conn) async {
+    final secureQuery = apiUtils.createQueryWithSecurity(
+        conn.apiSecret, {}, API_SECURITY_TYPE.userData);
+
+    final request =
+        Request('GET', Uri.parse('${conn.url}/api/v3/account?$secureQuery'));
+
+    apiUtils.addSecurityToHeader(
+        conn.apiKey, request, API_SECURITY_TYPE.userData);
+
+    StreamedResponse response = await request.send();
+
+    if (response.statusCode != HttpStatus.ok) {
+      return Future.error(
+        {response.reasonPhrase},
+        StackTrace.fromString('getAccountInformation'),
+      );
+    }
+
+    final body = await response.stream.bytesToString();
+
+    final res = ApiResponse(apiUtils._toJson(body), response.statusCode);
+
+    return res;
+  }
 }

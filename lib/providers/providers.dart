@@ -16,6 +16,7 @@ part 'secure_storage.provider.dart';
 part 'memory_storage.provider.dart';
 part 'models/secure_storage_key.dart';
 part 'snackbar.provider.dart';
-part 'binance_status.provider.dart';
+part 'binance_pub_net_status.provider.dart';
+part 'binance_test_net_status.provider.dart';
 part 'file_storage.provider.dart';
 part 'init.provider.dart';

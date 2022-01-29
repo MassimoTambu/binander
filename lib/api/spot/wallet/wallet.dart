@@ -33,8 +33,6 @@ class Wallet {
     }
 
     if (response.statusCode != HttpStatus.ok) {
-      // apiUtils.throwApiException('getApiKeyPermission', response.reasonPhrase);
-      // final res = ApiResponse('getApiKeyPermission', response.statusCode);
       return Future.error(
         {response.reasonPhrase},
         StackTrace.fromString('getApiKeyPermission'),
