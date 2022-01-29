@@ -41,7 +41,7 @@ class Wallet {
 
     final body = await response.stream.bytesToString();
 
-    final res = ApiResponse(apiUtils._toJson(body), response.statusCode);
+    final res = ApiResponse(jsonDecode(body), response.statusCode);
     return res;
   }
 }

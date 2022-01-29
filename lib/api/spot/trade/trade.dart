@@ -10,7 +10,8 @@ class Trade {
 
   Trade(this.ref);
 
-  Future<String> getOrders(ApiConnection conn, String symbol) async {
+  Future<ApiResponse<Order>> getOrders(
+      ApiConnection conn, String symbol) async {
     final query = {'symbol': symbol};
     // 'symbol=$symbol&timestamp=$timestamp&signature=';
 
@@ -18,7 +19,7 @@ class Trade {
         conn.apiSecret, query, API_SECURITY_TYPE.userData);
 
     final request =
-        Request('GET', Uri.parse('${conn.url}/allOrders?$secureQuery'));
+        Request('GET', Uri.parse('${conn.url}/api/v3/allOrders?$secureQuery'));
 
     apiUtils.addSecurityToHeader(
         conn.apiKey, request, API_SECURITY_TYPE.userData);
@@ -32,40 +33,60 @@ class Trade {
       );
     }
 
-    return await response.stream.bytesToString();
+    final body = await response.stream.bytesToString();
+
+    final res =
+        ApiResponse(Order.fromJson(jsonDecode(body)), response.statusCode);
+
+    return res;
   }
 
-//   Future<String> createOrder(
-//     String symbol,
-//     OrderSides side,
-//     OrderTypes type,
-//     double quantity,
-//     double price, {
-//     TimeInForce timeInForce = TimeInForce.GTC,
-//   }) async {
-//     final url = read(settingsProvider).apiUrl;
-// //     var headers = {
-// //   'Content-Type': 'application/json',
-// //   'X-MBX-APIKEY': 'api-key'
-// // };
-//     var request = http.Request(
-//         'POST',
-//         Uri.parse(
-//             'https://api.binance.com/api/v3/order?symbol=BTCUSDT&side=SELL&type=LIMIT&quantity=0.01&price=9000&timestamp=&signature='));
+  Future<ApiResponse<OrderNew>> createOrder(
+    ApiConnection conn,
+    String symbol,
+    OrderSides side,
+    OrderTypes type,
+    double quantity,
+    double price, {
+    TimeInForce timeInForce = TimeInForce.GTC,
+  }) async {
+    final query = {
+      'symbol': symbol,
+      'side': side.name,
+      'type': type.name,
+      'quantity': quantity.toString(),
+      'price': price.toString(),
+      'timeInForce': timeInForce.name,
+    };
 
-//     request.headers.addAll(headers);
+    final secureQuery = apiUtils.createQueryWithSecurity(
+        conn.apiSecret, query, API_SECURITY_TYPE.userData);
 
-//     http.StreamedResponse response = await request.send();
+    final request =
+        Request('POST', Uri.parse('${conn.url}/api/v3/order?$secureQuery'));
 
-//     if (response.statusCode == 200) {
-//       print(await response.stream.bytesToString());
-//     } else {
-//       print(response.reasonPhrase);
-//       return "";
-//     }
-//   }
+    apiUtils.addSecurityToHeader(
+        conn.apiKey, request, API_SECURITY_TYPE.userData);
 
-  Future<ApiResponse> getAccountInformation(ApiConnection conn) async {
+    StreamedResponse response = await request.send();
+
+    if (response.statusCode != HttpStatus.ok) {
+      return Future.error(
+        {response.reasonPhrase},
+        StackTrace.fromString('createOrder'),
+      );
+    }
+
+    final body = await response.stream.bytesToString();
+
+    final res =
+        ApiResponse(OrderNew.fromJson(jsonDecode(body)), response.statusCode);
+
+    return res;
+  }
+
+  Future<ApiResponse<AccountInformation>> getAccountInformation(
+      ApiConnection conn) async {
     final secureQuery = apiUtils.createQueryWithSecurity(
         conn.apiSecret, {}, API_SECURITY_TYPE.userData);
 
@@ -75,7 +96,7 @@ class Trade {
     apiUtils.addSecurityToHeader(
         conn.apiKey, request, API_SECURITY_TYPE.userData);
 
-    StreamedResponse response = await request.send();
+    final response = await request.send();
 
     if (response.statusCode != HttpStatus.ok) {
       return Future.error(
@@ -86,7 +107,8 @@ class Trade {
 
     final body = await response.stream.bytesToString();
 
-    final res = ApiResponse(apiUtils._toJson(body), response.statusCode);
+    final res = ApiResponse(
+        AccountInformation.fromJson(jsonDecode(body)), response.statusCode);
 
     return res;
   }

@@ -6,6 +6,52 @@ part of api;
 // JsonSerializableGenerator
 // **************************************************************************
 
+AccountInformation _$AccountInformationFromJson(Map<String, dynamic> json) =>
+    AccountInformation(
+      json['makerCommission'] as int,
+      json['takerCommission'] as int,
+      json['buyerCommission'] as int,
+      json['sellerCommission'] as int,
+      json['canTrade'] as bool,
+      json['canWithdraw'] as bool,
+      json['canDeposit'] as bool,
+      ParseUtils.unixToDateTime(json['updateTime'] as int),
+      json['accountType'] as String,
+      (json['balances'] as List<dynamic>)
+          .map((e) => AccountBalance.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      (json['permissions'] as List<dynamic>).map((e) => e as String).toList(),
+    );
+
+Map<String, dynamic> _$AccountInformationToJson(AccountInformation instance) =>
+    <String, dynamic>{
+      'makerCommission': instance.makerCommission,
+      'takerCommission': instance.takerCommission,
+      'buyerCommission': instance.buyerCommission,
+      'sellerCommission': instance.sellerCommission,
+      'canTrade': instance.canTrade,
+      'canWithdraw': instance.canWithdraw,
+      'canDeposit': instance.canDeposit,
+      'updateTime': instance.updateTime.toIso8601String(),
+      'accountType': instance.accountType,
+      'balances': instance.balances,
+      'permissions': instance.permissions,
+    };
+
+AccountBalance _$AccountBalanceFromJson(Map<String, dynamic> json) =>
+    AccountBalance(
+      json['asset'] as String,
+      ParseUtils.stringToDouble(json['free'] as String),
+      ParseUtils.stringToDouble(json['locked'] as String),
+    );
+
+Map<String, dynamic> _$AccountBalanceToJson(AccountBalance instance) =>
+    <String, dynamic>{
+      'asset': instance.asset,
+      'free': instance.free,
+      'locked': instance.locked,
+    };
+
 Order _$OrderFromJson(Map<String, dynamic> json) => Order(
       json['symbol'] as String,
       json['orderId'] as int,
@@ -21,8 +67,8 @@ Order _$OrderFromJson(Map<String, dynamic> json) => Order(
       $enumDecode(_$OrderSidesEnumMap, json['side']),
       (json['stopPrice'] as num).toDouble(),
       (json['icebergQty'] as num).toDouble(),
-      json['time'] as int,
-      json['updateTime'] as int,
+      ParseUtils.unixToDateTime(json['time'] as int),
+      ParseUtils.unixToDateTime(json['updateTime'] as int),
       json['isWorking'] as bool,
       (json['origQuoteOrderQty'] as num).toDouble(),
     );
@@ -42,8 +88,8 @@ Map<String, dynamic> _$OrderToJson(Order instance) => <String, dynamic>{
       'side': _$OrderSidesEnumMap[instance.side],
       'stopPrice': instance.stopPrice,
       'icebergQty': instance.icebergQty,
-      'time': instance.time,
-      'updateTime': instance.updateTime,
+      'time': instance.time.toIso8601String(),
+      'updateTime': instance.updateTime.toIso8601String(),
       'isWorking': instance.isWorking,
       'origQuoteOrderQty': instance.origQuoteOrderQty,
     };
@@ -84,11 +130,11 @@ OrderNew _$OrderNewFromJson(Map<String, dynamic> json) => OrderNew(
       json['orderId'] as int,
       json['orderListId'] as int,
       json['clientOrderId'] as String,
-      json['transactTime'] as int,
-      (json['price'] as num).toDouble(),
-      (json['origQty'] as num).toDouble(),
-      (json['executedQty'] as num).toDouble(),
-      (json['cummulativeQuoteQty'] as num).toDouble(),
+      ParseUtils.unixToDateTime(json['transactTime'] as int),
+      ParseUtils.stringToDouble(json['price'] as String),
+      ParseUtils.stringToDouble(json['origQty'] as String),
+      ParseUtils.stringToDouble(json['executedQty'] as String),
+      ParseUtils.stringToDouble(json['cummulativeQuoteQty'] as String),
       $enumDecode(_$OrderStatusEnumMap, json['status']),
       $enumDecode(_$TimeInForceEnumMap, json['timeInForce']),
       $enumDecode(_$OrderTypesEnumMap, json['type']),
@@ -103,7 +149,7 @@ Map<String, dynamic> _$OrderNewToJson(OrderNew instance) => <String, dynamic>{
       'orderId': instance.orderId,
       'orderListId': instance.orderListId,
       'clientOrderId': instance.clientOrderId,
-      'transactTime': instance.transactTime,
+      'transactTime': instance.transactTime.toIso8601String(),
       'price': instance.price,
       'origQty': instance.origQty,
       'executedQty': instance.executedQty,
@@ -116,9 +162,9 @@ Map<String, dynamic> _$OrderNewToJson(OrderNew instance) => <String, dynamic>{
     };
 
 Fill _$FillFromJson(Map<String, dynamic> json) => Fill(
-      (json['price'] as num).toDouble(),
-      (json['qty'] as num).toDouble(),
-      (json['commission'] as num).toDouble(),
+      ParseUtils.stringToDouble(json['price'] as String),
+      ParseUtils.stringToDouble(json['qty'] as String),
+      ParseUtils.stringToDouble(json['commission'] as String),
       json['commissionAsset'] as String,
       json['tradeId'] as int,
     );

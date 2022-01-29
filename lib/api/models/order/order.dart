@@ -16,8 +16,10 @@ class Order {
   final OrderSides side;
   final double stopPrice;
   final double icebergQty;
-  final int time;
-  final int updateTime;
+  @JsonKey(fromJson: ParseUtils.unixToDateTime)
+  final DateTime time;
+  @JsonKey(fromJson: ParseUtils.unixToDateTime)
+  final DateTime updateTime;
   final bool isWorking;
   final double origQuoteOrderQty;
 
@@ -41,4 +43,8 @@ class Order {
     this.isWorking,
     this.origQuoteOrderQty,
   );
+
+  factory Order.fromJson(Map<String, dynamic> json) => _$OrderFromJson(json);
+
+  Map<String, dynamic> toJson() => _$OrderToJson(this);
 }

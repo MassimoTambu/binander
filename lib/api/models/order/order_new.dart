@@ -6,10 +6,15 @@ class OrderNew {
   final int orderId;
   final int orderListId;
   final String clientOrderId;
-  final int transactTime;
+  @JsonKey(fromJson: ParseUtils.unixToDateTime)
+  final DateTime transactTime;
+  @JsonKey(fromJson: ParseUtils.stringToDouble)
   final double price;
+  @JsonKey(fromJson: ParseUtils.stringToDouble)
   final double origQty;
+  @JsonKey(fromJson: ParseUtils.stringToDouble)
   final double executedQty;
+  @JsonKey(fromJson: ParseUtils.stringToDouble)
   final double cummulativeQuoteQty;
   final OrderStatus status;
   final TimeInForce timeInForce;
@@ -42,8 +47,11 @@ class OrderNew {
 
 @JsonSerializable()
 class Fill {
+  @JsonKey(fromJson: ParseUtils.stringToDouble)
   final double price;
+  @JsonKey(fromJson: ParseUtils.stringToDouble)
   final double qty;
+  @JsonKey(fromJson: ParseUtils.stringToDouble)
   final double commission;
   final String commissionAsset;
   final int tradeId;
