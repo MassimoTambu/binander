@@ -15,6 +15,8 @@ class ConfigFieldUtils {
           return FormBuilderValidators.numeric(context);
         case ConfigFieldValidatorsTypes.positiveNumbers:
           return FormBuilderValidators.min(context, 0);
+        case ConfigFieldValidatorsTypes.min1:
+          return FormBuilderValidators.min(context, 1);
         default:
       }
       throw Exception(

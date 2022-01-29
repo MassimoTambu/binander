@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'models/interfaces/bot.interface.dart';
-part 'models/interfaces/strategy.interface.dart';
 part 'models/bot_types.enum.dart';
+part 'models/bot_phases.enum.dart';
+part 'models/bot_status.dart';
 part 'bot.provider.dart';

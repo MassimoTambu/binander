@@ -71,6 +71,7 @@ class MinimizeLossesConfig implements Config {
         ConfigFieldValidatorsTypes.required,
         ConfigFieldValidatorsTypes.double,
         ConfigFieldValidatorsTypes.positiveNumbers,
+        ConfigFieldValidatorsTypes.min1,
       ],
     ),
     timerBuyOrderName: ConfigField(

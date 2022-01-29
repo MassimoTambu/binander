@@ -5,4 +5,5 @@ enum ConfigFieldValidatorsTypes {
   int,
   double,
   positiveNumbers,
+  min1,
 }

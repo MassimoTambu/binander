@@ -8,7 +8,7 @@ abstract class Bot {
 
   const Bot(this.uuid, this.type, {required this.name, required this.config});
 
-  void start();
+  void start(Ref ref);
   void stop();
 
   factory Bot.fromJson(Map<String, dynamic> json) {

@@ -31,4 +31,8 @@ class Trade {
 
     return await response.stream.bytesToString();
   }
+
+  Future<String> createOrder(String symbol) async {
+    return "";
+  }
 }
