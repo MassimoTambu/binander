@@ -34,7 +34,7 @@ class DashboardPage extends ConsumerWidget {
         backgroundColor: Theme.of(context).colorScheme.primary,
         foregroundColor: Theme.of(context).colorScheme.onPrimary,
       ),
-      persistentFooterButtons: const [],
+      persistentFooterButtons: const [Text("v 0.6.9 - Dio 🐷")],
     );
   }
 }

@@ -23,10 +23,6 @@ class _$AppRouter extends RootStackRouter {
       return MaterialPageX<dynamic>(
           routeData: routeData, child: const SettingsPage());
     },
-    InfoRoute.name: (routeData) {
-      return MaterialPageX<dynamic>(
-          routeData: routeData, child: const InfoPage());
-    },
     CreateBotRoute.name: (routeData) {
       final args = routeData.argsAs<CreateBotRouteArgs>(
           orElse: () => const CreateBotRouteArgs());
@@ -45,7 +41,6 @@ class _$AppRouter extends RootStackRouter {
   List<RouteConfig> get routes => [
         RouteConfig(DashboardRoute.name, path: '/'),
         RouteConfig(SettingsRoute.name, path: '/settings-page'),
-        RouteConfig(InfoRoute.name, path: '/info-page'),
         RouteConfig(CreateBotRoute.name, path: '/create-bot-page'),
         RouteConfig(BinanceApiSettingsRoute.name,
             path: '/binance-api-settings-page')
@@ -66,14 +61,6 @@ class SettingsRoute extends PageRouteInfo<void> {
   const SettingsRoute() : super(SettingsRoute.name, path: '/settings-page');
 
   static const String name = 'SettingsRoute';
-}
-
-/// generated route for
-/// [InfoPage]
-class InfoRoute extends PageRouteInfo<void> {
-  const InfoRoute() : super(InfoRoute.name, path: '/info-page');
-
-  static const String name = 'InfoRoute';
 }
 
 /// generated route for

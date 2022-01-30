@@ -50,13 +50,6 @@ class SettingsPage extends ConsumerWidget {
                   .updateThemeMode(value ? ThemeMode.dark : ThemeMode.light);
             },
           ),
-          ListTile(
-            title: const Text('Info'),
-            subtitle: const Text('Show app info'),
-            onTap: () {
-              context.router.push(const InfoRoute());
-            },
-          ),
         ],
       ),
     );

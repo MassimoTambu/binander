@@ -11,7 +11,6 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 part 'pages/settings.page.dart';
-part 'pages/info.page.dart';
 part 'pages/binance_api_settings.page.dart';
 part 'providers/settings.provider.dart';
 part 'models/settings.dart';
