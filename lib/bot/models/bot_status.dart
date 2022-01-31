@@ -1,8 +1,8 @@
 part of bot;
 
 class BotStatus {
-  BotPhases botPhase;
+  BotPhases phase;
   String reason;
 
-  BotStatus(this.botPhase, this.reason);
+  BotStatus(this.phase, this.reason);
 }

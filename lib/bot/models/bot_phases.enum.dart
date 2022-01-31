@@ -1,3 +1,11 @@
 part of bot;
 
-enum BotPhases { offline, error, loading, online }
+enum BotPhases {
+  offline,
+  error,
+  starting,
+  submittingBuyOrder,
+  waitingBuyOrderToComplete,
+  stopping,
+  online,
+}

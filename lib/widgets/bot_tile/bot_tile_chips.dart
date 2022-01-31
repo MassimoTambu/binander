@@ -1,20 +1,21 @@
 part of widgets;
 
-class BotTileChips extends StatelessWidget {
-  final bool testNet;
-  final BotStatus botStatus;
+class BotTileChips extends ConsumerWidget {
+  final String uuid;
 
   const BotTileChips({
     Key? key,
-    required this.testNet,
-    required this.botStatus,
+    required this.uuid,
   }) : super(key: key);
 
-  Color getBotPhaseColor() {
-    switch (botStatus.botPhase) {
+  Color getBotPhaseColor(BotStatus botStatus) {
+    switch (botStatus.phase) {
       case BotPhases.offline:
         return Colors.grey;
-      case BotPhases.loading:
+      case BotPhases.starting:
+      case BotPhases.stopping:
+      case BotPhases.submittingBuyOrder:
+      case BotPhases.waitingBuyOrderToComplete:
         return Colors.orange;
       case BotPhases.error:
         return Colors.red;
@@ -25,12 +26,12 @@ class BotTileChips extends StatelessWidget {
     }
   }
 
-  String capitalize(String text) {
-    return text[0].toUpperCase() + text.substring(1);
-  }
-
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final botStatus = ref.watch(
+        botProvider.select((p) => p.firstWhere((b) => b.uuid == uuid).status));
+    final testNet = ref.watch(
+        botProvider.select((p) => p.firstWhere((b) => b.uuid == uuid).testNet));
     return Wrap(
       spacing: 8,
       runSpacing: 5,
@@ -41,12 +42,12 @@ class BotTileChips extends StatelessWidget {
             backgroundColor: Colors.black,
             radius: 8,
             child: CircleAvatar(
-              backgroundColor: getBotPhaseColor(),
+              backgroundColor: getBotPhaseColor(botStatus),
               radius: 5.4,
             ),
           ),
           label: Text(
-            capitalize(botStatus.botPhase.name),
+            botStatus.phase.name.capitalizeFirst(),
             style: const TextStyle(
               height: 1.1,
               fontWeight: FontWeight.bold,

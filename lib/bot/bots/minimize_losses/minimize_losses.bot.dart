@@ -17,7 +17,7 @@ class MinimizeLossesBot implements Bot {
   BotStatus status = BotStatus(BotPhases.offline, 'offline');
 
   @JsonKey(ignore: true)
-  Ref? ref;
+  WidgetRef? ref;
   @JsonKey(ignore: true)
   Timer? timer;
 
@@ -46,9 +46,11 @@ class MinimizeLossesBot implements Bot {
   }
 
   @override
-  void start(Ref ref) async {
-    status = BotStatus(BotPhases.loading, 'loading');
+  void start(WidgetRef ref) async {
     this.ref = ref;
+
+    status = BotStatus(BotPhases.starting, 'starting');
+    ref.read(botProvider.notifier).updateBotStatus(uuid, status);
 
     if (timer != null) timer!.cancel();
 
@@ -64,15 +66,27 @@ class MinimizeLossesBot implements Bot {
       timer = Timer.periodic(const Duration(seconds: 10), _runBotPipeline);
     }
 
-    status = BotStatus(BotPhases.loading, 'submitting order price');
+    print("starting");
+
+    await Future.delayed(const Duration(seconds: 4));
+    print("submitting order price");
+
+    status = BotStatus(BotPhases.submittingBuyOrder, 'submitting order price');
+    ref.read(botProvider.notifier).updateBotStatus(uuid, status);
 
     /// TODO create order price
   }
 
   @override
-  void stop() async {
+  void stop(WidgetRef ref) async {
     timer?.cancel();
+
+    status = BotStatus(BotPhases.stopping, 'stopping');
+    ref.read(botProvider.notifier).updateBotStatus(uuid, status);
+
+    await Future.delayed(const Duration(seconds: 4));
     status = BotStatus(BotPhases.offline, 'turned off');
+    ref.read(botProvider.notifier).updateBotStatus(uuid, status);
 
     /// TODO notify
   }

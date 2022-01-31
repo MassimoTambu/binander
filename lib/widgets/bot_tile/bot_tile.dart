@@ -18,9 +18,14 @@ class BotTile extends StatelessWidget {
             bot.name,
             style: Theme.of(context).textTheme.headline5,
           ),
-          BotTileChips(testNet: bot.testNet, botStatus: bot.status)
+          BotTileChips(uuid: bot.uuid)
         ],
       ),
+      childrenPadding: const EdgeInsets.all(10),
+      children: [
+        const BotTileDetails(),
+        BotTileButton(uuid: bot.uuid),
+      ],
     );
   }
 }

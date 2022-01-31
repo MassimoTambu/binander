@@ -17,6 +17,11 @@ class BotProvider extends StateNotifier<List<Bot>> {
     _loadBotsFromFile(_ref.watch(fileStorageProvider).data);
   }
 
+  void updateBotStatus(String uuid, BotStatus status) {
+    state.firstWhere((b) => b.uuid == uuid).status = status;
+    state = [...state];
+  }
+
   Bot createBotFromForm(
       Map<String, FormBuilderFieldState<FormBuilderField<dynamic>, dynamic>>
           fields) {
