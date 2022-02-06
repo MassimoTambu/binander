@@ -9,7 +9,8 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 
-part 'config_form_field.dart';
+part 'config_field_builder.dart';
+part 'select_field_builder.dart';
 part 'binance_status.dart';
 part 'bot_tile/bot_tile.dart';
 part 'bot_tile/bot_tile_button.dart';

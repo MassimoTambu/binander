@@ -33,6 +33,7 @@ class MinimizeLossesBot implements Bot {
   MinimizeLossesBot.create({
     required this.name,
     required this.testNet,
+    required String symbol,
     required int dailyLossSellOrders,
     required double maxInvestmentPerOrder,
     required double percentageSellOrder,
@@ -41,6 +42,7 @@ class MinimizeLossesBot implements Bot {
     uuid = const Uuid().v4();
     type = BotTypes.minimizeLosses;
     config = MinimizeLossesConfig.create(
+      symbol: symbol,
       dailyLossSellOrders: dailyLossSellOrders,
       maxInvestmentPerOrder: maxInvestmentPerOrder,
       percentageSellOrder: percentageSellOrder,

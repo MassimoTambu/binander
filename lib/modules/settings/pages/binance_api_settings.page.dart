@@ -106,9 +106,11 @@ class ConfigGroup extends StatelessWidget {
         ...configFields.map((e) {
           if (e.key == SettingsConfig.pubNetUrlName ||
               e.key == SettingsConfig.testNetUrlName) {
-            return ConfigFormField(configField: e.value, enabled: false);
+            return ConfigFieldBuilder(configField: e.value, enabled: false);
+          } else if (e.value is SelectField) {
+            return SelectFieldBuilder(configField: e.value as SelectField);
           }
-          return ConfigFormField(configField: e.value);
+          return ConfigFieldBuilder(configField: e.value);
         }),
       ],
     );

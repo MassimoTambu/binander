@@ -1,10 +1,10 @@
 part of widgets;
 
-class ConfigFormField extends StatelessWidget {
-  final ConfigField configField;
+class SelectFieldBuilder extends StatelessWidget {
+  final SelectField configField;
   final bool enabled;
 
-  const ConfigFormField({
+  const SelectFieldBuilder({
     Key? key,
     required this.configField,
     this.enabled = true,
@@ -12,7 +12,7 @@ class ConfigFormField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FormBuilderTextField(
+    return FormBuilderDropdown(
       name: configField.name,
       decoration: InputDecoration(
         label: Tooltip(
@@ -22,6 +22,14 @@ class ConfigFormField extends StatelessWidget {
         filled: !enabled,
       ),
       initialValue: configField.value ?? configField.defaultValue?.toString(),
+      items: configField.items
+          .map(
+            (c) => DropdownMenuItem<String>(
+              child: Text(c),
+              value: c,
+            ),
+          )
+          .toList(),
       validator: FormBuilderValidators.compose(
         ConfigFieldUtils.toFormBuilderValidators(
           context,

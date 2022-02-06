@@ -7,12 +7,14 @@ class MinimizeLossesConfig implements Config {
   int? dailyLossSellOrders;
   double? maxInvestmentPerOrder;
   double? percentageSellOrder;
+  String? symbol;
   Duration? timerBuyOrder;
 
   MinimizeLossesConfig({
     this.dailyLossSellOrders,
     this.maxInvestmentPerOrder,
     this.percentageSellOrder,
+    this.symbol,
     this.timerBuyOrder,
   });
 
@@ -20,11 +22,13 @@ class MinimizeLossesConfig implements Config {
     required int dailyLossSellOrders,
     required double maxInvestmentPerOrder,
     required double percentageSellOrder,
+    required String symbol,
     required Duration timerBuyOrder,
   }) {
     this.dailyLossSellOrders = dailyLossSellOrders;
     this.maxInvestmentPerOrder = maxInvestmentPerOrder;
     this.percentageSellOrder = percentageSellOrder;
+    this.symbol = symbol;
     this.timerBuyOrder = timerBuyOrder;
     configFields[dailyLossSellOrdersName]!.value =
         dailyLossSellOrders.toString();
@@ -32,6 +36,7 @@ class MinimizeLossesConfig implements Config {
         maxInvestmentPerOrder.toString();
     configFields[percentageSellOrderName]!.value =
         percentageSellOrder.toString();
+    configFields[symbolName]!.value = symbol.toString();
     configFields[timerBuyOrderName]!.value = timerBuyOrder.inMinutes.toString();
   }
 
@@ -74,6 +79,17 @@ class MinimizeLossesConfig implements Config {
         ConfigFieldValidatorsTypes.min1,
       ],
     ),
+    symbolName: SelectField(
+      name: symbolName,
+      publicName: symbolPublicName,
+      description: symbolDescription,
+      value: null,
+      items: symbols,
+      configFieldTypes: ConfigFieldTypes.selectField,
+      validators: [
+        ConfigFieldValidatorsTypes.required,
+      ],
+    ),
     timerBuyOrderName: ConfigField(
       name: timerBuyOrderName,
       publicName: timerBuyOrderPublicName,
@@ -100,6 +116,10 @@ class MinimizeLossesConfig implements Config {
   static const String percentageSellOrderName = 'percentage_sell_order';
   static const String percentageSellOrderPublicName = 'Sell order %';
   static const String percentageSellOrderDescription = '';
+  static const String symbolName = 'symbol';
+  static const String symbolPublicName = 'Crypto pair';
+  static const String symbolDescription =
+      "The crypto on the left will be used to buy the right one. NOTE: for TestNet use 'BTC-USDT' and 'BNB-USDT'";
   static const String timerBuyOrderName = 'timer_buy_order_name';
   static const String timerBuyOrderPublicName = 'Buy order timer';
   static const String timerBuyOrderDescription = '';

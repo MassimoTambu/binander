@@ -13,6 +13,7 @@ MinimizeLossesConfig _$MinimizeLossesConfigFromJson(
       maxInvestmentPerOrder:
           (json['maxInvestmentPerOrder'] as num?)?.toDouble(),
       percentageSellOrder: (json['percentageSellOrder'] as num?)?.toDouble(),
+      symbol: json['symbol'] as String?,
       timerBuyOrder: json['timerBuyOrder'] == null
           ? null
           : Duration(microseconds: json['timerBuyOrder'] as int),
@@ -24,6 +25,7 @@ Map<String, dynamic> _$MinimizeLossesConfigToJson(
       'dailyLossSellOrders': instance.dailyLossSellOrders,
       'maxInvestmentPerOrder': instance.maxInvestmentPerOrder,
       'percentageSellOrder': instance.percentageSellOrder,
+      'symbol': instance.symbol,
       'timerBuyOrder': instance.timerBuyOrder?.inMicroseconds,
     };
 

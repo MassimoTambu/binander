@@ -117,8 +117,12 @@ class BotConfigContainer extends ConsumerWidget {
             style: TextStyle(
                 fontSize: Theme.of(context).textTheme.subtitle1?.fontSize),
           ),
-          ...configFields.entries
-              .map((e) => ConfigFormField(configField: e.value)),
+          ...configFields.entries.map((e) {
+            if (e.value is SelectField) {
+              return SelectFieldBuilder(configField: e.value as SelectField);
+            }
+            return ConfigFieldBuilder(configField: e.value);
+          }),
         ],
       ),
     );
