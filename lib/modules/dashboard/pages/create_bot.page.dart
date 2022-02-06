@@ -52,6 +52,8 @@ class CreateBotPage extends ConsumerWidget {
                       'Run on TestNet',
                       style: Theme.of(context).textTheme.subtitle1,
                     ),
+                    subtitle: const Text(
+                        'Binance removes orders every start of month'),
                     initialValue: true,
                   ),
                   const BotConfigContainer(),

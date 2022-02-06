@@ -14,8 +14,6 @@ class BotTileChips extends ConsumerWidget {
         return Colors.grey;
       case BotPhases.starting:
       case BotPhases.stopping:
-      case BotPhases.submittingBuyOrder:
-      case BotPhases.waitingBuyOrderToComplete:
         return Colors.orange;
       case BotPhases.error:
         return Colors.red;

@@ -2,6 +2,7 @@ library minimize_losses_bot;
 
 import 'dart:async';
 
+import 'package:bottino_fortino/api/api.dart';
 import 'package:bottino_fortino/bot/bot.dart';
 import 'package:bottino_fortino/models/models.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

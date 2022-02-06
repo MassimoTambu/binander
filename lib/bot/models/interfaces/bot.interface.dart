@@ -18,7 +18,8 @@ abstract class Bot {
   });
 
   void start(WidgetRef ref);
-  void stop(WidgetRef ref);
+  void stop(WidgetRef ref, {String reason = ''});
+  void remove(WidgetRef ref);
 
   static String botNameName = "bot_name";
   static String testNetName = "test_net";

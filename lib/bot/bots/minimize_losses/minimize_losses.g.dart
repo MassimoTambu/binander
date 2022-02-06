@@ -36,7 +36,10 @@ MinimizeLossesBot _$MinimizeLossesBotFromJson(Map<String, dynamic> json) =>
       ..uuid = json['uuid'] as String
       ..type = $enumDecode(_$BotTypesEnumMap, json['type'])
       ..buyOrderPrice = (json['buyOrderPrice'] as num?)?.toDouble()
-      ..lastOrderPrice = (json['lastOrderPrice'] as num?)?.toDouble()
+      ..isBuyOrderCompleted = json['isBuyOrderCompleted'] as bool
+      ..lastSellOrderPrice = (json['lastSellOrderPrice'] as num?)?.toDouble()
+      ..sellOrderId = json['sellOrderId'] as int?
+      ..lossSellOrderCounter = (json['lossSellOrderCounter'] as num).toDouble()
       ..cryptoInfo = json['cryptoInfo'];
 
 Map<String, dynamic> _$MinimizeLossesBotToJson(MinimizeLossesBot instance) =>
@@ -47,7 +50,10 @@ Map<String, dynamic> _$MinimizeLossesBotToJson(MinimizeLossesBot instance) =>
       'config': instance.config,
       'name': instance.name,
       'buyOrderPrice': instance.buyOrderPrice,
-      'lastOrderPrice': instance.lastOrderPrice,
+      'isBuyOrderCompleted': instance.isBuyOrderCompleted,
+      'lastSellOrderPrice': instance.lastSellOrderPrice,
+      'sellOrderId': instance.sellOrderId,
+      'lossSellOrderCounter': instance.lossSellOrderCounter,
       'cryptoInfo': instance.cryptoInfo,
     };
 

@@ -22,7 +22,10 @@ class MinimizeLossesBot implements Bot {
   Timer? timer;
 
   double? buyOrderPrice;
-  double? lastOrderPrice;
+  bool isBuyOrderCompleted = false;
+  double? lastSellOrderPrice;
+  int? sellOrderId;
+  double lossSellOrderCounter = 0;
   dynamic? cryptoInfo;
 
   MinimizeLossesBot(this.name, this.testNet, this.config);
@@ -49,46 +52,54 @@ class MinimizeLossesBot implements Bot {
   void start(WidgetRef ref) async {
     this.ref = ref;
 
-    status = BotStatus(BotPhases.starting, 'starting');
-    ref.read(botProvider.notifier).updateBotStatus(uuid, status);
+    changeStatusTo(BotPhases.starting, 'starting');
 
     if (timer != null) timer!.cancel();
 
-    if (buyOrderPrice != null) {
-      /// TODO check every 10 seconds if buyOrderPrice is placed
-      /// fetch buyOrder
-      /// if is completed start _runBotPipeline
+    // If buyorder does not exists
+    if (buyOrderPrice == null) {
+      await _getCurrentCryptoPrice();
 
-      timer = Timer.periodic(const Duration(seconds: 10), _runBuyOrderPipeline);
+      // Exit if bot execution has been interrupted
+      if (status.phase != BotPhases.starting) return;
 
+      changeStatusTo(BotPhases.starting, 'submitting buy order');
+
+      // submit order price
       await _submitBuyOrder();
-
-      timer = Timer.periodic(const Duration(seconds: 10), _runBotPipeline);
     }
 
-    print("starting");
+    // Exit if bot execution has been interrupted
+    if (status.phase != BotPhases.starting) return;
 
-    await Future.delayed(const Duration(seconds: 4));
-    print("submitting order price");
+    changeStatusTo(BotPhases.starting, 'waiting buy order to complete');
 
-    status = BotStatus(BotPhases.submittingBuyOrder, 'submitting order price');
-    ref.read(botProvider.notifier).updateBotStatus(uuid, status);
-
-    /// TODO create order price
+    timer =
+        Timer.periodic(const Duration(seconds: 10), _runCheckBuyOrderPipeline);
   }
 
   @override
-  void stop(WidgetRef ref) async {
+  void stop(WidgetRef ref, {String reason = ''}) async {
     timer?.cancel();
 
-    status = BotStatus(BotPhases.stopping, 'stopping');
-    ref.read(botProvider.notifier).updateBotStatus(uuid, status);
+    if (reason.isNotEmpty) {
+      reason = ': $reason';
+    }
+
+    /// TODO check and remove Buy Order
+
+    changeStatusTo(BotPhases.stopping, 'stopping' + reason);
 
     await Future.delayed(const Duration(seconds: 4));
-    status = BotStatus(BotPhases.offline, 'turned off');
-    ref.read(botProvider.notifier).updateBotStatus(uuid, status);
+
+    changeStatusTo(BotPhases.offline, 'turned off' + reason);
 
     /// TODO notify
+  }
+
+  @override
+  void remove(WidgetRef ref) {
+    /// TODO implement remove
   }
 
   factory MinimizeLossesBot.fromJson(Map<String, dynamic> json) =>
@@ -97,33 +108,80 @@ class MinimizeLossesBot implements Bot {
   @override
   Map<String, dynamic> toJson() => _$MinimizeLossesBotToJson(this);
 
-  Future<void> _runBuyOrderPipeline(Timer timer) async {
-    if (!timer.isActive) return;
+  void changeStatusTo(BotPhases phase, String message) {
+    status = BotStatus(phase, message);
+    ref?.read(botProvider.notifier).updateBotStatus(uuid, status);
   }
 
+  Future<void> _runCheckBuyOrderPipeline(Timer timer) async {
+    if (!timer.isActive) return;
+    // Exit if bot execution has been interrupted
+    if (status.phase != BotPhases.starting) return;
+
+    final buyOrderStatus = await _checkBuyOrderStatus();
+
+    if (buyOrderStatus == 'completed') {
+      timer.cancel();
+
+      changeStatusTo(BotPhases.online, 'online');
+
+      timer = Timer.periodic(const Duration(seconds: 10), _runBotPipeline);
+    }
+  }
+
+  /// - fetch informazione sulla crypto ogni 10s
+  /// - Fare in modo che il bot aumenti l'ordine di vendita piazzando un ordine con un valore ricavato da questa formula:
+  /// (prezzo_attuale - (calcolo della % impostata verso il prezzo_iniziale)) > last_prezzo_ordine
+  /// - Memorizzare se l'ordine eseguito è risultato una perdita o un profitto.
+  /// - Controllare all'avvio se è presente un ordine in corso che è stato piazzato dall'ultimo avvio e ancora non si è concluso.
   Future<void> _runBotPipeline(Timer timer) async {
     if (!timer.isActive) return;
 
-    /// TODO check if order is open or closed.
-    /// If closed check if is a gain or a loss.
-    /// If is loss add to loss counter
-
-    /// TODO check if is major or equal to loss counter.
-    /// If so, shutdown bot and notify user
-
-    // - fetch informazione sulla crypto ogni 10s
-    // - Fare in modo che il bot aumenti l'ordine di vendita piazzando un ordine con un valore ricavato da questa formula:
-    // (prezzo_attuale - (calcolo della % impostata verso il prezzo_iniziale)) > last_prezzo_ordine
-    // - Memorizzare se l'ordine eseguito è risultato una perdita o un profitto.
-    // - Controllare all'avvio se è presente un ordine in corso che è stato piazzato dall'ultimo avvio e ancora non si è concluso.
-    cryptoInfo = await _fetchCryptoInfo();
-
-    if (_hasToMoveOrder()) {
-      await _moveOrder();
-      //TODO notify order moved
-    } else {
-      // do nothing
+    if (sellOrderId == null) {
+      await _submitSellOrder();
+      return;
     }
+
+    final sellOrder = await _getSellOrder();
+    await _getCurrentCryptoPrice();
+
+    // if order status is open or partially closed
+    if (sellOrder.status == OrderStatus.NEW ||
+        sellOrder.status == OrderStatus.PARTIALLY_FILLED) {
+      if (_hasToMoveOrder()) {
+        await _moveOrder();
+        //TODO notify order moved
+      }
+
+      return;
+    }
+    // if order status is closed
+    else if (sellOrder.status == OrderStatus.FILLED) {
+      sellOrderId = null;
+
+      /// TODO implement
+      if (sellOrder == 'is a loss') {
+        // add to loss counter
+        lossSellOrderCounter += 1;
+
+        /// TODO transform lossSellOrderCounter to dailyLossSellOrderCounter
+        // check if is major or equal to loss counter
+        if (lossSellOrderCounter >= config.dailyLossSellOrders!) {
+          timer.cancel();
+          return stop(ref!, reason: 'Daily loss sell orders reached');
+        }
+      }
+
+      /// TODO write sellOrder to bot history order
+
+    } else {
+      /// TODO throw error
+    }
+  }
+
+  Future<dynamic> _getCurrentCryptoPrice() {
+    //TODO implement _getCurrentCryptoPrice
+    return Future.delayed(const Duration(seconds: 1));
   }
 
   Future<dynamic> _submitBuyOrder() {
@@ -131,8 +189,18 @@ class MinimizeLossesBot implements Bot {
     return Future.delayed(const Duration(seconds: 1));
   }
 
-  Future<dynamic> _fetchCryptoInfo() {
-    //TODO implement _fetchCryptoInfo
+  Future<dynamic> _checkBuyOrderStatus() {
+    //TODO implement _checkBuyOrderStatus
+    return Future.delayed(const Duration(seconds: 1));
+  }
+
+  Future<dynamic> _submitSellOrder() {
+    //TODO implement _submitSellOrder
+    return Future.delayed(const Duration(seconds: 1));
+  }
+
+  Future<dynamic> _getSellOrder() {
+    //TODO implement _getSellOrder
     return Future.delayed(const Duration(seconds: 1));
   }
 
@@ -142,7 +210,7 @@ class MinimizeLossesBot implements Bot {
   }
 
   bool _hasToMoveOrder() {
-    return _calculateNewOrderPrice() > lastOrderPrice!;
+    return _calculateNewOrderPrice() > lastSellOrderPrice!;
   }
 
   double _calculateNewOrderPrice() {
