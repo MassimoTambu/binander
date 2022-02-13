@@ -5,13 +5,13 @@ final _walletProvider = Provider<Wallet>((ref) {
 });
 
 class Wallet {
-  final Reader read;
+  final Reader _read;
 
-  const Wallet(this.read);
+  const Wallet(this._read);
 
   /// Check Api status
   Future<ApiResponse> getPubNetApiKeyPermission(ApiConnection conn) async {
-    final apiUtils = read(_apiUtilsProvider);
+    final apiUtils = _read(_apiUtilsProvider);
 
     final secureQuery = apiUtils.createQueryWithSecurity(
         conn.apiSecret, {}, API_SECURITY_TYPE.userData);

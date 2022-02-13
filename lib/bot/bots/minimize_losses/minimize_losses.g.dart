@@ -42,7 +42,8 @@ MinimizeLossesBot _$MinimizeLossesBotFromJson(Map<String, dynamic> json) =>
       ..lastSellOrderPrice = (json['lastSellOrderPrice'] as num?)?.toDouble()
       ..sellOrderId = json['sellOrderId'] as int?
       ..lossSellOrderCounter = (json['lossSellOrderCounter'] as num).toDouble()
-      ..cryptoInfo = json['cryptoInfo'];
+      ..cryptoInfo = json['cryptoInfo']
+      ..ordersHistory = json['ordersHistory'];
 
 Map<String, dynamic> _$MinimizeLossesBotToJson(MinimizeLossesBot instance) =>
     <String, dynamic>{
@@ -57,6 +58,7 @@ Map<String, dynamic> _$MinimizeLossesBotToJson(MinimizeLossesBot instance) =>
       'sellOrderId': instance.sellOrderId,
       'lossSellOrderCounter': instance.lossSellOrderCounter,
       'cryptoInfo': instance.cryptoInfo,
+      'ordersHistory': instance.ordersHistory,
     };
 
 const _$BotTypesEnumMap = {

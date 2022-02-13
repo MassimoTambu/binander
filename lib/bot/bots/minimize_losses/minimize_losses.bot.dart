@@ -27,6 +27,7 @@ class MinimizeLossesBot implements Bot {
   int? sellOrderId;
   double lossSellOrderCounter = 0;
   dynamic? cryptoInfo;
+  dynamic ordersHistory;
 
   MinimizeLossesBot(this.name, this.testNet, this.config);
 
@@ -60,7 +61,7 @@ class MinimizeLossesBot implements Bot {
 
     // If buyorder does not exists
     if (buyOrderPrice == null) {
-      await _getCurrentCryptoPrice();
+      final avgPrice = await _getCurrentCryptoPrice();
 
       // Exit if bot execution has been interrupted
       if (status.phase != BotPhases.starting) return;
@@ -115,6 +116,7 @@ class MinimizeLossesBot implements Bot {
     ref?.read(botProvider.notifier).updateBotStatus(uuid, status);
   }
 
+  /// Check if buy order has been filled. If so, fetch run Bot Pipeline every 10s
   Future<void> _runCheckBuyOrderPipeline(Timer timer) async {
     if (!timer.isActive) return;
     // Exit if bot execution has been interrupted
@@ -131,7 +133,6 @@ class MinimizeLossesBot implements Bot {
     }
   }
 
-  /// - fetch informazione sulla crypto ogni 10s
   /// - Fare in modo che il bot aumenti l'ordine di vendita piazzando un ordine con un valore ricavato da questa formula:
   /// (prezzo_attuale - (calcolo della % impostata verso il prezzo_iniziale)) > last_prezzo_ordine
   /// - Memorizzare se l'ordine eseguito è risultato una perdita o un profitto.
@@ -145,7 +146,7 @@ class MinimizeLossesBot implements Bot {
     }
 
     final sellOrder = await _getSellOrder();
-    await _getCurrentCryptoPrice();
+    final avgPrice = await _getCurrentCryptoPrice();
 
     // if order status is open or partially closed
     if (sellOrder.status == OrderStatus.NEW ||
@@ -181,9 +182,20 @@ class MinimizeLossesBot implements Bot {
     }
   }
 
-  Future<dynamic> _getCurrentCryptoPrice() {
-    //TODO implement _getCurrentCryptoPrice
-    return Future.delayed(const Duration(seconds: 1));
+  ApiConnection getApiConnection() {
+    if (testNet) {
+      return ref!.read(settingsProvider).testNetConnection;
+    }
+    return ref!.read(settingsProvider).pubNetConnection;
+  }
+
+  Future<AveragePrice> _getCurrentCryptoPrice() async {
+    final res = await ref!
+        .read(apiProvider)
+        .spot
+        .market
+        .getAveragePrice(getApiConnection(), config.symbol!);
+    return res.body;
   }
 
   Future<dynamic> _submitBuyOrder() {

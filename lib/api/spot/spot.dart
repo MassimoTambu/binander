@@ -5,12 +5,14 @@ final _spotProvider = Provider<Spot>((ref) {
 });
 
 class Spot {
-  final Ref ref;
-  late Trade trade;
-  late Wallet wallet;
+  final Ref _ref;
+  late final Market market;
+  late final Trade trade;
+  late final Wallet wallet;
 
-  Spot(this.ref) {
-    trade = ref.watch(_tradeProvider);
-    wallet = ref.watch(_walletProvider);
+  Spot(this._ref) {
+    market = _ref.watch(_marketProvider);
+    trade = _ref.watch(_tradeProvider);
+    wallet = _ref.watch(_walletProvider);
   }
 }

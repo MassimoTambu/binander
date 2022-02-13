@@ -16,6 +16,7 @@ part 'api_utils.dart';
 part 'api_response.dart';
 part 'api_constants.dart';
 
+part 'models/average_price.dart';
 part 'models/account_and_symbol_permission.enum.dart';
 part 'models/symbol_status.enum.dart';
 part 'models/time_in_force.enum.dart';
@@ -35,6 +36,7 @@ part 'models/order/order_sides.enum.dart';
 part 'api.g.dart';
 
 part 'spot/spot.dart';
+part 'spot/market/market.dart';
 part 'spot/trade/trade.dart';
 part 'spot/wallet/wallet.dart';
 

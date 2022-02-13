@@ -119,7 +119,7 @@ class MinimizeLossesConfig implements Config {
   static const String symbolName = 'symbol';
   static const String symbolPublicName = 'Crypto pair';
   static const String symbolDescription =
-      "The crypto on the left will be used to buy the right one. NOTE: for TestNet use 'BTC-USDT' and 'BNB-USDT'";
+      "The crypto on the left will be used to buy the right one. NOTE: for TestNet use 'BTCUSDT' and 'BNBUSDT'";
   static const String timerBuyOrderName = 'timer_buy_order_name';
   static const String timerBuyOrderPublicName = 'Buy order timer';
   static const String timerBuyOrderDescription = '';

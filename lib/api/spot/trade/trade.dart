@@ -5,10 +5,10 @@ final _tradeProvider = Provider<Trade>((ref) {
 });
 
 class Trade {
-  final Ref ref;
-  late final ApiUtils apiUtils = ref.read(_apiUtilsProvider);
+  final Ref _ref;
+  late final ApiUtils apiUtils = _ref.read(_apiUtilsProvider);
 
-  Trade(this.ref);
+  Trade(this._ref);
 
   Future<ApiResponse<Order>> getOrders(
       ApiConnection conn, String symbol) async {

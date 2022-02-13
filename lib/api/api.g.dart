@@ -6,6 +6,17 @@ part of api;
 // JsonSerializableGenerator
 // **************************************************************************
 
+AveragePrice _$AveragePriceFromJson(Map<String, dynamic> json) => AveragePrice(
+      json['mins'] as int,
+      ParseUtils.stringToDouble(json['price'] as String),
+    );
+
+Map<String, dynamic> _$AveragePriceToJson(AveragePrice instance) =>
+    <String, dynamic>{
+      'mins': instance.mins,
+      'price': instance.price,
+    };
+
 AccountInformation _$AccountInformationFromJson(Map<String, dynamic> json) =>
     AccountInformation(
       json['makerCommission'] as int,
