@@ -10,7 +10,7 @@ class Trade {
 
   Trade(this._ref);
 
-  Future<ApiResponse<Order>> getOrders(
+  Future<ApiResponse<List<Order>>> getAllOrders(
       ApiConnection conn, String symbol) async {
     final query = {'symbol': symbol};
     // 'symbol=$symbol&timestamp=$timestamp&signature=';
@@ -34,6 +34,38 @@ class Trade {
     }
 
     final body = await response.stream.bytesToString();
+    final rawOrders = jsonDecode(body) as List<dynamic>;
+
+    final res = ApiResponse(
+        rawOrders.map((o) => Order.fromJson(o)).toList(), response.statusCode);
+
+    return res;
+  }
+
+  Future<ApiResponse<Order>> getQueryOrder(
+      ApiConnection conn, String symbol, int orderId) async {
+    final query = {'symbol': symbol, 'orderId': orderId.toString()};
+    // 'symbol=$symbol&timestamp=$timestamp&signature=';
+
+    final secureQuery = apiUtils.createQueryWithSecurity(
+        conn.apiSecret, query, API_SECURITY_TYPE.userData);
+
+    final request =
+        Request('GET', Uri.parse('${conn.url}/api/v3/order?$secureQuery'));
+
+    apiUtils.addSecurityToHeader(
+        conn.apiKey, request, API_SECURITY_TYPE.userData);
+
+    StreamedResponse response = await request.send();
+
+    if (response.statusCode != HttpStatus.ok) {
+      return Future.error(
+        {response.reasonPhrase},
+        StackTrace.fromString('getOrders'),
+      );
+    }
+
+    final body = await response.stream.bytesToString();
 
     final res =
         ApiResponse(Order.fromJson(jsonDecode(body)), response.statusCode);
@@ -41,7 +73,7 @@ class Trade {
     return res;
   }
 
-  Future<ApiResponse<OrderNew>> createOrder(
+  Future<ApiResponse<OrderNew>> newOrder(
     ApiConnection conn,
     String symbol,
     OrderSides side,
@@ -73,7 +105,7 @@ class Trade {
     if (response.statusCode != HttpStatus.ok) {
       return Future.error(
         {response.reasonPhrase},
-        StackTrace.fromString('createOrder'),
+        StackTrace.fromString('newOrder'),
       );
     }
 
@@ -81,6 +113,42 @@ class Trade {
 
     final res =
         ApiResponse(OrderNew.fromJson(jsonDecode(body)), response.statusCode);
+
+    return res;
+  }
+
+  Future<ApiResponse<OrderCancel>> cancelOrder(
+    ApiConnection conn,
+    String symbol,
+    int orderId,
+  ) async {
+    final query = {
+      'symbol': symbol,
+      'orderId': orderId.toString(),
+    };
+
+    final secureQuery = apiUtils.createQueryWithSecurity(
+        conn.apiSecret, query, API_SECURITY_TYPE.userData);
+
+    final request =
+        Request('DELETE', Uri.parse('${conn.url}/api/v3/order?$secureQuery'));
+
+    apiUtils.addSecurityToHeader(
+        conn.apiKey, request, API_SECURITY_TYPE.userData);
+
+    StreamedResponse response = await request.send();
+
+    if (response.statusCode != HttpStatus.ok) {
+      return Future.error(
+        {response.reasonPhrase},
+        StackTrace.fromString('cancelOrder'),
+      );
+    }
+
+    final body = await response.stream.bytesToString();
+
+    final res = ApiResponse(
+        OrderCancel.fromJson(jsonDecode(body)), response.statusCode);
 
     return res;
   }

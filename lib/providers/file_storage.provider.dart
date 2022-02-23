@@ -16,6 +16,8 @@ class FileStorageProvider {
     return true;
   }
 
+  static const encoder = JsonEncoder.withIndent('  ');
+
   static final String defaultApplicationPath = Directory.current.absolute.path;
   static final String defaultFileName = defaultApplicationPath + '/data.json';
 
@@ -63,6 +65,6 @@ class FileStorageProvider {
 
   Future<void> _saveFile() async {
     await File.fromUri(Uri.file(defaultFileName))
-        .writeAsString(jsonEncode(data));
+        .writeAsString(encoder.convert(data));
   }
 }

@@ -1,33 +1,32 @@
 part of api;
 
 @JsonSerializable()
-class Order {
+class OrderCancel {
   final String symbol;
   final int orderId;
   final int orderListId;
   final String clientOrderId;
+  @JsonKey(fromJson: ParseUtils.unixToDateTime)
+  final DateTime transactTime;
+  @JsonKey(fromJson: ParseUtils.stringToDouble)
   final double price;
+  @JsonKey(fromJson: ParseUtils.stringToDouble)
   final double origQty;
+  @JsonKey(fromJson: ParseUtils.stringToDouble)
   final double executedQty;
+  @JsonKey(fromJson: ParseUtils.stringToDouble)
   final double cummulativeQuoteQty;
   final OrderStatus status;
   final TimeInForce timeInForce;
   final OrderTypes type;
   final OrderSides side;
-  final double stopPrice;
-  final double icebergQty;
-  @JsonKey(fromJson: ParseUtils.unixToDateTime)
-  final DateTime time;
-  @JsonKey(fromJson: ParseUtils.unixToDateTime)
-  final DateTime updateTime;
-  final bool isWorking;
-  final double origQuoteOrderQty;
 
-  const Order(
+  const OrderCancel(
     this.symbol,
     this.orderId,
     this.orderListId,
     this.clientOrderId,
+    this.transactTime,
     this.price,
     this.origQty,
     this.executedQty,
@@ -36,15 +35,10 @@ class Order {
     this.timeInForce,
     this.type,
     this.side,
-    this.stopPrice,
-    this.icebergQty,
-    this.time,
-    this.updateTime,
-    this.isWorking,
-    this.origQuoteOrderQty,
   );
 
-  factory Order.fromJson(Map<String, dynamic> json) => _$OrderFromJson(json);
+  factory OrderCancel.fromJson(Map<String, dynamic> json) =>
+      _$OrderCancelFromJson(json);
 
-  Map<String, dynamic> toJson() => _$OrderToJson(this);
+  Map<String, dynamic> toJson() => _$OrderCancelToJson(this);
 }

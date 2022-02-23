@@ -8,6 +8,7 @@ const symbols = [
   'ADABTC',
   'ADAETH',
   'ADAUSDT',
+  'BNBBTC',
   'BNBUSDT',
   'BNBUSDC',
   'BTCBUSD',

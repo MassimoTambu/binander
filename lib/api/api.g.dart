@@ -136,6 +136,55 @@ const _$OrderSidesEnumMap = {
   OrderSides.SELL: 'SELL',
 };
 
+OrderCancel _$OrderCancelFromJson(Map<String, dynamic> json) => OrderCancel(
+      json['symbol'] as String,
+      json['orderId'] as int,
+      json['orderListId'] as int,
+      json['clientOrderId'] as String,
+      ParseUtils.unixToDateTime(json['transactTime'] as int),
+      ParseUtils.stringToDouble(json['price'] as String),
+      ParseUtils.stringToDouble(json['origQty'] as String),
+      ParseUtils.stringToDouble(json['executedQty'] as String),
+      ParseUtils.stringToDouble(json['cummulativeQuoteQty'] as String),
+      $enumDecode(_$OrderStatusEnumMap, json['status']),
+      $enumDecode(_$TimeInForceEnumMap, json['timeInForce']),
+      $enumDecode(_$OrderTypesEnumMap, json['type']),
+      $enumDecode(_$OrderSidesEnumMap, json['side']),
+    );
+
+Map<String, dynamic> _$OrderCancelToJson(OrderCancel instance) =>
+    <String, dynamic>{
+      'symbol': instance.symbol,
+      'orderId': instance.orderId,
+      'orderListId': instance.orderListId,
+      'clientOrderId': instance.clientOrderId,
+      'transactTime': instance.transactTime.toIso8601String(),
+      'price': instance.price,
+      'origQty': instance.origQty,
+      'executedQty': instance.executedQty,
+      'cummulativeQuoteQty': instance.cummulativeQuoteQty,
+      'status': _$OrderStatusEnumMap[instance.status],
+      'timeInForce': _$TimeInForceEnumMap[instance.timeInForce],
+      'type': _$OrderTypesEnumMap[instance.type],
+      'side': _$OrderSidesEnumMap[instance.side],
+    };
+
+Fill _$FillFromJson(Map<String, dynamic> json) => Fill(
+      ParseUtils.stringToDouble(json['price'] as String),
+      ParseUtils.stringToDouble(json['qty'] as String),
+      ParseUtils.stringToDouble(json['commission'] as String),
+      json['commissionAsset'] as String,
+      json['tradeId'] as int,
+    );
+
+Map<String, dynamic> _$FillToJson(Fill instance) => <String, dynamic>{
+      'price': instance.price,
+      'qty': instance.qty,
+      'commission': instance.commission,
+      'commissionAsset': instance.commissionAsset,
+      'tradeId': instance.tradeId,
+    };
+
 OrderNew _$OrderNewFromJson(Map<String, dynamic> json) => OrderNew(
       json['symbol'] as String,
       json['orderId'] as int,
@@ -170,20 +219,4 @@ Map<String, dynamic> _$OrderNewToJson(OrderNew instance) => <String, dynamic>{
       'type': _$OrderTypesEnumMap[instance.type],
       'side': _$OrderSidesEnumMap[instance.side],
       'fills': instance.fills,
-    };
-
-Fill _$FillFromJson(Map<String, dynamic> json) => Fill(
-      ParseUtils.stringToDouble(json['price'] as String),
-      ParseUtils.stringToDouble(json['qty'] as String),
-      ParseUtils.stringToDouble(json['commission'] as String),
-      json['commissionAsset'] as String,
-      json['tradeId'] as int,
-    );
-
-Map<String, dynamic> _$FillToJson(Fill instance) => <String, dynamic>{
-      'price': instance.price,
-      'qty': instance.qty,
-      'commission': instance.commission,
-      'commissionAsset': instance.commissionAsset,
-      'tradeId': instance.tradeId,
     };

@@ -17,17 +17,16 @@ class MinimizeLossesBot implements Bot {
   BotStatus status = BotStatus(BotPhases.offline, 'offline');
 
   @JsonKey(ignore: true)
-  WidgetRef? ref;
+  late WidgetRef ref;
   @JsonKey(ignore: true)
   Timer? timer;
 
-  double? buyOrderPrice;
+  OrderNew? lastBuyOrder;
   bool isBuyOrderCompleted = false;
-  double? lastSellOrderPrice;
-  int? sellOrderId;
+  OrderNew? lastSellOrder;
   double lossSellOrderCounter = 0;
   dynamic? cryptoInfo;
-  dynamic ordersHistory;
+  List<Order> ordersHistory = [];
 
   MinimizeLossesBot(this.name, this.testNet, this.config);
 
@@ -60,7 +59,7 @@ class MinimizeLossesBot implements Bot {
     if (timer != null) timer!.cancel();
 
     // If buyorder does not exists
-    if (buyOrderPrice == null) {
+    if (lastBuyOrder == null) {
       final avgPrice = await _getCurrentCryptoPrice();
 
       // Exit if bot execution has been interrupted
@@ -69,7 +68,7 @@ class MinimizeLossesBot implements Bot {
       changeStatusTo(BotPhases.starting, 'submitting buy order');
 
       // submit order price
-      await _submitBuyOrder();
+      lastBuyOrder = await _submitBuyOrder(avgPrice.price);
     }
 
     // Exit if bot execution has been interrupted
@@ -89,7 +88,9 @@ class MinimizeLossesBot implements Bot {
       reason = ': $reason';
     }
 
-    /// TODO check and remove Buy Order
+    if (lastBuyOrder != null) {
+      await _cancelOrder(lastBuyOrder!.orderId);
+    }
 
     changeStatusTo(BotPhases.stopping, 'stopping' + reason);
 
@@ -113,7 +114,7 @@ class MinimizeLossesBot implements Bot {
 
   void changeStatusTo(BotPhases phase, String message) {
     status = BotStatus(phase, message);
-    ref?.read(botProvider.notifier).updateBotStatus(uuid, status);
+    ref.read(botProvider.notifier).updateBotStatus(uuid, status);
   }
 
   /// Check if buy order has been filled. If so, fetch run Bot Pipeline every 10s
@@ -124,7 +125,7 @@ class MinimizeLossesBot implements Bot {
 
     final buyOrderStatus = await _checkBuyOrderStatus();
 
-    if (buyOrderStatus == 'completed') {
+    if (buyOrderStatus == OrderStatus.FILLED) {
       timer.cancel();
 
       changeStatusTo(BotPhases.online, 'online');
@@ -140,8 +141,8 @@ class MinimizeLossesBot implements Bot {
   Future<void> _runBotPipeline(Timer timer) async {
     if (!timer.isActive) return;
 
-    if (sellOrderId == null) {
-      await _submitSellOrder();
+    if (lastSellOrder == null) {
+      lastSellOrder = await _submitSellOrder();
       return;
     }
 
@@ -152,7 +153,7 @@ class MinimizeLossesBot implements Bot {
     if (sellOrder.status == OrderStatus.NEW ||
         sellOrder.status == OrderStatus.PARTIALLY_FILLED) {
       if (_hasToMoveOrder()) {
-        await _moveOrder();
+        await _moveOrder(sellOrder.orderId);
         //TODO notify order moved
       }
 
@@ -160,10 +161,12 @@ class MinimizeLossesBot implements Bot {
     }
     // if order status is closed
     else if (sellOrder.status == OrderStatus.FILLED) {
-      sellOrderId = null;
+      // TODO resume a buy order
+      ordersHistory.add(sellOrder);
+      lastSellOrder = null;
 
-      /// TODO implement
-      if (sellOrder == 'is a loss') {
+      // Check if is a loss
+      if (sellOrder.executedQty < lastBuyOrder!.executedQty) {
         // add to loss counter
         lossSellOrderCounter += 1;
 
@@ -171,64 +174,94 @@ class MinimizeLossesBot implements Bot {
         // check if is major or equal to loss counter
         if (lossSellOrderCounter >= config.dailyLossSellOrders!) {
           timer.cancel();
-          return stop(ref!, reason: 'Daily loss sell orders reached');
+          return stop(ref, reason: 'Daily loss sell orders reached');
         }
       }
-
-      /// TODO write sellOrder to bot history order
-
     } else {
       /// TODO throw error
     }
   }
 
-  ApiConnection getApiConnection() {
+  ApiConnection _getApiConnection() {
     if (testNet) {
-      return ref!.read(settingsProvider).testNetConnection;
+      return ref.read(settingsProvider).testNetConnection;
     }
-    return ref!.read(settingsProvider).pubNetConnection;
+    return ref.read(settingsProvider).pubNetConnection;
   }
 
   Future<AveragePrice> _getCurrentCryptoPrice() async {
-    final res = await ref!
+    final res = await ref
         .read(apiProvider)
         .spot
         .market
-        .getAveragePrice(getApiConnection(), config.symbol!);
+        .getAveragePrice(_getApiConnection(), config.symbol!);
     return res.body;
   }
 
-  Future<dynamic> _submitBuyOrder() {
-    //TODO implement _submitBuyOrder
-    return Future.delayed(const Duration(seconds: 1));
+  Future<OrderNew> _submitBuyOrder(double currentPrice) async {
+    currentPrice = _approxPrice(currentPrice);
+    final res = await ref.read(apiProvider).spot.trade.newOrder(
+        _getApiConnection(),
+        config.symbol!,
+        OrderSides.BUY,
+        OrderTypes.LIMIT,
+        config.maxInvestmentPerOrder!,
+        currentPrice);
+
+    return res.body;
   }
 
-  Future<dynamic> _checkBuyOrderStatus() {
-    //TODO implement _checkBuyOrderStatus
-    return Future.delayed(const Duration(seconds: 1));
+  Future<OrderStatus> _checkBuyOrderStatus() async {
+    final res = await ref.read(apiProvider).spot.trade.getQueryOrder(
+        _getApiConnection(), config.symbol!, lastBuyOrder!.orderId);
+
+    return res.body.status;
   }
 
-  Future<dynamic> _submitSellOrder() {
+  Future<OrderNew> _submitSellOrder() async {
     //TODO implement _submitSellOrder
-    return Future.delayed(const Duration(seconds: 1));
+    final res = await ref.read(apiProvider).spot.trade.newOrder(
+        _getApiConnection(),
+        config.symbol!,
+        OrderSides.SELL,
+        OrderTypes.LIMIT,
+        config.maxInvestmentPerOrder!,
+        lastBuyOrder!.executedQty);
+    return res.body;
   }
 
-  Future<dynamic> _getSellOrder() {
-    //TODO implement _getSellOrder
-    return Future.delayed(const Duration(seconds: 1));
+  Future<Order> _getSellOrder() async {
+    final res = await ref.read(apiProvider).spot.trade.getQueryOrder(
+        _getApiConnection(), config.symbol!, lastBuyOrder!.orderId);
+    return res.body;
   }
 
-  Future<dynamic> _moveOrder() {
-    //TODO implement _moveOrder
-    return Future.delayed(const Duration(seconds: 1));
+  Future<void> _moveOrder(int orderId) async {
+    await _cancelOrder(orderId);
+    lastSellOrder = await _submitSellOrder();
+  }
+
+  Future<OrderCancel> _cancelOrder(int orderId) async {
+    final res = await ref
+        .read(apiProvider)
+        .spot
+        .trade
+        .cancelOrder(_getApiConnection(), config.symbol!, orderId);
+
+    return res.body;
   }
 
   bool _hasToMoveOrder() {
-    return _calculateNewOrderPrice() > lastSellOrderPrice!;
+    return _calculateNewOrderPrice() > lastSellOrder!.price;
   }
 
   double _calculateNewOrderPrice() {
     return cryptoInfo.actualValue -
-        (buyOrderPrice! * config.percentageSellOrder! / 100);
+        (lastBuyOrder!.price * config.percentageSellOrder! / 100);
+  }
+
+  /// TODO put buy order price as parameter
+  double _approxPrice(double price) {
+    return (price).floorToDouble();
   }
 }

@@ -22,7 +22,7 @@ class OrderNew {
   final OrderSides side;
   final List<Fill> fills;
 
-  OrderNew(
+  const OrderNew(
     this.symbol,
     this.orderId,
     this.orderListId,
@@ -43,28 +43,4 @@ class OrderNew {
       _$OrderNewFromJson(json);
 
   Map<String, dynamic> toJson() => _$OrderNewToJson(this);
-}
-
-@JsonSerializable()
-class Fill {
-  @JsonKey(fromJson: ParseUtils.stringToDouble)
-  final double price;
-  @JsonKey(fromJson: ParseUtils.stringToDouble)
-  final double qty;
-  @JsonKey(fromJson: ParseUtils.stringToDouble)
-  final double commission;
-  final String commissionAsset;
-  final int tradeId;
-
-  Fill(
-    this.price,
-    this.qty,
-    this.commission,
-    this.commissionAsset,
-    this.tradeId,
-  );
-
-  factory Fill.fromJson(Map<String, dynamic> json) => _$FillFromJson(json);
-
-  Map<String, dynamic> toJson() => _$FillToJson(this);
 }

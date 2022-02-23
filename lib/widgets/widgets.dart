@@ -2,6 +2,7 @@ library widgets;
 
 import 'package:bottino_fortino/api/api.dart';
 import 'package:bottino_fortino/bot/bot.dart';
+import 'package:bottino_fortino/bot/bots/minimize_losses/minimize_losses.dart';
 import 'package:bottino_fortino/models/models.dart';
 import 'package:bottino_fortino/utils/utils.dart';
 import 'package:flutter/material.dart';

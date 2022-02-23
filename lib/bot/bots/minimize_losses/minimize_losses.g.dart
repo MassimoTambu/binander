@@ -37,13 +37,18 @@ MinimizeLossesBot _$MinimizeLossesBotFromJson(Map<String, dynamic> json) =>
     )
       ..uuid = json['uuid'] as String
       ..type = $enumDecode(_$BotTypesEnumMap, json['type'])
-      ..buyOrderPrice = (json['buyOrderPrice'] as num?)?.toDouble()
+      ..lastBuyOrder = json['lastBuyOrder'] == null
+          ? null
+          : OrderNew.fromJson(json['lastBuyOrder'] as Map<String, dynamic>)
       ..isBuyOrderCompleted = json['isBuyOrderCompleted'] as bool
-      ..lastSellOrderPrice = (json['lastSellOrderPrice'] as num?)?.toDouble()
-      ..sellOrderId = json['sellOrderId'] as int?
+      ..lastSellOrder = json['lastSellOrder'] == null
+          ? null
+          : OrderNew.fromJson(json['lastSellOrder'] as Map<String, dynamic>)
       ..lossSellOrderCounter = (json['lossSellOrderCounter'] as num).toDouble()
       ..cryptoInfo = json['cryptoInfo']
-      ..ordersHistory = json['ordersHistory'];
+      ..ordersHistory = (json['ordersHistory'] as List<dynamic>)
+          .map((e) => Order.fromJson(e as Map<String, dynamic>))
+          .toList();
 
 Map<String, dynamic> _$MinimizeLossesBotToJson(MinimizeLossesBot instance) =>
     <String, dynamic>{
@@ -52,10 +57,9 @@ Map<String, dynamic> _$MinimizeLossesBotToJson(MinimizeLossesBot instance) =>
       'testNet': instance.testNet,
       'config': instance.config,
       'name': instance.name,
-      'buyOrderPrice': instance.buyOrderPrice,
+      'lastBuyOrder': instance.lastBuyOrder,
       'isBuyOrderCompleted': instance.isBuyOrderCompleted,
-      'lastSellOrderPrice': instance.lastSellOrderPrice,
-      'sellOrderId': instance.sellOrderId,
+      'lastSellOrder': instance.lastSellOrder,
       'lossSellOrderCounter': instance.lossSellOrderCounter,
       'cryptoInfo': instance.cryptoInfo,
       'ordersHistory': instance.ordersHistory,
