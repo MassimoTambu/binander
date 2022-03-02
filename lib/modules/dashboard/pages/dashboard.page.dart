@@ -25,8 +25,10 @@ class DashboardPage extends ConsumerWidget {
       ),
       body: ListView.builder(
         itemCount: bots.length,
-        itemBuilder: (context, index) {
-          return BotTile(bot: bots[index]);
+        itemBuilder: (context, i) {
+          return ProviderScope(overrides: [
+            currentBot.overrideWithValue(bots[i]),
+          ], child: const BotTile());
         },
       ),
       floatingActionButton: FloatingActionButton(

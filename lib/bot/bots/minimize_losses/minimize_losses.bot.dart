@@ -35,7 +35,7 @@ class MinimizeLossesBot implements Bot {
     required this.testNet,
     required String symbol,
     required int dailyLossSellOrders,
-    required double maxInvestmentPerOrder,
+    required double maxQuantityPerOrder,
     required double percentageSellOrder,
     required Duration timerBuyOrder,
   }) {
@@ -44,7 +44,7 @@ class MinimizeLossesBot implements Bot {
     config = MinimizeLossesConfig.create(
       symbol: symbol,
       dailyLossSellOrders: dailyLossSellOrders,
-      maxInvestmentPerOrder: maxInvestmentPerOrder,
+      maxQuantityPerOrder: maxQuantityPerOrder,
       percentageSellOrder: percentageSellOrder,
       timerBuyOrder: timerBuyOrder,
     );
@@ -75,6 +75,8 @@ class MinimizeLossesBot implements Bot {
     if (status.phase != BotPhases.starting) return;
 
     changeStatusTo(BotPhases.starting, 'waiting buy order to complete');
+
+    ref.read(fileStorageProvider).saveBots([this]);
 
     timer =
         Timer.periodic(const Duration(seconds: 10), _runCheckBuyOrderPipeline);
@@ -205,7 +207,7 @@ class MinimizeLossesBot implements Bot {
         config.symbol!,
         OrderSides.BUY,
         OrderTypes.LIMIT,
-        config.maxInvestmentPerOrder!,
+        config.maxQuantityPerOrder!,
         currentPrice);
 
     return res.body;
@@ -225,7 +227,7 @@ class MinimizeLossesBot implements Bot {
         config.symbol!,
         OrderSides.SELL,
         OrderTypes.LIMIT,
-        config.maxInvestmentPerOrder!,
+        config.maxQuantityPerOrder!,
         lastBuyOrder!.executedQty);
     return res.body;
   }

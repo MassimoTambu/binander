@@ -34,7 +34,7 @@ class BotProvider extends StateNotifier<List<Bot>> {
           symbol: fields[MinimizeLossesConfig.symbolName]!.value,
           dailyLossSellOrders: int.parse(
               fields[MinimizeLossesConfig.dailyLossSellOrdersName]!.value),
-          maxInvestmentPerOrder: double.parse(
+          maxQuantityPerOrder: double.parse(
               fields[MinimizeLossesConfig.maxInvestmentPerOrderName]!.value),
           percentageSellOrder: double.parse(
               fields[MinimizeLossesConfig.percentageSellOrderName]!.value),
@@ -51,7 +51,7 @@ class BotProvider extends StateNotifier<List<Bot>> {
           symbol: fields[MinimizeLossesConfig.symbolName]!.value,
           dailyLossSellOrders: int.parse(
               fields[MinimizeLossesConfig.dailyLossSellOrdersName]!.value),
-          maxInvestmentPerOrder: double.parse(
+          maxQuantityPerOrder: double.parse(
               fields[MinimizeLossesConfig.maxInvestmentPerOrderName]!.value),
           percentageSellOrder: double.parse(
               fields[MinimizeLossesConfig.percentageSellOrderName]!.value),
@@ -91,7 +91,7 @@ class BotProvider extends StateNotifier<List<Bot>> {
     required bool testNet,
     required String symbol,
     required int dailyLossSellOrders,
-    required double maxInvestmentPerOrder,
+    required double maxQuantityPerOrder,
     required double percentageSellOrder,
     required Duration timerBuyOrder,
   }) {
@@ -100,7 +100,7 @@ class BotProvider extends StateNotifier<List<Bot>> {
       testNet: testNet,
       symbol: symbol,
       dailyLossSellOrders: dailyLossSellOrders,
-      maxInvestmentPerOrder: maxInvestmentPerOrder,
+      maxQuantityPerOrder: maxQuantityPerOrder,
       percentageSellOrder: percentageSellOrder,
       timerBuyOrder: timerBuyOrder,
     );

@@ -1,12 +1,13 @@
-part of widgets;
+part of dashboard_module;
 
-class BotTile extends StatelessWidget {
-  final Bot bot;
+final currentBot = Provider<Bot>((ref) => throw UnimplementedError());
 
-  const BotTile({Key? key, required this.bot}) : super(key: key);
+class BotTile extends ConsumerWidget {
+  const BotTile({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final bot = ref.watch(currentBot);
     return ExpansionTile(
       title: Wrap(
         spacing: 8,

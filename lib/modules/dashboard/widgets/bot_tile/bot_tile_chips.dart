@@ -1,4 +1,4 @@
-part of widgets;
+part of dashboard_module;
 
 class BotTileChips extends ConsumerWidget {
   final String uuid;

@@ -68,7 +68,7 @@ Order _$OrderFromJson(Map<String, dynamic> json) => Order(
       json['orderId'] as int,
       json['orderListId'] as int,
       json['clientOrderId'] as String,
-      (json['price'] as num).toDouble(),
+      ParseUtils.stringToDouble(json['price'] as String),
       (json['origQty'] as num).toDouble(),
       (json['executedQty'] as num).toDouble(),
       (json['cummulativeQuoteQty'] as num).toDouble(),

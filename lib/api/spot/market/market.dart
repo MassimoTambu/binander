@@ -20,7 +20,7 @@ class Market {
     final request =
         Request('GET', Uri.parse('${conn.url}/api/v3/avgPrice?$secureQuery'));
 
-    StreamedResponse response = await request.send();
+    final response = await request.send();
 
     if (response.statusCode != HttpStatus.ok) {
       return Future.error(

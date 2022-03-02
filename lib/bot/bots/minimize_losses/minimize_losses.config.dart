@@ -5,14 +5,14 @@ part of minimize_losses_bot;
 @JsonSerializable()
 class MinimizeLossesConfig implements Config {
   int? dailyLossSellOrders;
-  double? maxInvestmentPerOrder;
+  double? maxQuantityPerOrder;
   double? percentageSellOrder;
   String? symbol;
   Duration? timerBuyOrder;
 
   MinimizeLossesConfig({
     this.dailyLossSellOrders,
-    this.maxInvestmentPerOrder,
+    this.maxQuantityPerOrder,
     this.percentageSellOrder,
     this.symbol,
     this.timerBuyOrder,
@@ -20,20 +20,20 @@ class MinimizeLossesConfig implements Config {
 
   MinimizeLossesConfig.create({
     required int dailyLossSellOrders,
-    required double maxInvestmentPerOrder,
+    required double maxQuantityPerOrder,
     required double percentageSellOrder,
     required String symbol,
     required Duration timerBuyOrder,
   }) {
     this.dailyLossSellOrders = dailyLossSellOrders;
-    this.maxInvestmentPerOrder = maxInvestmentPerOrder;
+    this.maxQuantityPerOrder = maxQuantityPerOrder;
     this.percentageSellOrder = percentageSellOrder;
     this.symbol = symbol;
     this.timerBuyOrder = timerBuyOrder;
     configFields[dailyLossSellOrdersName]!.value =
         dailyLossSellOrders.toString();
     configFields[maxInvestmentPerOrderName]!.value =
-        maxInvestmentPerOrder.toString();
+        maxQuantityPerOrder.toString();
     configFields[percentageSellOrderName]!.value =
         percentageSellOrder.toString();
     configFields[symbolName]!.value = symbol.toString();

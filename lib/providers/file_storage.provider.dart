@@ -6,6 +6,7 @@ final fileStorageProvider = Provider<FileStorageProvider>((ref) {
 
 class FileStorageProvider {
   Map<String, dynamic> data = {};
+  late IOSink sink;
 
   Future<bool> init() async {
     if (kDebugMode) {
@@ -23,12 +24,17 @@ class FileStorageProvider {
 
   Future<void> readData() async {
     final file = File.fromUri(Uri.file(defaultFileName));
+
     if (await file.exists()) {
       final _data = await file.readAsString();
       data = jsonDecode(_data);
+
+      // sink = file.openWrite();
     } else {
+      // sink = file.openWrite();
+
       _loadSchema();
-      _saveFile();
+      await _saveFile();
     }
   }
 
@@ -66,5 +72,9 @@ class FileStorageProvider {
   Future<void> _saveFile() async {
     await File.fromUri(Uri.file(defaultFileName))
         .writeAsString(encoder.convert(data));
+
+    // final file = File.fromUri(Uri.file(defaultFileName));
+    // sink.
+    // await file.writeAsString(encoder.convert(data));
   }
 }

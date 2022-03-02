@@ -24,7 +24,7 @@ class Trade {
     apiUtils.addSecurityToHeader(
         conn.apiKey, request, API_SECURITY_TYPE.userData);
 
-    StreamedResponse response = await request.send();
+    final response = await request.send();
 
     if (response.statusCode != HttpStatus.ok) {
       return Future.error(
@@ -56,7 +56,7 @@ class Trade {
     apiUtils.addSecurityToHeader(
         conn.apiKey, request, API_SECURITY_TYPE.userData);
 
-    StreamedResponse response = await request.send();
+    final response = await request.send();
 
     if (response.statusCode != HttpStatus.ok) {
       return Future.error(
@@ -100,7 +100,7 @@ class Trade {
     apiUtils.addSecurityToHeader(
         conn.apiKey, request, API_SECURITY_TYPE.userData);
 
-    StreamedResponse response = await request.send();
+    final response = await request.send();
 
     if (response.statusCode != HttpStatus.ok) {
       return Future.error(
@@ -136,7 +136,7 @@ class Trade {
     apiUtils.addSecurityToHeader(
         conn.apiKey, request, API_SECURITY_TYPE.userData);
 
-    StreamedResponse response = await request.send();
+    final response = await request.send();
 
     if (response.statusCode != HttpStatus.ok) {
       return Future.error(

@@ -6,6 +6,7 @@ class Order {
   final int orderId;
   final int orderListId;
   final String clientOrderId;
+  @JsonKey(fromJson: ParseUtils.stringToDouble)
   final double price;
   final double origQty;
   final double executedQty;
