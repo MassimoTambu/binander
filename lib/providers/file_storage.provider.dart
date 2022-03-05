@@ -6,7 +6,8 @@ final fileStorageProvider = Provider<FileStorageProvider>((ref) {
 
 class FileStorageProvider {
   Map<String, dynamic> data = {};
-  late IOSink sink;
+  // TODO use stream to write repeatedly to file
+  // late IOSink sink;
 
   Future<bool> init() async {
     if (kDebugMode) {
