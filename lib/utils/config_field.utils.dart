@@ -1,4 +1,4 @@
-part of models;
+part of utils;
 
 class ConfigFieldUtils {
   static List<String? Function(String?)> toFormBuilderValidators(

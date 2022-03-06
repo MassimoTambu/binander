@@ -1,58 +1,28 @@
 part of minimize_losses_bot;
 
 @JsonSerializable()
-class MinimizeLossesBot implements Bot {
+class MinimizeLossesPipeline implements Pipeline {
   @override
-  late final String uuid;
-  @override
-  late final BotTypes type;
-  @override
-  late final bool testNet;
-  @override
-  late final MinimizeLossesConfig config;
-  @override
-  final String name;
+  final MinimizeLossesBot bot;
+
   @override
   @JsonKey(ignore: true)
   BotStatus status = BotStatus(BotPhases.offline, 'offline');
 
   @JsonKey(ignore: true)
-  late WidgetRef ref;
-  @JsonKey(ignore: true)
   Timer? timer;
 
+  late AveragePrice lastAveragePrice;
   OrderNew? lastBuyOrder;
   bool isBuyOrderCompleted = false;
   OrderNew? lastSellOrder;
   double lossSellOrderCounter = 0;
-  dynamic? cryptoInfo;
-  List<Order> ordersHistory = [];
 
-  MinimizeLossesBot(this.name, this.testNet, this.config);
-
-  MinimizeLossesBot.create({
-    required this.name,
-    required this.testNet,
-    required String symbol,
-    required int dailyLossSellOrders,
-    required double maxQuantityPerOrder,
-    required double percentageSellOrder,
-    required Duration timerBuyOrder,
-  }) {
-    uuid = const Uuid().v4();
-    type = BotTypes.minimizeLosses;
-    config = MinimizeLossesConfig.create(
-      symbol: symbol,
-      dailyLossSellOrders: dailyLossSellOrders,
-      maxQuantityPerOrder: maxQuantityPerOrder,
-      percentageSellOrder: percentageSellOrder,
-      timerBuyOrder: timerBuyOrder,
-    );
-  }
+  MinimizeLossesPipeline(this.bot);
 
   @override
   void start(WidgetRef ref) async {
-    this.ref = ref;
+    bot.ref = bot.ref;
 
     changeStatusTo(BotPhases.starting, 'starting');
 
@@ -60,7 +30,7 @@ class MinimizeLossesBot implements Bot {
 
     // If buyorder does not exists
     if (lastBuyOrder == null) {
-      final avgPrice = await _getCurrentCryptoPrice();
+      lastAveragePrice = await _getCurrentCryptoPrice();
 
       // Exit if bot execution has been interrupted
       if (status.phase != BotPhases.starting) return;
@@ -68,7 +38,7 @@ class MinimizeLossesBot implements Bot {
       changeStatusTo(BotPhases.starting, 'submitting buy order');
 
       // submit order price
-      lastBuyOrder = await _submitBuyOrder(avgPrice.price);
+      lastBuyOrder = await _submitBuyOrder();
     }
 
     // Exit if bot execution has been interrupted
@@ -76,7 +46,7 @@ class MinimizeLossesBot implements Bot {
 
     changeStatusTo(BotPhases.starting, 'waiting buy order to complete');
 
-    ref.read(fileStorageProvider).saveBots([this]);
+    bot.ref.read(fileStorageProvider).upsertBots([bot]);
 
     timer =
         Timer.periodic(const Duration(seconds: 10), _runCheckBuyOrderPipeline);
@@ -103,20 +73,9 @@ class MinimizeLossesBot implements Bot {
     /// TODO notify
   }
 
-  @override
-  void remove(WidgetRef ref) {
-    /// TODO implement remove
-  }
-
-  factory MinimizeLossesBot.fromJson(Map<String, dynamic> json) =>
-      _$MinimizeLossesBotFromJson(json);
-
-  @override
-  Map<String, dynamic> toJson() => _$MinimizeLossesBotToJson(this);
-
   void changeStatusTo(BotPhases phase, String message) {
     status = BotStatus(phase, message);
-    ref.read(botProvider.notifier).updateBotStatus(uuid, status);
+    bot.ref.read(botProvider.notifier).updateBotStatus(bot.uuid, status);
   }
 
   /// Check if buy order has been filled. If so, fetch run Bot Pipeline every 10s
@@ -149,7 +108,7 @@ class MinimizeLossesBot implements Bot {
     }
 
     final sellOrder = await _getSellOrder();
-    final avgPrice = await _getCurrentCryptoPrice();
+    lastAveragePrice = await _getCurrentCryptoPrice();
 
     // if order status is open or partially closed
     if (sellOrder.status == OrderStatus.NEW ||
@@ -164,7 +123,7 @@ class MinimizeLossesBot implements Bot {
     // if order status is closed
     else if (sellOrder.status == OrderStatus.FILLED) {
       // TODO resume a buy order
-      ordersHistory.add(sellOrder);
+      bot.ordersHistory.add(sellOrder);
       lastSellOrder = null;
 
       // Check if is a loss
@@ -174,9 +133,9 @@ class MinimizeLossesBot implements Bot {
 
         /// TODO transform lossSellOrderCounter to dailyLossSellOrderCounter
         // check if is major or equal to loss counter
-        if (lossSellOrderCounter >= config.dailyLossSellOrders!) {
+        if (lossSellOrderCounter >= bot.config.dailyLossSellOrders!) {
           timer.cancel();
-          return stop(ref, reason: 'Daily loss sell orders reached');
+          return stop(bot.ref, reason: 'Daily loss sell orders reached');
         }
       }
     } else {
@@ -185,56 +144,57 @@ class MinimizeLossesBot implements Bot {
   }
 
   ApiConnection _getApiConnection() {
-    if (testNet) {
-      return ref.read(settingsProvider).testNetConnection;
+    if (bot.testNet) {
+      return bot.ref.read(settingsProvider).testNetConnection;
     }
-    return ref.read(settingsProvider).pubNetConnection;
+    return bot.ref.read(settingsProvider).pubNetConnection;
   }
 
   Future<AveragePrice> _getCurrentCryptoPrice() async {
-    final res = await ref
+    final res = await bot.ref
         .read(apiProvider)
         .spot
         .market
-        .getAveragePrice(_getApiConnection(), config.symbol!);
+        .getAveragePrice(_getApiConnection(), bot.config.symbol!);
     return res.body;
   }
 
-  Future<OrderNew> _submitBuyOrder(double currentPrice) async {
-    currentPrice = _approxPrice(currentPrice);
-    final res = await ref.read(apiProvider).spot.trade.newOrder(
+  /// Submit a new Buy Order with the last average price approximated
+  Future<OrderNew> _submitBuyOrder() async {
+    final currentApproxPrice = _approxPrice(lastAveragePrice.price);
+    final res = await bot.ref.read(apiProvider).spot.trade.newOrder(
         _getApiConnection(),
-        config.symbol!,
+        bot.config.symbol!,
         OrderSides.BUY,
         OrderTypes.LIMIT,
-        config.maxQuantityPerOrder!,
-        currentPrice);
+        bot.config.maxQuantityPerOrder!,
+        currentApproxPrice);
 
     return res.body;
   }
 
   Future<OrderStatus> _checkBuyOrderStatus() async {
-    final res = await ref.read(apiProvider).spot.trade.getQueryOrder(
-        _getApiConnection(), config.symbol!, lastBuyOrder!.orderId);
+    final res = await bot.ref.read(apiProvider).spot.trade.getQueryOrder(
+        _getApiConnection(), bot.config.symbol!, lastBuyOrder!.orderId);
 
     return res.body.status;
   }
 
   Future<OrderNew> _submitSellOrder() async {
     //TODO implement _submitSellOrder
-    final res = await ref.read(apiProvider).spot.trade.newOrder(
+    final res = await bot.ref.read(apiProvider).spot.trade.newOrder(
         _getApiConnection(),
-        config.symbol!,
+        bot.config.symbol!,
         OrderSides.SELL,
         OrderTypes.LIMIT,
-        config.maxQuantityPerOrder!,
+        bot.config.maxQuantityPerOrder!,
         lastBuyOrder!.executedQty);
     return res.body;
   }
 
   Future<Order> _getSellOrder() async {
-    final res = await ref.read(apiProvider).spot.trade.getQueryOrder(
-        _getApiConnection(), config.symbol!, lastBuyOrder!.orderId);
+    final res = await bot.ref.read(apiProvider).spot.trade.getQueryOrder(
+        _getApiConnection(), bot.config.symbol!, lastBuyOrder!.orderId);
     return res.body;
   }
 
@@ -244,11 +204,11 @@ class MinimizeLossesBot implements Bot {
   }
 
   Future<OrderCancel> _cancelOrder(int orderId) async {
-    final res = await ref
+    final res = await bot.ref
         .read(apiProvider)
         .spot
         .trade
-        .cancelOrder(_getApiConnection(), config.symbol!, orderId);
+        .cancelOrder(_getApiConnection(), bot.config.symbol!, orderId);
 
     return res.body;
   }
@@ -258,12 +218,17 @@ class MinimizeLossesBot implements Bot {
   }
 
   double _calculateNewOrderPrice() {
-    return cryptoInfo.actualValue -
-        (lastBuyOrder!.price * config.percentageSellOrder! / 100);
+    return lastAveragePrice.price -
+        (lastBuyOrder!.price * bot.config.percentageSellOrder! / 100);
   }
 
   /// TODO put buy order price as parameter
   double _approxPrice(double price) {
     return (price).floorToDouble();
   }
+
+  factory MinimizeLossesPipeline.fromJson(Map<String, dynamic> json) =>
+      _$MinimizeLossesPipelineFromJson(json);
+
+  Map<String, dynamic> toJson() => _$MinimizeLossesPipelineToJson(this);
 }

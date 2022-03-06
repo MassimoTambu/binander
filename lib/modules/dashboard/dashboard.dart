@@ -1,7 +1,7 @@
 library dashboard_module;
 
-import 'package:bottino_fortino/bot/bot.dart';
-import 'package:bottino_fortino/bot/bots/minimize_losses/minimize_losses.dart';
+import 'package:bottino_fortino/modules/bot/bot.dart';
+import 'package:bottino_fortino/modules/bot/bots/minimize_losses/minimize_losses.dart';
 import 'package:bottino_fortino/models/models.dart';
 import 'package:bottino_fortino/router/app_router.dart';
 import 'package:auto_route/auto_route.dart';

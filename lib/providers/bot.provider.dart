@@ -1,4 +1,4 @@
-part of bot;
+part of providers;
 
 final botProvider = StateNotifierProvider<BotProvider, List<Bot>>((ref) {
   return BotProvider(ref);
@@ -18,7 +18,7 @@ class BotProvider extends StateNotifier<List<Bot>> {
   }
 
   void updateBotStatus(String uuid, BotStatus status) {
-    state.firstWhere((b) => b.uuid == uuid).status = status;
+    state.firstWhere((b) => b.uuid == uuid).pipeline.status = status;
     state = [...state];
   }
 
@@ -122,6 +122,6 @@ class BotProvider extends StateNotifier<List<Bot>> {
   }
 
   void _saveBot(Bot bot) {
-    _ref.read(fileStorageProvider).saveBots([bot]);
+    _ref.read(fileStorageProvider).upsertBots([bot]);
   }
 }

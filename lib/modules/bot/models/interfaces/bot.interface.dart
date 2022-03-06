@@ -6,19 +6,20 @@ abstract class Bot {
   final String name;
   final bool testNet;
   final Config config;
-
-  var status = BotStatus(BotPhases.offline, 'offline');
+  final Pipeline pipeline;
+  final OrdersHistory ordersHistory;
+  late final WidgetRef ref;
 
   Bot(
     this.uuid,
     this.type, {
     required this.name,
-    required this.config,
     required this.testNet,
+    required this.config,
+    required this.pipeline,
+    required this.ordersHistory,
   });
 
-  void start(WidgetRef ref);
-  void stop(WidgetRef ref, {String reason = ''});
   void remove(WidgetRef ref);
 
   static String botNameName = "bot_name";

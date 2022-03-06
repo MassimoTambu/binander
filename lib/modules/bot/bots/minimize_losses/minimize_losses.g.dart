@@ -28,6 +28,33 @@ Map<String, dynamic> _$MinimizeLossesConfigToJson(
       'timerBuyOrder': instance.timerBuyOrder?.inMicroseconds,
     };
 
+MinimizeLossesPipeline _$MinimizeLossesPipelineFromJson(
+        Map<String, dynamic> json) =>
+    MinimizeLossesPipeline(
+      MinimizeLossesBot.fromJson(json['bot'] as Map<String, dynamic>),
+    )
+      ..lastAveragePrice = AveragePrice.fromJson(
+          json['lastAveragePrice'] as Map<String, dynamic>)
+      ..lastBuyOrder = json['lastBuyOrder'] == null
+          ? null
+          : OrderNew.fromJson(json['lastBuyOrder'] as Map<String, dynamic>)
+      ..isBuyOrderCompleted = json['isBuyOrderCompleted'] as bool
+      ..lastSellOrder = json['lastSellOrder'] == null
+          ? null
+          : OrderNew.fromJson(json['lastSellOrder'] as Map<String, dynamic>)
+      ..lossSellOrderCounter = (json['lossSellOrderCounter'] as num).toDouble();
+
+Map<String, dynamic> _$MinimizeLossesPipelineToJson(
+        MinimizeLossesPipeline instance) =>
+    <String, dynamic>{
+      'bot': instance.bot,
+      'lastAveragePrice': instance.lastAveragePrice,
+      'lastBuyOrder': instance.lastBuyOrder,
+      'isBuyOrderCompleted': instance.isBuyOrderCompleted,
+      'lastSellOrder': instance.lastSellOrder,
+      'lossSellOrderCounter': instance.lossSellOrderCounter,
+    };
+
 MinimizeLossesBot _$MinimizeLossesBotFromJson(Map<String, dynamic> json) =>
     MinimizeLossesBot(
       json['name'] as String,
@@ -36,18 +63,8 @@ MinimizeLossesBot _$MinimizeLossesBotFromJson(Map<String, dynamic> json) =>
     )
       ..uuid = json['uuid'] as String
       ..type = $enumDecode(_$BotTypesEnumMap, json['type'])
-      ..lastBuyOrder = json['lastBuyOrder'] == null
-          ? null
-          : OrderNew.fromJson(json['lastBuyOrder'] as Map<String, dynamic>)
-      ..isBuyOrderCompleted = json['isBuyOrderCompleted'] as bool
-      ..lastSellOrder = json['lastSellOrder'] == null
-          ? null
-          : OrderNew.fromJson(json['lastSellOrder'] as Map<String, dynamic>)
-      ..lossSellOrderCounter = (json['lossSellOrderCounter'] as num).toDouble()
-      ..cryptoInfo = json['cryptoInfo']
-      ..ordersHistory = (json['ordersHistory'] as List<dynamic>)
-          .map((e) => Order.fromJson(e as Map<String, dynamic>))
-          .toList();
+      ..pipeline = MinimizeLossesPipeline.fromJson(
+          json['pipeline'] as Map<String, dynamic>);
 
 Map<String, dynamic> _$MinimizeLossesBotToJson(MinimizeLossesBot instance) =>
     <String, dynamic>{
@@ -56,12 +73,7 @@ Map<String, dynamic> _$MinimizeLossesBotToJson(MinimizeLossesBot instance) =>
       'testNet': instance.testNet,
       'config': instance.config,
       'name': instance.name,
-      'lastBuyOrder': instance.lastBuyOrder,
-      'isBuyOrderCompleted': instance.isBuyOrderCompleted,
-      'lastSellOrder': instance.lastSellOrder,
-      'lossSellOrderCounter': instance.lossSellOrderCounter,
-      'cryptoInfo': instance.cryptoInfo,
-      'ordersHistory': instance.ordersHistory,
+      'pipeline': instance.pipeline,
     };
 
 const _$BotTypesEnumMap = {

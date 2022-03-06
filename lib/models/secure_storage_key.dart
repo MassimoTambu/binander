@@ -1,4 +1,4 @@
-part of providers;
+part of models;
 
 class SecureStorageKey {
   final String name;

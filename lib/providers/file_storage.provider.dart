@@ -39,15 +39,15 @@ class FileStorageProvider {
     }
   }
 
-  void saveBots(List<Bot> bots) {
+  void upsertBots(List<Bot> bots) {
     for (var bot in bots) {
-      if (bot is MinimizeLossesBot) _saveBot(bot);
+      if (bot is MinimizeLossesBot) _upsertBot(bot);
     }
 
     _saveFile();
   }
 
-  void _saveBot(Bot newBot) {
+  void _upsertBot(Bot newBot) {
     final bots = data['bots'] as List;
     var botFound = false;
 
