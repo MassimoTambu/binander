@@ -22,7 +22,7 @@ class MinimizeLossesPipeline implements Pipeline {
 
   @override
   void start(WidgetRef ref) async {
-    bot.ref = bot.ref;
+    bot._ref = ref;
 
     changeStatusTo(BotPhases.starting, 'starting');
 
@@ -46,7 +46,7 @@ class MinimizeLossesPipeline implements Pipeline {
 
     changeStatusTo(BotPhases.starting, 'waiting buy order to complete');
 
-    bot.ref.read(fileStorageProvider).upsertBots([bot]);
+    bot._ref.read(fileStorageProvider).upsertBots([bot]);
 
     timer =
         Timer.periodic(const Duration(seconds: 10), _runCheckBuyOrderPipeline);
@@ -54,6 +54,7 @@ class MinimizeLossesPipeline implements Pipeline {
 
   @override
   void stop(WidgetRef ref, {String reason = ''}) async {
+    bot._ref = ref;
     timer?.cancel();
 
     if (reason.isNotEmpty) {
@@ -75,7 +76,7 @@ class MinimizeLossesPipeline implements Pipeline {
 
   void changeStatusTo(BotPhases phase, String message) {
     status = BotStatus(phase, message);
-    bot.ref.read(botProvider.notifier).updateBotStatus(bot.uuid, status);
+    bot._ref.read(botProvider.notifier).updateBotStatus(bot.uuid, status);
   }
 
   /// Check if buy order has been filled. If so, fetch run Bot Pipeline every 10s
@@ -135,7 +136,7 @@ class MinimizeLossesPipeline implements Pipeline {
         // check if is major or equal to loss counter
         if (lossSellOrderCounter >= bot.config.dailyLossSellOrders!) {
           timer.cancel();
-          return stop(bot.ref, reason: 'Daily loss sell orders reached');
+          return stop(bot._ref, reason: 'Daily loss sell orders reached');
         }
       }
     } else {
@@ -145,13 +146,13 @@ class MinimizeLossesPipeline implements Pipeline {
 
   ApiConnection _getApiConnection() {
     if (bot.testNet) {
-      return bot.ref.read(settingsProvider).testNetConnection;
+      return bot._ref.read(settingsProvider).testNetConnection;
     }
-    return bot.ref.read(settingsProvider).pubNetConnection;
+    return bot._ref.read(settingsProvider).pubNetConnection;
   }
 
   Future<AveragePrice> _getCurrentCryptoPrice() async {
-    final res = await bot.ref
+    final res = await bot._ref
         .read(apiProvider)
         .spot
         .market
@@ -162,7 +163,7 @@ class MinimizeLossesPipeline implements Pipeline {
   /// Submit a new Buy Order with the last average price approximated
   Future<OrderNew> _submitBuyOrder() async {
     final currentApproxPrice = _approxPrice(lastAveragePrice.price);
-    final res = await bot.ref.read(apiProvider).spot.trade.newOrder(
+    final res = await bot._ref.read(apiProvider).spot.trade.newOrder(
         _getApiConnection(),
         bot.config.symbol!,
         OrderSides.BUY,
@@ -174,7 +175,7 @@ class MinimizeLossesPipeline implements Pipeline {
   }
 
   Future<OrderStatus> _checkBuyOrderStatus() async {
-    final res = await bot.ref.read(apiProvider).spot.trade.getQueryOrder(
+    final res = await bot._ref.read(apiProvider).spot.trade.getQueryOrder(
         _getApiConnection(), bot.config.symbol!, lastBuyOrder!.orderId);
 
     return res.body.status;
@@ -182,7 +183,7 @@ class MinimizeLossesPipeline implements Pipeline {
 
   Future<OrderNew> _submitSellOrder() async {
     //TODO implement _submitSellOrder
-    final res = await bot.ref.read(apiProvider).spot.trade.newOrder(
+    final res = await bot._ref.read(apiProvider).spot.trade.newOrder(
         _getApiConnection(),
         bot.config.symbol!,
         OrderSides.SELL,
@@ -193,7 +194,7 @@ class MinimizeLossesPipeline implements Pipeline {
   }
 
   Future<Order> _getSellOrder() async {
-    final res = await bot.ref.read(apiProvider).spot.trade.getQueryOrder(
+    final res = await bot._ref.read(apiProvider).spot.trade.getQueryOrder(
         _getApiConnection(), bot.config.symbol!, lastBuyOrder!.orderId);
     return res.body;
   }
@@ -204,7 +205,7 @@ class MinimizeLossesPipeline implements Pipeline {
   }
 
   Future<OrderCancel> _cancelOrder(int orderId) async {
-    final res = await bot.ref
+    final res = await bot._ref
         .read(apiProvider)
         .spot
         .trade

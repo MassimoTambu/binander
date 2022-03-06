@@ -8,7 +8,7 @@ abstract class Bot {
   final Config config;
   final Pipeline pipeline;
   final OrdersHistory ordersHistory;
-  late final WidgetRef ref;
+  late final WidgetRef _ref;
 
   Bot(
     this.uuid,

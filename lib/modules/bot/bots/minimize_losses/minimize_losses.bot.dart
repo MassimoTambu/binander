@@ -14,7 +14,7 @@ class MinimizeLossesBot implements Bot {
   final String name;
   @override
   @JsonKey(ignore: true)
-  late WidgetRef ref;
+  late WidgetRef _ref;
   @override
   late final MinimizeLossesPipeline pipeline;
   @override
