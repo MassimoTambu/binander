@@ -3,6 +3,7 @@ library bot;
 import 'package:bottino_fortino/api/api.dart';
 import 'package:bottino_fortino/modules/bot/bots/minimize_losses/minimize_losses.dart';
 import 'package:bottino_fortino/models/models.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 part 'models/interfaces/bot.interface.dart';

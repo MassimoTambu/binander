@@ -8,22 +8,6 @@ class BotTileChips extends ConsumerWidget {
     required this.uuid,
   }) : super(key: key);
 
-  Color getBotPhaseColor(BotStatus botStatus) {
-    switch (botStatus.phase) {
-      case BotPhases.offline:
-        return Colors.grey;
-      case BotPhases.starting:
-      case BotPhases.stopping:
-        return Colors.orange;
-      case BotPhases.error:
-        return Colors.red;
-      case BotPhases.online:
-        return Colors.green;
-      default:
-        return Colors.grey;
-    }
-  }
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final botStatus = ref.watch(botProvider
@@ -40,7 +24,7 @@ class BotTileChips extends ConsumerWidget {
             backgroundColor: Colors.black,
             radius: 8,
             child: CircleAvatar(
-              backgroundColor: getBotPhaseColor(botStatus),
+              backgroundColor: botStatus.getBotPhaseColor(),
               radius: 5.4,
             ),
           ),
