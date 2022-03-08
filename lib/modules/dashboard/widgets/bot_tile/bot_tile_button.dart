@@ -30,17 +30,17 @@ class _BotTileButtonState extends ConsumerState<BotTileButton> {
   }
 
   void onPressed(WidgetRef ref, Bot bot) {
-    if (hasToStart(bot.pipeline.status.phase)) {
-      bot.pipeline.start(ref);
+    if (hasToStart(bot.status.phase)) {
+      bot.start(ref);
     } else {
-      bot.pipeline.stop(ref);
+      bot.stop(ref);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final bot = ref.watch(botProvider).firstWhere((b) => b.uuid == widget.uuid);
-    final phase = bot.pipeline.status.phase;
+    final phase = bot.status.phase;
 
     isDisabled = isButtonDisabled(phase);
     isStarted = !hasToStart(phase);

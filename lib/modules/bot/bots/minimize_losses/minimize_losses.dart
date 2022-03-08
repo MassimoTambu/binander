@@ -12,6 +12,5 @@ import 'package:json_annotation/json_annotation.dart';
 import 'package:uuid/uuid.dart';
 
 part 'minimize_losses.config.dart';
-part 'minimize_losses.pipeline.dart';
 part 'minimize_losses.bot.dart';
 part 'minimize_losses.g.dart';

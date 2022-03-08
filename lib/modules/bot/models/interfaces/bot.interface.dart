@@ -1,12 +1,11 @@
 part of bot;
 
-abstract class Bot {
+abstract class Bot implements Pipeline {
   final String uuid;
   final BotTypes type;
   final String name;
   final bool testNet;
   final Config config;
-  final Pipeline pipeline;
   final OrdersHistory ordersHistory;
   late final WidgetRef _ref;
 
@@ -16,7 +15,6 @@ abstract class Bot {
     required this.name,
     required this.testNet,
     required this.config,
-    required this.pipeline,
     required this.ordersHistory,
   });
 

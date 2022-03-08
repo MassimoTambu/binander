@@ -18,7 +18,7 @@ class BotProvider extends StateNotifier<List<Bot>> {
   }
 
   void updateBotStatus(String uuid, BotStatus status) {
-    state.firstWhere((b) => b.uuid == uuid).pipeline.status = status;
+    state.firstWhere((b) => b.uuid == uuid).status = status;
     state = [...state];
   }
 
