@@ -7,7 +7,7 @@ abstract class Bot implements Pipeline {
   final bool testNet;
   final Config config;
   final OrdersHistory ordersHistory;
-  late final WidgetRef _ref;
+  late final WidgetRef ref;
 
   Bot(
     this.uuid,

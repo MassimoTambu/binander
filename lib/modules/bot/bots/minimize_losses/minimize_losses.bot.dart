@@ -14,7 +14,7 @@ class MinimizeLossesBot implements Bot {
   final String name;
   @override
   @JsonKey(ignore: true)
-  late WidgetRef _ref;
+  late WidgetRef ref;
   @override
   final ordersHistory = const OrdersHistory([]);
   @override
@@ -58,7 +58,7 @@ class MinimizeLossesBot implements Bot {
 
   @override
   void start(WidgetRef ref) async {
-    _ref = ref;
+    this.ref = ref;
 
     changeStatusTo(BotPhases.starting, 'starting');
 
@@ -82,7 +82,7 @@ class MinimizeLossesBot implements Bot {
 
     changeStatusTo(BotPhases.starting, 'waiting buy order to complete');
 
-    _ref.read(fileStorageProvider).upsertBots([this]);
+    ref.read(fileStorageProvider).upsertBots([this]);
 
     timer =
         Timer.periodic(const Duration(seconds: 10), _runCheckBuyOrderPipeline);
@@ -90,7 +90,7 @@ class MinimizeLossesBot implements Bot {
 
   @override
   void stop(WidgetRef ref, {String reason = ''}) async {
-    _ref = ref;
+    this.ref = ref;
     timer?.cancel();
 
     if (reason.isNotEmpty) {
@@ -112,7 +112,7 @@ class MinimizeLossesBot implements Bot {
 
   void changeStatusTo(BotPhases phase, String message) {
     status = BotStatus(phase, message);
-    _ref.read(botProvider.notifier).updateBotStatus(uuid, status);
+    ref.read(botProvider.notifier).updateBotStatus(uuid, status);
   }
 
   /// Check if buy order has been filled. If so, fetch run Bot Pipeline every 10s
@@ -172,7 +172,7 @@ class MinimizeLossesBot implements Bot {
         // check if is major or equal to loss counter
         if (lossSellOrderCounter >= config.dailyLossSellOrders!) {
           timer.cancel();
-          return stop(_ref, reason: 'Daily loss sell orders reached');
+          return stop(ref, reason: 'Daily loss sell orders reached');
         }
       }
     } else {
@@ -182,13 +182,13 @@ class MinimizeLossesBot implements Bot {
 
   ApiConnection _getApiConnection() {
     if (testNet) {
-      return _ref.read(settingsProvider).testNetConnection;
+      return ref.read(settingsProvider).testNetConnection;
     }
-    return _ref.read(settingsProvider).pubNetConnection;
+    return ref.read(settingsProvider).pubNetConnection;
   }
 
   Future<AveragePrice> _getCurrentCryptoPrice() async {
-    final res = await _ref
+    final res = await ref
         .read(apiProvider)
         .spot
         .market
@@ -199,7 +199,7 @@ class MinimizeLossesBot implements Bot {
   /// Submit a new Buy Order with the last average price approximated
   Future<OrderNew> _submitBuyOrder() async {
     final currentApproxPrice = _approxPrice(lastAveragePrice.price);
-    final res = await _ref.read(apiProvider).spot.trade.newOrder(
+    final res = await ref.read(apiProvider).spot.trade.newOrder(
         _getApiConnection(),
         config.symbol!,
         OrderSides.BUY,
@@ -211,7 +211,7 @@ class MinimizeLossesBot implements Bot {
   }
 
   Future<OrderStatus> _checkBuyOrderStatus() async {
-    final res = await _ref.read(apiProvider).spot.trade.getQueryOrder(
+    final res = await ref.read(apiProvider).spot.trade.getQueryOrder(
         _getApiConnection(), config.symbol!, lastBuyOrder!.orderId);
 
     return res.body.status;
@@ -219,7 +219,7 @@ class MinimizeLossesBot implements Bot {
 
   Future<OrderNew> _submitSellOrder() async {
     //TODO implement _submitSellOrder
-    final res = await _ref.read(apiProvider).spot.trade.newOrder(
+    final res = await ref.read(apiProvider).spot.trade.newOrder(
         _getApiConnection(),
         config.symbol!,
         OrderSides.SELL,
@@ -230,7 +230,7 @@ class MinimizeLossesBot implements Bot {
   }
 
   Future<Order> _getSellOrder() async {
-    final res = await _ref.read(apiProvider).spot.trade.getQueryOrder(
+    final res = await ref.read(apiProvider).spot.trade.getQueryOrder(
         _getApiConnection(), config.symbol!, lastBuyOrder!.orderId);
     return res.body;
   }
@@ -241,7 +241,7 @@ class MinimizeLossesBot implements Bot {
   }
 
   Future<OrderCancel> _cancelOrder(int orderId) async {
-    final res = await _ref
+    final res = await ref
         .read(apiProvider)
         .spot
         .trade
