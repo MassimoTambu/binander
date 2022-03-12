@@ -6,6 +6,37 @@ part of api;
 // JsonSerializableGenerator
 // **************************************************************************
 
+ApiKeyPermission _$ApiKeyPermissionFromJson(Map<String, dynamic> json) =>
+    ApiKeyPermission(
+      json['ipRestrict'] as bool,
+      ParseUtils.unixToDateTime(json['createTime'] as int),
+      json['enableWithdrawals'] as bool,
+      json['enableInternalTransfer'] as bool,
+      json['permitsUniversalTransfer'] as bool,
+      json['enableVanillaOptions'] as bool,
+      json['enableReading'] as bool,
+      json['enableFutures'] as bool,
+      json['enableMargin'] as bool,
+      json['enableSpotAndMarginTrading'] as bool,
+      ParseUtils.unixToDateTime(json['tradingAuthorityExpirationTime'] as int),
+    );
+
+Map<String, dynamic> _$ApiKeyPermissionToJson(ApiKeyPermission instance) =>
+    <String, dynamic>{
+      'ipRestrict': instance.ipRestrict,
+      'createTime': instance.createTime.toIso8601String(),
+      'enableWithdrawals': instance.enableWithdrawals,
+      'enableInternalTransfer': instance.enableInternalTransfer,
+      'permitsUniversalTransfer': instance.permitsUniversalTransfer,
+      'enableVanillaOptions': instance.enableVanillaOptions,
+      'enableReading': instance.enableReading,
+      'enableFutures': instance.enableFutures,
+      'enableMargin': instance.enableMargin,
+      'enableSpotAndMarginTrading': instance.enableSpotAndMarginTrading,
+      'tradingAuthorityExpirationTime':
+          instance.tradingAuthorityExpirationTime.toIso8601String(),
+    };
+
 AveragePrice _$AveragePriceFromJson(Map<String, dynamic> json) => AveragePrice(
       json['mins'] as int,
       ParseUtils.stringToDouble(json['price'] as String),
@@ -15,6 +46,17 @@ Map<String, dynamic> _$AveragePriceToJson(AveragePrice instance) =>
     <String, dynamic>{
       'mins': instance.mins,
       'price': instance.price,
+    };
+
+SystemStatus _$SystemStatusFromJson(Map<String, dynamic> json) => SystemStatus(
+      json['status'] as int,
+      json['msg'] as String,
+    );
+
+Map<String, dynamic> _$SystemStatusToJson(SystemStatus instance) =>
+    <String, dynamic>{
+      'status': instance.status,
+      'msg': instance.msg,
     };
 
 AccountInformation _$AccountInformationFromJson(Map<String, dynamic> json) =>

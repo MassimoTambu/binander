@@ -16,7 +16,9 @@ part 'api_utils.dart';
 part 'api_response.dart';
 part 'api_constants.dart';
 
+part 'models/api_key_permission.dart';
 part 'models/average_price.dart';
+part 'models/system_status.dart';
 part 'models/account_and_symbol_permission.enum.dart';
 part 'models/symbol_status.enum.dart';
 part 'models/time_in_force.enum.dart';

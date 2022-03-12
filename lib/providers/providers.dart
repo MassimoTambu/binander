@@ -17,6 +17,7 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 part 'secure_storage.provider.dart';
 part 'memory_storage.provider.dart';
 part 'snackbar.provider.dart';
+part 'binance_account_information.provider.dart';
 part 'binance_pub_net_status.provider.dart';
 part 'binance_test_net_status.provider.dart';
 part 'file_storage.provider.dart';

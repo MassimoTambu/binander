@@ -9,8 +9,29 @@ class Wallet {
 
   const Wallet(this._read);
 
-  /// Check Api status
-  Future<ApiResponse> getPubNetApiKeyPermission(ApiConnection conn) async {
+  Future<ApiResponse<SystemStatus>> getSystemStatus(ApiConnection conn) async {
+    final request =
+        Request('GET', Uri.parse('${conn.url}/sapi/v1/system/status'));
+
+    final response = await request.send();
+
+    if (response.statusCode != HttpStatus.ok) {
+      return Future.error(
+        {response.reasonPhrase},
+        StackTrace.fromString('getSystemStatus'),
+      );
+    }
+
+    final body = await response.stream.bytesToString();
+
+    final res = ApiResponse(
+        SystemStatus.fromJson(jsonDecode(body)), response.statusCode);
+    return res;
+  }
+
+  /// Check ApiKey Permission status
+  Future<ApiResponse<ApiKeyPermission>> getPubNetApiKeyPermission(
+      ApiConnection conn) async {
     final apiUtils = _read(_apiUtilsProvider);
 
     final secureQuery = apiUtils.createQueryWithSecurity(
@@ -41,7 +62,8 @@ class Wallet {
 
     final body = await response.stream.bytesToString();
 
-    final res = ApiResponse(jsonDecode(body), response.statusCode);
+    final res = ApiResponse(
+        ApiKeyPermission.fromJson(jsonDecode(body)), response.statusCode);
     return res;
   }
 }
