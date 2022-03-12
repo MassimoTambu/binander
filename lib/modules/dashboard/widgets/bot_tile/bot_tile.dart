@@ -25,7 +25,14 @@ class BotTile extends ConsumerWidget {
       childrenPadding: const EdgeInsets.all(10),
       children: [
         const BotTileDetails(),
-        BotTileButton(uuid: bot.uuid),
+        const BotTileButton(),
+        // TODO add History Orders
+        // ProviderScope(
+        //   overrides: [
+        //     isTestNet.overrideWithValue(bot.testNet),
+        //   ],
+        //   child: const History(),
+        // ),
       ],
     );
   }

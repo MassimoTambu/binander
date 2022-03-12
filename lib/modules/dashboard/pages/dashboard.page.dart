@@ -11,7 +11,6 @@ class DashboardPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final bots = ref.watch(botProvider);
 
-    ///TODO show also owned crypto list and quantities on pubnet and testnet
     return Scaffold(
       appBar: AppBar(
         title: const Text('Dashboard'),

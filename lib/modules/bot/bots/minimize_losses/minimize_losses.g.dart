@@ -36,8 +36,10 @@ MinimizeLossesBot _$MinimizeLossesBotFromJson(Map<String, dynamic> json) =>
     )
       ..uuid = json['uuid'] as String
       ..type = $enumDecode(_$BotTypesEnumMap, json['type'])
-      ..lastAveragePrice = AveragePrice.fromJson(
-          json['lastAveragePrice'] as Map<String, dynamic>)
+      ..lastAveragePrice = json['lastAveragePrice'] == null
+          ? null
+          : AveragePrice.fromJson(
+              json['lastAveragePrice'] as Map<String, dynamic>)
       ..lastBuyOrder = json['lastBuyOrder'] == null
           ? null
           : OrderNew.fromJson(json['lastBuyOrder'] as Map<String, dynamic>)

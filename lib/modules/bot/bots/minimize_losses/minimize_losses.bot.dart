@@ -23,7 +23,7 @@ class MinimizeLossesBot implements Bot {
 
   @JsonKey(ignore: true)
   Timer? timer;
-  late AveragePrice lastAveragePrice;
+  AveragePrice? lastAveragePrice;
   OrderNew? lastBuyOrder;
   bool isBuyOrderCompleted = false;
   OrderNew? lastSellOrder;
@@ -198,7 +198,7 @@ class MinimizeLossesBot implements Bot {
 
   /// Submit a new Buy Order with the last average price approximated
   Future<OrderNew> _submitBuyOrder() async {
-    final currentApproxPrice = _approxPrice(lastAveragePrice.price);
+    final currentApproxPrice = _approxPrice(lastAveragePrice!.price);
     final res = await ref.read(apiProvider).spot.trade.newOrder(
         _getApiConnection(),
         config.symbol!,
@@ -255,7 +255,7 @@ class MinimizeLossesBot implements Bot {
   }
 
   double _calculateNewOrderPrice() {
-    return lastAveragePrice.price -
+    return lastAveragePrice!.price -
         (lastBuyOrder!.price * config.percentageSellOrder! / 100);
   }
 
