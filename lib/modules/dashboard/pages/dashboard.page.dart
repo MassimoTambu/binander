@@ -22,13 +22,28 @@ class DashboardPage extends ConsumerWidget {
           ),
         ],
       ),
-      body: ListView.builder(
-        itemCount: bots.length,
-        itemBuilder: (context, i) {
-          return ProviderScope(overrides: [
-            currentBot.overrideWithValue(bots[i]),
-          ], child: const BotTile());
-        },
+      body: CustomScrollView(
+        slivers: [
+          const SliverToBoxAdapter(child: _CryptoInfoContainer()),
+          SliverToBoxAdapter(
+              child: Padding(
+            padding: const EdgeInsets.all(15),
+            child: Text(
+              'Bots',
+              style: Theme.of(context).textTheme.headline5,
+            ),
+          )),
+          SliverList(
+            delegate: SliverChildBuilderDelegate(
+              ((context, i) {
+                return ProviderScope(overrides: [
+                  currentBot.overrideWithValue(bots[i]),
+                ], child: const BotTile());
+              }),
+              childCount: bots.length,
+            ),
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _navigateToAddBotPage(context),

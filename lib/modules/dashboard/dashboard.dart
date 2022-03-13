@@ -21,3 +21,5 @@ part 'widgets/bot_tile/bot_tile.dart';
 part 'widgets/bot_tile/bot_tile_button.dart';
 part 'widgets/bot_tile/bot_tile_chips.dart';
 part 'widgets/bot_tile/bot_tile_details.dart';
+part 'widgets/crypto_info_container/crypto_info_container.dart';
+part 'widgets/crypto_info_container/crypto_info_title.dart';

@@ -17,7 +17,7 @@ class BotTile extends ConsumerWidget {
         children: [
           Text(
             bot.name,
-            style: Theme.of(context).textTheme.headline5,
+            style: Theme.of(context).textTheme.headline6,
           ),
           BotTileChips(uuid: bot.uuid)
         ],
@@ -29,7 +29,7 @@ class BotTile extends ConsumerWidget {
         // TODO add History Orders
         // ProviderScope(
         //   overrides: [
-        //     isTestNet.overrideWithValue(bot.testNet),
+        //     isTestNetProvider.overrideWithValue(bot.testNet),
         //   ],
         //   child: const History(),
         // ),
