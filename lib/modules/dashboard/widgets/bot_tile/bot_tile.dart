@@ -1,13 +1,11 @@
 part of dashboard_module;
 
-final currentBot = Provider<Bot>((ref) => throw UnimplementedError());
-
 class BotTile extends ConsumerWidget {
   const BotTile({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final bot = ref.watch(currentBot);
+    final bot = ref.watch(botTileProvider).bot;
     return ExpansionTile(
       title: Wrap(
         spacing: 8,

@@ -6,15 +6,20 @@ class OrderCancel {
   final int orderId;
   final int orderListId;
   final String clientOrderId;
-  @JsonKey(fromJson: ParseUtils.unixToDateTime)
+  @JsonKey(
+      fromJson: ParseUtils.unixToDateTime, toJson: ParseUtils.dateTimeToUnix)
   final DateTime transactTime;
-  @JsonKey(fromJson: ParseUtils.stringToDouble)
+  @JsonKey(
+      fromJson: ParseUtils.stringToDouble, toJson: ParseUtils.doubleToString)
   final double price;
-  @JsonKey(fromJson: ParseUtils.stringToDouble)
+  @JsonKey(
+      fromJson: ParseUtils.stringToDouble, toJson: ParseUtils.doubleToString)
   final double origQty;
-  @JsonKey(fromJson: ParseUtils.stringToDouble)
+  @JsonKey(
+      fromJson: ParseUtils.stringToDouble, toJson: ParseUtils.doubleToString)
   final double executedQty;
-  @JsonKey(fromJson: ParseUtils.stringToDouble)
+  @JsonKey(
+      fromJson: ParseUtils.stringToDouble, toJson: ParseUtils.doubleToString)
   final double cummulativeQuoteQty;
   final OrderStatus status;
   final TimeInForce timeInForce;

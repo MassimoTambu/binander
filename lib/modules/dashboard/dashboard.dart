@@ -16,7 +16,7 @@ import 'package:bottino_fortino/utils/utils.dart';
 part 'pages/dashboard.page.dart';
 part 'pages/create_bot.page.dart';
 part 'providers/create_bot.provider.dart';
-part 'providers/dashboard.provider.dart';
+part 'providers/bot_tile.provider.dart';
 part 'widgets/bot_tile/bot_tile.dart';
 part 'widgets/bot_tile/bot_tile_button.dart';
 part 'widgets/bot_tile/bot_tile_chips.dart';

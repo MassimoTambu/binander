@@ -35,10 +35,13 @@ class DashboardPage extends ConsumerWidget {
           )),
           SliverList(
             delegate: SliverChildBuilderDelegate(
-              ((context, i) {
-                return ProviderScope(overrides: [
-                  currentBot.overrideWithValue(bots[i]),
-                ], child: const BotTile());
+              ((_, i) {
+                return ProviderScope(
+                  overrides: [
+                    botTileProvider.overrideWithValue(BotTileProvider(bots[i])),
+                  ],
+                  child: const BotTile(),
+                );
               }),
               childCount: bots.length,
             ),

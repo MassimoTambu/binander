@@ -2,11 +2,14 @@ part of api;
 
 @JsonSerializable()
 class Fill {
-  @JsonKey(fromJson: ParseUtils.stringToDouble)
+  @JsonKey(
+      fromJson: ParseUtils.stringToDouble, toJson: ParseUtils.doubleToString)
   final double price;
-  @JsonKey(fromJson: ParseUtils.stringToDouble)
+  @JsonKey(
+      fromJson: ParseUtils.stringToDouble, toJson: ParseUtils.doubleToString)
   final double qty;
-  @JsonKey(fromJson: ParseUtils.stringToDouble)
+  @JsonKey(
+      fromJson: ParseUtils.stringToDouble, toJson: ParseUtils.doubleToString)
   final double commission;
   final String commissionAsset;
   final int tradeId;

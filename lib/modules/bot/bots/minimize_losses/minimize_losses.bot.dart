@@ -23,9 +23,9 @@ class MinimizeLossesBot implements Bot {
 
   @JsonKey(ignore: true)
   Timer? timer;
+  @JsonKey(ignore: true)
   AveragePrice? lastAveragePrice;
   OrderNew? lastBuyOrder;
-  bool isBuyOrderCompleted = false;
   OrderNew? lastSellOrder;
   double lossSellOrderCounter = 0;
 
@@ -58,6 +58,8 @@ class MinimizeLossesBot implements Bot {
 
   @override
   void start(WidgetRef ref) async {
+    if (timer != null && !timer!.isActive) return;
+
     this.ref = ref;
 
     changeStatusTo(BotPhases.starting, 'starting');
@@ -85,9 +87,15 @@ class MinimizeLossesBot implements Bot {
     // Exit if bot execution has been interrupted
     if (status.phase != BotPhases.starting) return;
 
-    changeStatusTo(BotPhases.starting, 'waiting buy order to complete');
+    // ref.read(fileStorageProvider).upsertBots([this]);
 
-    ref.read(fileStorageProvider).upsertBots([this]);
+    // Skip buyOrder pipeline if it has been filled
+    if (lastBuyOrder != null && lastBuyOrder!.status == OrderStatus.FILLED) {
+      timer = Timer.periodic(const Duration(seconds: 10), _runBotPipeline);
+      return;
+    }
+
+    changeStatusTo(BotPhases.starting, 'waiting buy order to complete');
 
     timer =
         Timer.periodic(const Duration(seconds: 10), _runCheckBuyOrderPipeline);
@@ -98,6 +106,8 @@ class MinimizeLossesBot implements Bot {
     this.ref = ref;
     timer?.cancel();
 
+    changeStatusTo(BotPhases.stopping, 'stopping' + reason);
+
     if (reason.isNotEmpty) {
       reason = ': $reason';
     }
@@ -106,13 +116,11 @@ class MinimizeLossesBot implements Bot {
       await _cancelOrder(lastBuyOrder!.orderId);
     }
 
-    changeStatusTo(BotPhases.stopping, 'stopping' + reason);
+    final closingMessage = 'turned off' + reason;
 
-    await Future.delayed(const Duration(seconds: 4));
+    changeStatusTo(BotPhases.offline, closingMessage);
 
-    changeStatusTo(BotPhases.offline, 'turned off' + reason);
-
-    /// TODO notify
+    _showSnackBar(closingMessage);
   }
 
   void changeStatusTo(BotPhases phase, String message) {
@@ -136,12 +144,13 @@ class MinimizeLossesBot implements Bot {
     // Exit if bot execution has been interrupted
     if (status.phase != BotPhases.starting) return;
 
-    final buyOrderStatus = await _checkBuyOrderStatus();
+    // Update order status
+    lastBuyOrder!.status = await _checkBuyOrderStatus();
 
-    if (buyOrderStatus == OrderStatus.FILLED) {
+    if (lastBuyOrder!.status == OrderStatus.FILLED) {
       timer.cancel();
 
-      changeStatusTo(BotPhases.online, 'online');
+      changeStatusTo(BotPhases.online, 'buy order has been filled');
 
       timer = Timer.periodic(const Duration(seconds: 10), _runBotPipeline);
     }
@@ -154,13 +163,17 @@ class MinimizeLossesBot implements Bot {
   Future<void> _runBotPipeline(Timer timer) async {
     if (!timer.isActive) return;
 
+    lastAveragePrice = await _getCurrentCryptoPrice();
+
     if (lastSellOrder == null) {
+      changeStatusTo(BotPhases.online, 'submitting sell order');
       lastSellOrder = await _submitSellOrder();
       return;
     }
 
+    changeStatusTo(BotPhases.online, 'pipeline has been started');
+
     final sellOrder = await _getSellOrder();
-    lastAveragePrice = await _getCurrentCryptoPrice();
 
     // if order status is open or partially closed
     if (sellOrder.status == OrderStatus.NEW ||
@@ -221,7 +234,7 @@ class MinimizeLossesBot implements Bot {
     } on ApiException catch (_, __) {
       const message = 'Failed to submit buy order. Retry in 10s';
 
-      changeStatusTo(BotPhases.error, message);
+      changeStatusTo(BotPhases.starting, message);
 
       _showSnackBar(message);
 
@@ -252,14 +265,15 @@ class MinimizeLossesBot implements Bot {
   }
 
   Future<OrderNew> _submitSellOrder() async {
-    //TODO implement _submitSellOrder
+    final currentApproxPrice = _approxPrice(_calculateNewOrderPrice());
+
     final res = await ref.read(apiProvider).spot.trade.newOrder(
         _getApiConnection(),
         config.symbol!,
         OrderSides.SELL,
         OrderTypes.LIMIT,
         config.maxQuantityPerOrder!,
-        lastBuyOrder!.executedQty);
+        currentApproxPrice);
     return res.body;
   }
 

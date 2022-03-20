@@ -9,6 +9,11 @@ class FileStorageProvider {
   // TODO use stream to write repeatedly to file
   // late IOSink sink;
 
+  static const encoder = JsonEncoder.withIndent('  ');
+
+  static final String defaultApplicationPath = Directory.current.absolute.path;
+  static final String defaultFileName = defaultApplicationPath + '/data.json';
+
   Future<bool> init() async {
     if (kDebugMode) {
       print('init fileStorage');
@@ -17,11 +22,6 @@ class FileStorageProvider {
 
     return true;
   }
-
-  static const encoder = JsonEncoder.withIndent('  ');
-
-  static final String defaultApplicationPath = Directory.current.absolute.path;
-  static final String defaultFileName = defaultApplicationPath + '/data.json';
 
   Future<void> readData() async {
     final file = File.fromUri(Uri.file(defaultFileName));

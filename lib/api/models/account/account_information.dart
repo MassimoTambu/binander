@@ -9,7 +9,8 @@ class AccountInformation {
   final bool canTrade;
   final bool canWithdraw;
   final bool canDeposit;
-  @JsonKey(fromJson: ParseUtils.unixToDateTime)
+  @JsonKey(
+      fromJson: ParseUtils.unixToDateTime, toJson: ParseUtils.dateTimeToUnix)
   final DateTime updateTime;
   final String accountType;
   final List<AccountBalance> balances;

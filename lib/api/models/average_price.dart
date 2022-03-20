@@ -3,7 +3,8 @@ part of api;
 @JsonSerializable()
 class AveragePrice {
   final int mins;
-  @JsonKey(fromJson: ParseUtils.stringToDouble)
+  @JsonKey(
+      fromJson: ParseUtils.stringToDouble, toJson: ParseUtils.doubleToString)
   final double price;
 
   const AveragePrice(this.mins, this.price);

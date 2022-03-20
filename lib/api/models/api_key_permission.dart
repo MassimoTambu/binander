@@ -3,7 +3,8 @@ part of api;
 @JsonSerializable()
 class ApiKeyPermission {
   final bool ipRestrict;
-  @JsonKey(fromJson: ParseUtils.unixToDateTime)
+  @JsonKey(
+      fromJson: ParseUtils.unixToDateTime, toJson: ParseUtils.dateTimeToUnix)
   final DateTime createTime;
   final bool
       enableWithdrawals; // This option allows you to withdraw via API. You must apply the IP Access Restriction filter in order to enable withdrawals
@@ -19,7 +20,8 @@ class ApiKeyPermission {
   final bool
       enableMargin; //  This option can be adjusted after the Cross Margin account transfer is completed
   final bool enableSpotAndMarginTrading; // Spot and margin trading
-  @JsonKey(fromJson: ParseUtils.unixToDateTime)
+  @JsonKey(
+      fromJson: ParseUtils.unixToDateTime, toJson: ParseUtils.dateTimeToUnix)
   final DateTime tradingAuthorityExpirationTime;
 
   ApiKeyPermission(

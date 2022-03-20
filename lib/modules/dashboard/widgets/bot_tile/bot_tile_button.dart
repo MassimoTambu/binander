@@ -1,47 +1,13 @@
 part of dashboard_module;
 
-class BotTileButton extends ConsumerStatefulWidget {
+class BotTileButton extends ConsumerWidget {
   const BotTileButton({Key? key}) : super(key: key);
 
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() => _BotTileButtonState();
-}
-
-class _BotTileButtonState extends ConsumerState<BotTileButton> {
-  late final Bot bot;
-  var isDisabled = false;
-  var isStarted = false;
-
-  bool isButtonDisabled() {
-    if (bot.status.phase == BotPhases.stopping) {
-      return true;
-    }
-
-    return false;
-  }
-
-  bool hasToStart() {
-    if (bot.status.phase == BotPhases.offline ||
-        bot.status.phase == BotPhases.error) {
-      return true;
-    }
-
-    return false;
-  }
-
-  void onPressed(WidgetRef ref) {
-    if (hasToStart()) {
-      bot.start(ref);
-    } else {
-      bot.stop(ref);
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    bot = ref.watch(currentBot);
-    isDisabled = isButtonDisabled();
-    isStarted = !hasToStart();
+  Widget build(BuildContext context, WidgetRef ref) {
+    final _botTileProvider = ref.watch(botTileProvider);
+    final isDisabled = _botTileProvider.isButtonDisabled;
+    final isStarted = !_botTileProvider.hasToStart;
 
     return Row(
       children: [
@@ -53,7 +19,15 @@ class _BotTileButtonState extends ConsumerState<BotTileButton> {
               isStarted ? Colors.red : Theme.of(context).colorScheme.primary,
             ),
           ),
-          onPressed: isDisabled ? null : () => onPressed(ref),
+          onPressed: isDisabled
+              ? null
+              : () {
+                  if (!isStarted) {
+                    _botTileProvider.bot.start(ref);
+                  } else {
+                    _botTileProvider.bot.stop(ref);
+                  }
+                },
         ),
       ],
     );

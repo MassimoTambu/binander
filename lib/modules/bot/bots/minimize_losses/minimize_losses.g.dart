@@ -36,14 +36,9 @@ MinimizeLossesBot _$MinimizeLossesBotFromJson(Map<String, dynamic> json) =>
     )
       ..uuid = json['uuid'] as String
       ..type = $enumDecode(_$BotTypesEnumMap, json['type'])
-      ..lastAveragePrice = json['lastAveragePrice'] == null
-          ? null
-          : AveragePrice.fromJson(
-              json['lastAveragePrice'] as Map<String, dynamic>)
       ..lastBuyOrder = json['lastBuyOrder'] == null
           ? null
           : OrderNew.fromJson(json['lastBuyOrder'] as Map<String, dynamic>)
-      ..isBuyOrderCompleted = json['isBuyOrderCompleted'] as bool
       ..lastSellOrder = json['lastSellOrder'] == null
           ? null
           : OrderNew.fromJson(json['lastSellOrder'] as Map<String, dynamic>)
@@ -56,9 +51,7 @@ Map<String, dynamic> _$MinimizeLossesBotToJson(MinimizeLossesBot instance) =>
       'testNet': instance.testNet,
       'config': instance.config,
       'name': instance.name,
-      'lastAveragePrice': instance.lastAveragePrice,
       'lastBuyOrder': instance.lastBuyOrder,
-      'isBuyOrderCompleted': instance.isBuyOrderCompleted,
       'lastSellOrder': instance.lastSellOrder,
       'lossSellOrderCounter': instance.lossSellOrderCounter,
     };

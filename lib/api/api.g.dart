@@ -24,7 +24,7 @@ ApiKeyPermission _$ApiKeyPermissionFromJson(Map<String, dynamic> json) =>
 Map<String, dynamic> _$ApiKeyPermissionToJson(ApiKeyPermission instance) =>
     <String, dynamic>{
       'ipRestrict': instance.ipRestrict,
-      'createTime': instance.createTime.toIso8601String(),
+      'createTime': ParseUtils.dateTimeToUnix(instance.createTime),
       'enableWithdrawals': instance.enableWithdrawals,
       'enableInternalTransfer': instance.enableInternalTransfer,
       'permitsUniversalTransfer': instance.permitsUniversalTransfer,
@@ -34,7 +34,7 @@ Map<String, dynamic> _$ApiKeyPermissionToJson(ApiKeyPermission instance) =>
       'enableMargin': instance.enableMargin,
       'enableSpotAndMarginTrading': instance.enableSpotAndMarginTrading,
       'tradingAuthorityExpirationTime':
-          instance.tradingAuthorityExpirationTime.toIso8601String(),
+          ParseUtils.dateTimeToUnix(instance.tradingAuthorityExpirationTime),
     };
 
 AveragePrice _$AveragePriceFromJson(Map<String, dynamic> json) => AveragePrice(
@@ -45,7 +45,7 @@ AveragePrice _$AveragePriceFromJson(Map<String, dynamic> json) => AveragePrice(
 Map<String, dynamic> _$AveragePriceToJson(AveragePrice instance) =>
     <String, dynamic>{
       'mins': instance.mins,
-      'price': instance.price,
+      'price': ParseUtils.doubleToString(instance.price),
     };
 
 SystemStatus _$SystemStatusFromJson(Map<String, dynamic> json) => SystemStatus(
@@ -85,7 +85,7 @@ Map<String, dynamic> _$AccountInformationToJson(AccountInformation instance) =>
       'canTrade': instance.canTrade,
       'canWithdraw': instance.canWithdraw,
       'canDeposit': instance.canDeposit,
-      'updateTime': instance.updateTime.toIso8601String(),
+      'updateTime': ParseUtils.dateTimeToUnix(instance.updateTime),
       'accountType': instance.accountType,
       'balances': instance.balances,
       'permissions': instance.permissions,
@@ -111,19 +111,19 @@ Order _$OrderFromJson(Map<String, dynamic> json) => Order(
       json['orderListId'] as int,
       json['clientOrderId'] as String,
       ParseUtils.stringToDouble(json['price'] as String),
-      (json['origQty'] as num).toDouble(),
-      (json['executedQty'] as num).toDouble(),
-      (json['cummulativeQuoteQty'] as num).toDouble(),
+      ParseUtils.stringToDouble(json['origQty'] as String),
+      ParseUtils.stringToDouble(json['executedQty'] as String),
+      ParseUtils.stringToDouble(json['cummulativeQuoteQty'] as String),
       $enumDecode(_$OrderStatusEnumMap, json['status']),
       $enumDecode(_$TimeInForceEnumMap, json['timeInForce']),
       $enumDecode(_$OrderTypesEnumMap, json['type']),
       $enumDecode(_$OrderSidesEnumMap, json['side']),
-      (json['stopPrice'] as num).toDouble(),
-      (json['icebergQty'] as num).toDouble(),
+      ParseUtils.stringToDouble(json['stopPrice'] as String),
+      ParseUtils.stringToDouble(json['icebergQty'] as String),
       ParseUtils.unixToDateTime(json['time'] as int),
       ParseUtils.unixToDateTime(json['updateTime'] as int),
       json['isWorking'] as bool,
-      (json['origQuoteOrderQty'] as num).toDouble(),
+      ParseUtils.stringToDouble(json['origQuoteOrderQty'] as String),
     );
 
 Map<String, dynamic> _$OrderToJson(Order instance) => <String, dynamic>{
@@ -131,20 +131,22 @@ Map<String, dynamic> _$OrderToJson(Order instance) => <String, dynamic>{
       'orderId': instance.orderId,
       'orderListId': instance.orderListId,
       'clientOrderId': instance.clientOrderId,
-      'price': instance.price,
-      'origQty': instance.origQty,
-      'executedQty': instance.executedQty,
-      'cummulativeQuoteQty': instance.cummulativeQuoteQty,
+      'price': ParseUtils.doubleToString(instance.price),
+      'origQty': ParseUtils.doubleToString(instance.origQty),
+      'executedQty': ParseUtils.doubleToString(instance.executedQty),
+      'cummulativeQuoteQty':
+          ParseUtils.doubleToString(instance.cummulativeQuoteQty),
       'status': _$OrderStatusEnumMap[instance.status],
       'timeInForce': _$TimeInForceEnumMap[instance.timeInForce],
       'type': _$OrderTypesEnumMap[instance.type],
       'side': _$OrderSidesEnumMap[instance.side],
-      'stopPrice': instance.stopPrice,
-      'icebergQty': instance.icebergQty,
-      'time': instance.time.toIso8601String(),
-      'updateTime': instance.updateTime.toIso8601String(),
+      'stopPrice': ParseUtils.doubleToString(instance.stopPrice),
+      'icebergQty': ParseUtils.doubleToString(instance.icebergQty),
+      'time': ParseUtils.dateTimeToUnix(instance.time),
+      'updateTime': ParseUtils.dateTimeToUnix(instance.updateTime),
       'isWorking': instance.isWorking,
-      'origQuoteOrderQty': instance.origQuoteOrderQty,
+      'origQuoteOrderQty':
+          ParseUtils.doubleToString(instance.origQuoteOrderQty),
     };
 
 const _$OrderStatusEnumMap = {
@@ -200,11 +202,12 @@ Map<String, dynamic> _$OrderCancelToJson(OrderCancel instance) =>
       'orderId': instance.orderId,
       'orderListId': instance.orderListId,
       'clientOrderId': instance.clientOrderId,
-      'transactTime': instance.transactTime.toIso8601String(),
-      'price': instance.price,
-      'origQty': instance.origQty,
-      'executedQty': instance.executedQty,
-      'cummulativeQuoteQty': instance.cummulativeQuoteQty,
+      'transactTime': ParseUtils.dateTimeToUnix(instance.transactTime),
+      'price': ParseUtils.doubleToString(instance.price),
+      'origQty': ParseUtils.doubleToString(instance.origQty),
+      'executedQty': ParseUtils.doubleToString(instance.executedQty),
+      'cummulativeQuoteQty':
+          ParseUtils.doubleToString(instance.cummulativeQuoteQty),
       'status': _$OrderStatusEnumMap[instance.status],
       'timeInForce': _$TimeInForceEnumMap[instance.timeInForce],
       'type': _$OrderTypesEnumMap[instance.type],
@@ -220,9 +223,9 @@ Fill _$FillFromJson(Map<String, dynamic> json) => Fill(
     );
 
 Map<String, dynamic> _$FillToJson(Fill instance) => <String, dynamic>{
-      'price': instance.price,
-      'qty': instance.qty,
-      'commission': instance.commission,
+      'price': ParseUtils.doubleToString(instance.price),
+      'qty': ParseUtils.doubleToString(instance.qty),
+      'commission': ParseUtils.doubleToString(instance.commission),
       'commissionAsset': instance.commissionAsset,
       'tradeId': instance.tradeId,
     };
@@ -251,11 +254,12 @@ Map<String, dynamic> _$OrderNewToJson(OrderNew instance) => <String, dynamic>{
       'orderId': instance.orderId,
       'orderListId': instance.orderListId,
       'clientOrderId': instance.clientOrderId,
-      'transactTime': instance.transactTime.toIso8601String(),
-      'price': instance.price,
-      'origQty': instance.origQty,
-      'executedQty': instance.executedQty,
-      'cummulativeQuoteQty': instance.cummulativeQuoteQty,
+      'transactTime': ParseUtils.dateTimeToUnix(instance.transactTime),
+      'price': ParseUtils.doubleToString(instance.price),
+      'origQty': ParseUtils.doubleToString(instance.origQty),
+      'executedQty': ParseUtils.doubleToString(instance.executedQty),
+      'cummulativeQuoteQty':
+          ParseUtils.doubleToString(instance.cummulativeQuoteQty),
       'status': _$OrderStatusEnumMap[instance.status],
       'timeInForce': _$TimeInForceEnumMap[instance.timeInForce],
       'type': _$OrderTypesEnumMap[instance.type],

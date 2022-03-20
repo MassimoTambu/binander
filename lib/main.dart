@@ -1,4 +1,5 @@
 import 'package:bottino_fortino/models/models.dart';
+import 'package:bottino_fortino/modules/bot/bot.dart';
 import 'package:bottino_fortino/modules/settings/settings.dart';
 import 'package:bottino_fortino/router/app_router.dart';
 import 'package:bottino_fortino/providers/providers.dart';
@@ -23,16 +24,23 @@ class BottinoFortino extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Container(
       child: ref.watch(initProvider).when(
-            data: (_) => MaterialApp.router(
-              scaffoldMessengerKey: snackbarKey,
-              routerDelegate: _router.delegate(),
-              routeInformationProvider: _router.routeInfoProvider(),
-              routeInformationParser: _router.defaultRouteParser(),
-              localizationsDelegates: const [FormBuilderLocalizations.delegate],
-              theme: themeLight,
-              darkTheme: themeDark,
-              themeMode: ref.watch(settingsProvider).themeMode,
-            ),
+            data: (_) {
+              ref.listen<List<Bot>>(botProvider, (prevBots, newBots) {
+                ref.watch(fileStorageProvider).upsertBots(newBots);
+              });
+              return MaterialApp.router(
+                scaffoldMessengerKey: snackbarKey,
+                routerDelegate: _router.delegate(),
+                routeInformationProvider: _router.routeInfoProvider(),
+                routeInformationParser: _router.defaultRouteParser(),
+                localizationsDelegates: const [
+                  FormBuilderLocalizations.delegate
+                ],
+                theme: themeLight,
+                darkTheme: themeDark,
+                themeMode: ref.watch(settingsProvider).themeMode,
+              );
+            },
             error: (error, st) => Container(
               color: Colors.white,
               child: Center(
