@@ -64,6 +64,12 @@ class MinimizeLossesBot implements Bot {
 
     if (timer != null) timer!.cancel();
 
+    final botLimits = _getBotLimitsReached();
+    if (botLimits.isNotEmpty) {
+      changeStatusTo(BotPhases.error, botLimits.first.cause);
+      return;
+    }
+
     // If buyorder does not exists
     if (lastBuyOrder == null) {
       lastAveragePrice = await _getCurrentCryptoPrice();
@@ -112,6 +118,16 @@ class MinimizeLossesBot implements Bot {
   void changeStatusTo(BotPhases phase, String message) {
     status = BotStatus(phase, message);
     ref.read(botProvider.notifier).updateBotStatus(uuid, status);
+  }
+
+  List<BotLimit> _getBotLimitsReached() {
+    final limits = <BotLimit>[];
+    if (_hasReachDailySellLossLimit()) {
+      limits.add(BotLimit(
+          'Daily sell loss limit reached, max ${config.dailyLossSellOrders}'));
+    }
+
+    return limits;
   }
 
   /// Check if buy order has been filled. If so, fetch run Bot Pipeline every 10s
@@ -169,7 +185,7 @@ class MinimizeLossesBot implements Bot {
 
         /// TODO transform lossSellOrderCounter to dailyLossSellOrderCounter
         // check if is major or equal to loss counter
-        if (lossSellOrderCounter >= config.dailyLossSellOrders!) {
+        if (_hasReachDailySellLossLimit()) {
           timer.cancel();
           return stop(ref, reason: 'Daily loss sell orders reached');
         }
@@ -279,7 +295,11 @@ class MinimizeLossesBot implements Bot {
 
   /// TODO put buy order price as parameter
   double _approxPrice(double price) {
-    return (price).floorToDouble();
+    return price.floorToDouble();
+  }
+
+  bool _hasReachDailySellLossLimit() {
+    return lossSellOrderCounter >= config.dailyLossSellOrders!;
   }
 
   factory MinimizeLossesBot.fromJson(Map<String, dynamic> json) =>

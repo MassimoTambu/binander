@@ -12,3 +12,4 @@ part 'models/orders_history.dart';
 part 'models/bot_types.enum.dart';
 part 'models/bot_phases.enum.dart';
 part 'models/bot_status.dart';
+part 'models/bot_limit.dart';
