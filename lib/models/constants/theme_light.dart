@@ -4,8 +4,8 @@ final themeLight = ThemeData(
   colorScheme: const ColorScheme(
     primary: Color.fromARGB(255, 240, 185, 11),
     secondary: Color.fromARGB(255, 245, 245, 245),
-    primaryVariant: Color.fromARGB(255, 234, 236, 239),
-    secondaryVariant: Color.fromARGB(255, 245, 245, 245),
+    primaryContainer: Color.fromARGB(255, 234, 236, 239),
+    secondaryContainer: Color.fromARGB(255, 245, 245, 245),
     background: Color.fromARGB(255, 255, 255, 255),
     brightness: Brightness.light,
     error: Color.fromARGB(255, 255, 255, 255),

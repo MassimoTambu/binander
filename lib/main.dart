@@ -24,6 +24,7 @@ class BottinoFortino extends ConsumerWidget {
     return Container(
       child: ref.watch(initProvider).when(
             data: (_) => MaterialApp.router(
+              scaffoldMessengerKey: snackbarKey,
               routerDelegate: _router.delegate(),
               routeInformationProvider: _router.routeInfoProvider(),
               routeInformationParser: _router.defaultRouteParser(),

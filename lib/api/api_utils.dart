@@ -102,11 +102,7 @@ class ApiUtils {
     return str;
   }
 
-  void throwApiException(String method, String? reasonPhrase) {
-    if (reasonPhrase != null && reasonPhrase.isNotEmpty) {
-      throw ApiException('$reasonPhrase. Method: $method');
-    }
-
-    throw ApiException('An error occurred at method $method');
+  ApiException buildApiException(String method, BaseResponse response) {
+    return ApiException(method, response.statusCode, response.reasonPhrase);
   }
 }

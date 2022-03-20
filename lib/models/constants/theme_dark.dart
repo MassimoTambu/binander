@@ -4,8 +4,8 @@ final themeDark = ThemeData(
   colorScheme: const ColorScheme(
     primary: Color.fromARGB(255, 252, 213, 53),
     secondary: Color.fromARGB(255, 43, 49, 57),
-    primaryVariant: Color.fromARGB(255, 71, 77, 87),
-    secondaryVariant: Color.fromARGB(255, 43, 49, 57),
+    primaryContainer: Color.fromARGB(255, 71, 77, 87),
+    secondaryContainer: Color.fromARGB(255, 43, 49, 57),
     background: Color.fromARGB(255, 24, 26, 32),
     brightness: Brightness.dark,
     error: Color.fromARGB(255, 24, 26, 32),

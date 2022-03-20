@@ -27,10 +27,9 @@ class Trade {
     final response = await request.send();
 
     if (response.statusCode != HttpStatus.ok) {
-      return Future.error(
-        {response.reasonPhrase},
-        StackTrace.fromString('getOrders'),
-      );
+      return Future.error(_ref
+          .read(_apiUtilsProvider)
+          .buildApiException('getAllOrders', response));
     }
 
     final body = await response.stream.bytesToString();
@@ -59,10 +58,9 @@ class Trade {
     final response = await request.send();
 
     if (response.statusCode != HttpStatus.ok) {
-      return Future.error(
-        {response.reasonPhrase},
-        StackTrace.fromString('getOrders'),
-      );
+      return Future.error(_ref
+          .read(_apiUtilsProvider)
+          .buildApiException('getQueryOrder', response));
     }
 
     final body = await response.stream.bytesToString();
@@ -104,9 +102,7 @@ class Trade {
 
     if (response.statusCode != HttpStatus.ok) {
       return Future.error(
-        {response.reasonPhrase},
-        StackTrace.fromString('newOrder'),
-      );
+          _ref.read(_apiUtilsProvider).buildApiException('newOrder', response));
     }
 
     final body = await response.stream.bytesToString();
@@ -139,10 +135,9 @@ class Trade {
     final response = await request.send();
 
     if (response.statusCode != HttpStatus.ok) {
-      return Future.error(
-        {response.reasonPhrase},
-        StackTrace.fromString('cancelOrder'),
-      );
+      return Future.error(_ref
+          .read(_apiUtilsProvider)
+          .buildApiException('cancelOrder', response));
     }
 
     final body = await response.stream.bytesToString();
@@ -167,10 +162,9 @@ class Trade {
     final response = await request.send();
 
     if (response.statusCode != HttpStatus.ok) {
-      return Future.error(
-        {response.reasonPhrase},
-        StackTrace.fromString('getAccountInformation'),
-      );
+      return Future.error(_ref
+          .read(_apiUtilsProvider)
+          .buildApiException('getAccountInformation', response));
     }
 
     final body = await response.stream.bytesToString();

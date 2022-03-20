@@ -2,6 +2,7 @@ library models;
 
 import 'package:flutter/material.dart';
 
+part 'constants/globals.dart';
 part 'constants/theme_light.dart';
 part 'constants/theme_dark.dart';
 part 'constants/symbols.dart';

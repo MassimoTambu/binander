@@ -23,10 +23,9 @@ class Market {
     final response = await request.send();
 
     if (response.statusCode != HttpStatus.ok) {
-      return Future.error(
-        {response.reasonPhrase},
-        StackTrace.fromString('getAveragePrice'),
-      );
+      return Future.error(_ref
+          .read(_apiUtilsProvider)
+          .buildApiException('getAveragePrice', response));
     }
 
     final body = await response.stream.bytesToString();

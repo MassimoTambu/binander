@@ -5,20 +5,16 @@ final snackBarProvider = Provider<SnackBarProvider>((ref) {
 });
 
 class SnackBarProvider {
-  void show(BuildContext context, String message, {bool dismissable = false}) {
+  void show(String message, {bool dismissable = false}) {
     final snackBar = SnackBar(
       duration: const Duration(seconds: 3),
-      content: Text(
-        message,
-        style: TextStyle(color: Theme.of(context).textTheme.bodyText1?.color),
-      ),
-      backgroundColor: Theme.of(context).primaryColor,
+      content: Text(message),
       action: SnackBarAction(
         label: 'Okay',
         onPressed: () {},
       ),
     );
 
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    snackbarKey.currentState?.showSnackBar(snackBar);
   }
 }

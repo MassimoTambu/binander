@@ -1,11 +1,17 @@
 part of api;
 
 class ApiException implements Exception {
-  final String cause;
-  const ApiException(this.cause);
+  final String method;
+  final int statusCode;
+  final String? reasonPhrase;
+  const ApiException(this.method, this.statusCode, this.reasonPhrase);
 
   @override
   String toString() {
-    return cause;
+    if (reasonPhrase != null && reasonPhrase!.isNotEmpty) {
+      return '$statusCode - $reasonPhrase. Method: $method';
+    }
+
+    return '$statusCode - An error occurred at method $method';
   }
 }

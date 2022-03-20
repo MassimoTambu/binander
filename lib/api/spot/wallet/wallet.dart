@@ -1,13 +1,13 @@
 part of api;
 
 final _walletProvider = Provider<Wallet>((ref) {
-  return Wallet(ref.read);
+  return Wallet(ref);
 });
 
 class Wallet {
-  final Reader _read;
+  final Ref _ref;
 
-  const Wallet(this._read);
+  const Wallet(this._ref);
 
   Future<ApiResponse<SystemStatus>> getSystemStatus(ApiConnection conn) async {
     final request =
@@ -16,10 +16,9 @@ class Wallet {
     final response = await request.send();
 
     if (response.statusCode != HttpStatus.ok) {
-      return Future.error(
-        {response.reasonPhrase},
-        StackTrace.fromString('getSystemStatus'),
-      );
+      return Future.error(_ref
+          .read(_apiUtilsProvider)
+          .buildApiException('getSystemStatus', response));
     }
 
     final body = await response.stream.bytesToString();
@@ -32,7 +31,7 @@ class Wallet {
   /// Check ApiKey Permission status
   Future<ApiResponse<ApiKeyPermission>> getPubNetApiKeyPermission(
       ApiConnection conn) async {
-    final apiUtils = _read(_apiUtilsProvider);
+    final apiUtils = _ref.read(_apiUtilsProvider);
 
     final secureQuery = apiUtils.createQueryWithSecurity(
         conn.apiSecret, {}, API_SECURITY_TYPE.userData);
@@ -54,10 +53,9 @@ class Wallet {
     }
 
     if (response.statusCode != HttpStatus.ok) {
-      return Future.error(
-        {response.reasonPhrase},
-        StackTrace.fromString('getApiKeyPermission'),
-      );
+      return Future.error(_ref
+          .read(_apiUtilsProvider)
+          .buildApiException('getApiKeyPermission', response));
     }
 
     final body = await response.stream.bytesToString();

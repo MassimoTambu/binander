@@ -73,8 +73,7 @@ class MinimizeLossesBot implements Bot {
 
       changeStatusTo(BotPhases.starting, 'submitting buy order');
 
-      // submit order price
-      lastBuyOrder = await _submitBuyOrder();
+      await _trySubmitBuyOrder();
     }
 
     // Exit if bot execution has been interrupted
@@ -180,6 +179,10 @@ class MinimizeLossesBot implements Bot {
     }
   }
 
+  void _showSnackBar(String message) {
+    ref.read(snackBarProvider).show(message);
+  }
+
   ApiConnection _getApiConnection() {
     if (testNet) {
       return ref.read(settingsProvider).testNetConnection;
@@ -194,6 +197,21 @@ class MinimizeLossesBot implements Bot {
         .market
         .getAveragePrice(_getApiConnection(), config.symbol!);
     return res.body;
+  }
+
+  Future<void> _trySubmitBuyOrder() async {
+    try {
+      lastBuyOrder = await _submitBuyOrder();
+    } on ApiException catch (_, __) {
+      const message = 'Failed to submit buy order. Retry in 10s';
+
+      changeStatusTo(BotPhases.error, message);
+
+      _showSnackBar(message);
+
+      timer?.cancel();
+      timer = Timer(const Duration(seconds: 10), () => start(ref));
+    }
   }
 
   /// Submit a new Buy Order with the last average price approximated

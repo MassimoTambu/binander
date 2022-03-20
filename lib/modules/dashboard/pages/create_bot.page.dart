@@ -9,7 +9,7 @@ class CreateBotPage extends ConsumerWidget {
     if (_formKey.currentState!.validate()) {
       ref
           .read(createBotProvider.notifier)
-          .createBot(context, _formKey.currentState!.fields);
+          .createBot(_formKey.currentState!.fields);
       context.router.navigateBack();
     }
   }

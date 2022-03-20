@@ -80,15 +80,17 @@ class SettingsProvider extends StateNotifier<Settings> {
   }
 
   static ThemeMode _setDefaultThemeMode(Ref ref) {
-    return ThemeMode.values.firstWhere(
-        (key) =>
-            key.name ==
-            ref.read(memoryStorageProvider)[SecureStorageKey.themeMode],
-        orElse: () {
+    final themeMode = SecureStorageKey.themeMode();
+    final memory = ref.read(memoryStorageProvider);
+
+    final selectedThemeMode = ThemeMode.values
+        .firstWhere((key) => key.name == memory[themeMode.name], orElse: () {
       ref
           .read(memoryStorageProvider.notifier)
-          .write(SecureStorageKey.themeMode(), defaultThemeMode.name);
+          .write(themeMode, defaultThemeMode.name);
       return defaultThemeMode;
     });
+
+    return selectedThemeMode;
   }
 }
