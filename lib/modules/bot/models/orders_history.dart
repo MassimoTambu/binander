@@ -1,11 +1,18 @@
 part of bot;
 
+@JsonSerializable()
 class OrdersHistory {
-  final List<Order> _orders;
+  // ignore: prefer_final_fields
+  List<OrderPair> orders;
 
-  const OrdersHistory(this._orders);
+  OrdersHistory(this.orders);
 
-  void add(Order order) {
-    _orders.add(order);
+  void add({required Order buyOrder, required Order sellOrder}) {
+    orders.add(OrderPair(buyOrder: buyOrder, sellOrder: sellOrder));
   }
+
+  factory OrdersHistory.fromJson(Map<String, dynamic> json) =>
+      _$OrdersHistoryFromJson(json);
+
+  Map<String, dynamic> toJson() => _$OrdersHistoryToJson(this);
 }

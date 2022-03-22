@@ -5,6 +5,7 @@ import 'package:bottino_fortino/modules/bot/bots/minimize_losses/minimize_losses
 import 'package:bottino_fortino/models/models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:json_annotation/json_annotation.dart';
 
 part 'models/interfaces/bot.interface.dart';
 part 'models/interfaces/pipeline.interface.dart';
@@ -13,3 +14,5 @@ part 'models/bot_types.enum.dart';
 part 'models/bot_phases.enum.dart';
 part 'models/bot_status.dart';
 part 'models/bot_limit.dart';
+part 'models/order_pair.dart';
+part 'bot.g.dart';

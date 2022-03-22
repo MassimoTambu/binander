@@ -16,7 +16,7 @@ class MinimizeLossesBot implements Bot {
   @JsonKey(ignore: true)
   late WidgetRef ref;
   @override
-  final ordersHistory = const OrdersHistory([]);
+  final ordersHistory = OrdersHistory([]);
   @override
   @JsonKey(ignore: true)
   BotStatus status = BotStatus(BotPhases.offline, 'offline');
@@ -27,7 +27,7 @@ class MinimizeLossesBot implements Bot {
   AveragePrice? lastAveragePrice;
   OrderNew? lastBuyOrder;
   OrderNew? lastSellOrder;
-  double lossSellOrderCounter = 0;
+  int lossSellOrderCounter = 0;
 
   MinimizeLossesBot(this.name, this.testNet, this.config);
 
@@ -145,7 +145,7 @@ class MinimizeLossesBot implements Bot {
     if (status.phase != BotPhases.starting) return;
 
     // Update order status
-    lastBuyOrder!.status = await _checkBuyOrderStatus();
+    lastBuyOrder!.status = (await _getBuyOrder()).status;
 
     if (lastBuyOrder!.status == OrderStatus.FILLED) {
       timer.cancel();
@@ -166,14 +166,18 @@ class MinimizeLossesBot implements Bot {
     lastAveragePrice = await _getCurrentCryptoPrice();
 
     if (lastSellOrder == null) {
-      changeStatusTo(BotPhases.online, 'submitting sell order');
-      lastSellOrder = await _submitSellOrder();
+      await _trySubmitSellOrder();
+      changeStatusTo(BotPhases.online, 'submitted sell order');
       return;
     }
 
     changeStatusTo(BotPhases.online, 'pipeline has been started');
 
     final sellOrder = await _getSellOrder();
+
+    print(_calculateNewOrderPrice());
+    print(lastSellOrder!.price);
+    print(lastSellOrder!.price);
 
     // if order status is open or partially closed
     if (sellOrder.status == OrderStatus.NEW ||
@@ -188,8 +192,12 @@ class MinimizeLossesBot implements Bot {
     // if order status is closed
     else if (sellOrder.status == OrderStatus.FILLED) {
       // TODO resume a buy order
-      ordersHistory.add(sellOrder);
+      final buyOrder = await _getBuyOrder();
+      ordersHistory.add(buyOrder: buyOrder, sellOrder: sellOrder);
+
+      lastBuyOrder = null;
       lastSellOrder = null;
+      timer.cancel();
 
       // Check if is a loss
       if (sellOrder.executedQty < lastBuyOrder!.executedQty) {
@@ -199,10 +207,11 @@ class MinimizeLossesBot implements Bot {
         /// TODO transform lossSellOrderCounter to dailyLossSellOrderCounter
         // check if is major or equal to loss counter
         if (_hasReachDailySellLossLimit()) {
-          timer.cancel();
           return stop(ref, reason: 'Daily loss sell orders reached');
         }
       }
+
+      return stop(ref, reason: 'Sell order executed');
     } else {
       /// TODO throw error
     }
@@ -257,11 +266,23 @@ class MinimizeLossesBot implements Bot {
     return res.body;
   }
 
-  Future<OrderStatus> _checkBuyOrderStatus() async {
+  Future<Order> _getBuyOrder() async {
     final res = await ref.read(apiProvider).spot.trade.getQueryOrder(
         _getApiConnection(), config.symbol!, lastBuyOrder!.orderId);
 
-    return res.body.status;
+    return res.body;
+  }
+
+  Future<void> _trySubmitSellOrder() async {
+    try {
+      lastSellOrder = await _submitSellOrder();
+    } on ApiException catch (_, __) {
+      const message = 'Failed to submit sell order';
+
+      changeStatusTo(BotPhases.starting, message);
+
+      _showSnackBar(message);
+    }
   }
 
   Future<OrderNew> _submitSellOrder() async {
@@ -285,7 +306,7 @@ class MinimizeLossesBot implements Bot {
 
   Future<void> _moveOrder(int orderId) async {
     await _cancelOrder(orderId);
-    lastSellOrder = await _submitSellOrder();
+    await _trySubmitSellOrder();
   }
 
   Future<OrderCancel> _cancelOrder(int orderId) async {

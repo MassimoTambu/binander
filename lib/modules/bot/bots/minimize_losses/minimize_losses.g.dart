@@ -42,7 +42,7 @@ MinimizeLossesBot _$MinimizeLossesBotFromJson(Map<String, dynamic> json) =>
       ..lastSellOrder = json['lastSellOrder'] == null
           ? null
           : OrderNew.fromJson(json['lastSellOrder'] as Map<String, dynamic>)
-      ..lossSellOrderCounter = (json['lossSellOrderCounter'] as num).toDouble();
+      ..lossSellOrderCounter = json['lossSellOrderCounter'] as int;
 
 Map<String, dynamic> _$MinimizeLossesBotToJson(MinimizeLossesBot instance) =>
     <String, dynamic>{
