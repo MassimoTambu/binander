@@ -1,7 +1,6 @@
 part of bot;
 
-class BotLimit {
-  final String cause;
-
-  const BotLimit(this.cause);
+@freezed
+class BotLimit with _$BotLimit {
+  const factory BotLimit(String cause) = _BotLimit;
 }

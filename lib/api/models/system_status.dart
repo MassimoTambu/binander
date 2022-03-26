@@ -1,14 +1,15 @@
 part of api;
 
-@JsonSerializable()
-class SystemStatus {
-  final int status; // 0: normal，1：system maintenance
-  final String msg; // "normal", "system_maintenance"
+@freezed
+class SystemStatus with _$SystemStatus {
+  const factory SystemStatus(
+    /// 0: normal，1：system maintenance
+    int status,
 
-  const SystemStatus(this.status, this.msg);
+    /// "normal", "system_maintenance"
+    String msg,
+  ) = _SystemStatus;
 
   factory SystemStatus.fromJson(Map<String, dynamic> json) =>
       _$SystemStatusFromJson(json);
-
-  Map<String, dynamic> toJson() => _$SystemStatusToJson(this);
 }

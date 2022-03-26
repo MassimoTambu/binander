@@ -1,10 +1,13 @@
 part of api;
 
-class ApiException implements Exception {
-  final String method;
-  final int statusCode;
-  final String? reasonPhrase;
-  const ApiException(this.method, this.statusCode, this.reasonPhrase);
+@freezed
+class ApiException with _$ApiException implements Exception {
+  const ApiException._();
+  const factory ApiException(
+    String method,
+    int statusCode,
+    String? reasonPhrase,
+  ) = _ApiException;
 
   @override
   String toString() {

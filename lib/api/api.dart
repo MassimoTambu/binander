@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:bottino_fortino/modules/settings/settings.dart';
 import 'package:bottino_fortino/utils/utils.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:http/http.dart';
 import 'dart:convert';
 import 'package:crypto/crypto.dart';
@@ -28,16 +29,16 @@ part 'models/rate_limit_intervals.enum.dart';
 part 'models/oco/oco_status.enum.dart';
 part 'models/oco/oco_order_status.enum.dart';
 part 'models/account/account_information.dart';
+part 'models/account/account_balance.dart';
 part 'models/order/order.dart';
-part 'models/order/order_cancel.dart';
 part 'models/order/fill.dart';
-part 'models/order/order_new.dart';
 part 'models/order/order_status.enum.dart';
 part 'models/order/order_types.enum.dart';
 part 'models/order/order_response_types.enum.dart';
 part 'models/order/order_sides.enum.dart';
 
 part 'api.g.dart';
+part 'api.freezed.dart';
 
 part 'spot/spot.dart';
 part 'spot/market/market.dart';

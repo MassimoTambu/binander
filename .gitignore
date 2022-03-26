@@ -1,6 +1,11 @@
 # Generated App data
 data.json
 
+# Generated Dart files  
+**/*.freezed.dart
+**/*.g.dart
+**/*.gr.dart
+
 # Miscellaneous
 *.class
 *.log

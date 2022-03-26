@@ -1,11 +1,10 @@
 part of bot;
 
-@JsonSerializable()
-class OrdersHistory {
-  // ignore: prefer_final_fields
-  List<OrderPair> orders;
-
-  OrdersHistory(this.orders);
+@freezed
+class OrdersHistory with _$OrdersHistory {
+  const OrdersHistory._();
+  //TODO forse dovrò rimuovere const per via della List
+  const factory OrdersHistory(List<OrderPair> orders) = _OrdersHistory;
 
   void add({required Order buyOrder, required Order sellOrder}) {
     orders.add(OrderPair(buyOrder: buyOrder, sellOrder: sellOrder));
@@ -13,6 +12,4 @@ class OrdersHistory {
 
   factory OrdersHistory.fromJson(Map<String, dynamic> json) =>
       _$OrdersHistoryFromJson(json);
-
-  Map<String, dynamic> toJson() => _$OrdersHistoryToJson(this);
 }

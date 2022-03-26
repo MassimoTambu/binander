@@ -1,10 +1,9 @@
 part of bot;
 
-class BotStatus {
-  BotPhases phase;
-  String reason;
-
-  BotStatus(this.phase, this.reason);
+@freezed
+class BotStatus with _$BotStatus {
+  const BotStatus._();
+  const factory BotStatus(BotPhases phase, String reason) = _BotStatus;
 
   Color getBotPhaseColor() {
     switch (phase) {

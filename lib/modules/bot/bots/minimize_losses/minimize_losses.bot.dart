@@ -145,7 +145,7 @@ class MinimizeLossesBot implements Bot {
     if (status.phase != BotPhases.starting) return;
 
     // Update order status
-    lastBuyOrder!.status = (await _getBuyOrder()).status;
+    lastBuyOrder!.copyWith(status: (await _getBuyOrder()).status);
 
     if (lastBuyOrder!.status == OrderStatus.FILLED) {
       timer.cancel();

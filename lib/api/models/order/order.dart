@@ -1,66 +1,79 @@
 part of api;
 
-@JsonSerializable()
-class Order {
-  final String symbol;
-  final int orderId;
-  final int orderListId;
-  final String clientOrderId;
-  @JsonKey(
-      fromJson: ParseUtils.stringToDouble, toJson: ParseUtils.doubleToString)
-  final double price;
-  @JsonKey(
-      fromJson: ParseUtils.stringToDouble, toJson: ParseUtils.doubleToString)
-  final double origQty;
-  @JsonKey(
-      fromJson: ParseUtils.stringToDouble, toJson: ParseUtils.doubleToString)
-  final double executedQty;
-  @JsonKey(
-      fromJson: ParseUtils.stringToDouble, toJson: ParseUtils.doubleToString)
-  final double cummulativeQuoteQty;
-  final OrderStatus status;
-  final TimeInForce timeInForce;
-  final OrderTypes type;
-  final OrderSides side;
-  @JsonKey(
-      fromJson: ParseUtils.stringToDouble, toJson: ParseUtils.doubleToString)
-  final double stopPrice;
-  @JsonKey(
-      fromJson: ParseUtils.stringToDouble, toJson: ParseUtils.doubleToString)
-  final double icebergQty;
-  @JsonKey(
-      fromJson: ParseUtils.unixToDateTime, toJson: ParseUtils.dateTimeToUnix)
-  final DateTime time;
-  @JsonKey(
-      fromJson: ParseUtils.unixToDateTime, toJson: ParseUtils.dateTimeToUnix)
-  final DateTime updateTime;
-  final bool isWorking;
-  @JsonKey(
-      fromJson: ParseUtils.stringToDouble, toJson: ParseUtils.doubleToString)
-  final double origQuoteOrderQty;
+@freezed
+class Order with _$Order {
+  const factory Order(
+    String symbol,
+    int orderId,
+    int orderListId,
+    String clientOrderId,
+    @JsonKey(fromJson: ParseUtils.stringToDouble, toJson: ParseUtils.doubleToString)
+        double price,
+    @JsonKey(fromJson: ParseUtils.stringToDouble, toJson: ParseUtils.doubleToString)
+        double origQty,
+    @JsonKey(fromJson: ParseUtils.stringToDouble, toJson: ParseUtils.doubleToString)
+        double executedQty,
+    @JsonKey(fromJson: ParseUtils.stringToDouble, toJson: ParseUtils.doubleToString)
+        double cummulativeQuoteQty,
+    OrderStatus status,
+    TimeInForce timeInForce,
+    OrderTypes type,
+    OrderSides side,
+    @JsonKey(fromJson: ParseUtils.stringToDouble, toJson: ParseUtils.doubleToString)
+        double stopPrice,
+    @JsonKey(fromJson: ParseUtils.stringToDouble, toJson: ParseUtils.doubleToString)
+        double icebergQty,
+    @JsonKey(fromJson: ParseUtils.unixToDateTime, toJson: ParseUtils.dateTimeToUnix)
+        DateTime time,
+    @JsonKey(fromJson: ParseUtils.unixToDateTime, toJson: ParseUtils.dateTimeToUnix)
+        DateTime updateTime,
+    bool isWorking,
+    @JsonKey(fromJson: ParseUtils.stringToDouble, toJson: ParseUtils.doubleToString)
+        double origQuoteOrderQty,
+  ) = OrderData;
 
-  const Order(
-    this.symbol,
-    this.orderId,
-    this.orderListId,
-    this.clientOrderId,
-    this.price,
-    this.origQty,
-    this.executedQty,
-    this.cummulativeQuoteQty,
-    this.status,
-    this.timeInForce,
-    this.type,
-    this.side,
-    this.stopPrice,
-    this.icebergQty,
-    this.time,
-    this.updateTime,
-    this.isWorking,
-    this.origQuoteOrderQty,
-  );
+  const factory Order.newOrder(
+    String symbol,
+    int orderId,
+    int orderListId,
+    String clientOrderId,
+    @JsonKey(fromJson: ParseUtils.unixToDateTime, toJson: ParseUtils.dateTimeToUnix)
+        DateTime transactTime,
+    @JsonKey(fromJson: ParseUtils.stringToDouble, toJson: ParseUtils.doubleToString)
+        double price,
+    @JsonKey(fromJson: ParseUtils.stringToDouble, toJson: ParseUtils.doubleToString)
+        double origQty,
+    @JsonKey(fromJson: ParseUtils.stringToDouble, toJson: ParseUtils.doubleToString)
+        double executedQty,
+    @JsonKey(fromJson: ParseUtils.stringToDouble, toJson: ParseUtils.doubleToString)
+        double cummulativeQuoteQty,
+    OrderStatus status,
+    TimeInForce timeInForce,
+    OrderTypes type,
+    OrderSides side,
+    List<Fill> fills,
+  ) = OrderNew;
+
+  const factory Order.cancelOrder(
+    String symbol,
+    int orderId,
+    int orderListId,
+    String clientOrderId,
+    @JsonKey(fromJson: ParseUtils.unixToDateTime, toJson: ParseUtils.dateTimeToUnix)
+        DateTime transactTime,
+    @JsonKey(fromJson: ParseUtils.stringToDouble, toJson: ParseUtils.doubleToString)
+        double price,
+    @JsonKey(fromJson: ParseUtils.stringToDouble, toJson: ParseUtils.doubleToString)
+        double origQty,
+    @JsonKey(fromJson: ParseUtils.stringToDouble, toJson: ParseUtils.doubleToString)
+        double executedQty,
+    @JsonKey(fromJson: ParseUtils.stringToDouble, toJson: ParseUtils.doubleToString)
+        double cummulativeQuoteQty,
+    OrderStatus status,
+    TimeInForce timeInForce,
+    OrderTypes type,
+    OrderSides side,
+  ) = OrderCancel;
 
   factory Order.fromJson(Map<String, dynamic> json) => _$OrderFromJson(json);
-
-  Map<String, dynamic> toJson() => _$OrderToJson(this);
 }

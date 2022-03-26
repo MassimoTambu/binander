@@ -9,7 +9,6 @@ class SecureStorageKey {
     return const SecureStorageKey('theme_mode');
   }
 
-  // PUBNET
   factory SecureStorageKey.pubNetApiKey() {
     return const SecureStorageKey('pub_net_api_key');
   }
@@ -18,7 +17,6 @@ class SecureStorageKey {
     return const SecureStorageKey('pub_net_api_secret');
   }
 
-  // TESTNET
   factory SecureStorageKey.testNetApiKey() {
     return const SecureStorageKey('test_net_api_key');
   }

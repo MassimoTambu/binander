@@ -1,16 +1,12 @@
 part of api;
 
-@JsonSerializable()
-class AveragePrice {
-  final int mins;
-  @JsonKey(
-      fromJson: ParseUtils.stringToDouble, toJson: ParseUtils.doubleToString)
-  final double price;
-
-  const AveragePrice(this.mins, this.price);
+@freezed
+class AveragePrice with _$AveragePrice {
+  const factory AveragePrice(
+      int mins,
+      @JsonKey(fromJson: ParseUtils.stringToDouble, toJson: ParseUtils.doubleToString)
+          double price) = _AveragePrice;
 
   factory AveragePrice.fromJson(Map<String, dynamic> json) =>
       _$AveragePriceFromJson(json);
-
-  Map<String, dynamic> toJson() => _$AveragePriceToJson(this);
 }

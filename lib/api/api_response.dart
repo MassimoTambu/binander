@@ -1,8 +1,9 @@
 part of api;
 
-class ApiResponse<T> {
-  final T body;
-  final int statusCode;
-
-  const ApiResponse(this.body, this.statusCode);
+@freezed
+class ApiResponse<T> with _$ApiResponse<T> {
+  const factory ApiResponse(
+    T body,
+    int statusCode,
+  ) = _ApiResponse;
 }
