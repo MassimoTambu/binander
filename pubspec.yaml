@@ -44,6 +44,7 @@ dependencies:
   uuid: ^3.0.5
   json_annotation: ^4.4.0
   freezed_annotation: ^1.1.0
+  dio: ^4.0.4
 
 dev_dependencies:
   flutter_test:
@@ -59,6 +60,7 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^1.0.4
+  http_mock_adapter: ^0.3.2
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

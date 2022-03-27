@@ -4,12 +4,13 @@ import 'dart:io';
 
 import 'package:bottino_fortino/modules/settings/settings.dart';
 import 'package:bottino_fortino/utils/utils.dart';
+import 'package:dio/dio.dart' as dio;
+import 'package:http_mock_adapter/http_mock_adapter.dart' as http_mock;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:http/http.dart';
 import 'dart:convert';
 import 'package:crypto/crypto.dart';
-import 'package:json_annotation/json_annotation.dart';
 
 part 'api.exception.dart';
 part 'api_security_level.enum.dart';
@@ -40,18 +41,9 @@ part 'models/order/order_sides.enum.dart';
 part 'api.g.dart';
 part 'api.freezed.dart';
 
-part 'spot/spot.dart';
-part 'spot/market/market.dart';
-part 'spot/trade/trade.dart';
-part 'spot/wallet/wallet.dart';
-
-final apiProvider = Provider<Api>((ref) {
-  final spot = ref.watch(_spotProvider);
-  return Api(spot);
-});
-
-class Api {
-  final Spot spot;
-
-  const Api(this.spot);
-}
+part 'api.provider.dart';
+part 'dio.provider.dart';
+part 'spot/spot.provider.dart';
+part 'spot/market/market.provider.dart';
+part 'spot/trade/trade.provider.dart';
+part 'spot/wallet/wallet.provider.dart';

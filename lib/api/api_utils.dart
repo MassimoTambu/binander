@@ -9,7 +9,7 @@ class ApiUtils {
 
   const ApiUtils(this.read);
 
-  String createQueryWithSecurity(
+  Map<String, String> createQueryWithSecurity(
     String apiSecret,
     Map<String, String> query,
     API_SECURITY_TYPE securityType,
@@ -26,12 +26,12 @@ class ApiUtils {
         break;
     }
 
-    return _mapToString(query);
+    return query;
   }
 
   void addSecurityToHeader(
     String apiKey,
-    Request request,
+    Map<String, dynamic> headers,
     API_SECURITY_TYPE securityType,
   ) {
     switch (securityType) {
@@ -40,21 +40,15 @@ class ApiUtils {
       case API_SECURITY_TYPE.userData:
       case API_SECURITY_TYPE.userStream:
       case API_SECURITY_TYPE.marketData:
-        final headers = {
-          'Content-Type': 'application/json',
-          'X-MBX-APIKEY': apiKey
-        };
+        headers.addAll(
+            {'Content-Type': 'application/json', 'X-MBX-APIKEY': apiKey});
 
-        request.headers.addAll(headers);
         break;
+
       // No security header needed for none type
       default:
         break;
     }
-  }
-
-  Map<String, dynamic> _toJson(String body) {
-    return json.decode(body);
   }
 
   void _addTimestamp(Map<String, String> query) {
@@ -89,20 +83,7 @@ class ApiUtils {
     return signature.toString();
   }
 
-  String _mapToString(Map<String, String> query) {
-    String str = '';
-    query.forEach((key, value) {
-      if (key == query.keys.last) {
-        str += '$key=$value';
-      } else {
-        str += '$key=$value&';
-      }
-    });
-
-    return str;
-  }
-
-  ApiException buildApiException(String method, BaseResponse response) {
-    return ApiException(method, response.statusCode, response.reasonPhrase);
+  ApiException buildApiException<T>(String method, dio.Response<T> response) {
+    return ApiException(method, response.statusCode!, response.statusMessage!);
   }
 }
