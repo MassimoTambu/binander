@@ -1,14 +1,10 @@
 library api;
 
-import 'dart:io';
-
 import 'package:bottino_fortino/modules/settings/settings.dart';
 import 'package:bottino_fortino/utils/utils.dart';
 import 'package:dio/dio.dart' as dio;
-import 'package:http_mock_adapter/http_mock_adapter.dart' as http_mock;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:http/http.dart';
 import 'dart:convert';
 import 'package:crypto/crypto.dart';
 
