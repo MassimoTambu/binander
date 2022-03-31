@@ -26,7 +26,7 @@ class TradeProvider {
 
     late final dio.Response<String> response;
     try {
-      response = await _ref.read(_dioProvider).get(
+      response = await _ref.read(dioProvider).get(
           '${conn.url}/api/v3/allOrders',
           options: options,
           queryParameters: secureQuery);
@@ -60,7 +60,7 @@ class TradeProvider {
 
     late final dio.Response<String> response;
     try {
-      response = await _ref.read(_dioProvider).get('${conn.url}/api/v3/order',
+      response = await _ref.read(dioProvider).get('${conn.url}/api/v3/order',
           options: options, queryParameters: secureQuery);
     } on dio.DioError catch (_) {
       return Future.error(_ref
@@ -104,7 +104,7 @@ class TradeProvider {
 
     late final dio.Response<String> response;
     try {
-      response = await _ref.read(_dioProvider).post('${conn.url}/api/v3/order',
+      response = await _ref.read(dioProvider).post('${conn.url}/api/v3/order',
           options: options, queryParameters: secureQuery);
     } on dio.DioError catch (_) {
       return Future.error(
@@ -139,10 +139,8 @@ class TradeProvider {
 
     late final dio.Response<String> response;
     try {
-      response = await _ref.read(_dioProvider).delete(
-          '${conn.url}/api/v3/order',
-          options: options,
-          queryParameters: secureQuery);
+      response = await _ref.read(dioProvider).delete('${conn.url}/api/v3/order',
+          options: options, queryParameters: secureQuery);
     } on dio.DioError catch (_) {
       return Future.error(_ref
           .read(_apiUtilsProvider)
@@ -169,7 +167,7 @@ class TradeProvider {
 
     late final dio.Response<String> response;
     try {
-      response = await _ref.read(_dioProvider).get('${conn.url}/api/v3/account',
+      response = await _ref.read(dioProvider).get('${conn.url}/api/v3/account',
           options: options, queryParameters: secureQuery);
     } on dio.DioError catch (_) {
       return Future.error(_ref

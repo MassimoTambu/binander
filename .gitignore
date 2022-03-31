@@ -5,6 +5,7 @@ data.json
 **/*.freezed.dart
 **/*.g.dart
 **/*.gr.dart
+**/*.mocks.dart
 
 # Miscellaneous
 *.class

@@ -16,10 +16,10 @@ class MinimizeLossesBot implements Bot {
   @JsonKey(ignore: true)
   late WidgetRef ref;
   @override
-  final ordersHistory = OrdersHistory([]);
+  final ordersHistory = const OrdersHistory([]);
   @override
   @JsonKey(ignore: true)
-  BotStatus status = BotStatus(BotPhases.offline, 'offline');
+  BotStatus status = const BotStatus(BotPhases.offline, 'offline');
 
   @JsonKey(ignore: true)
   Timer? timer;
