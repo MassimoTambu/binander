@@ -1,13 +1,14 @@
 part of providers;
 
-final botProvider = StateNotifierProvider<BotProvider, List<Bot>>((ref) {
-  return BotProvider(ref);
+final pipelineProvider =
+    StateNotifierProvider<PipelineProvider, List<Pipeline>>((ref) {
+  return PipelineProvider(ref);
 });
 
-class BotProvider extends StateNotifier<List<Bot>> {
+class PipelineProvider extends StateNotifier<List<Pipeline>> {
   final Ref _ref;
 
-  BotProvider(this._ref) : super([]) {
+  PipelineProvider(this._ref) : super([]) {
     _ref.listen<Map<String, dynamic>>(fileStorageProvider.select((p) => p.data),
         (previous, next) {
       // We can prevent reloading by storinh the hashCode in json and then analyze them
@@ -18,7 +19,8 @@ class BotProvider extends StateNotifier<List<Bot>> {
   }
 
   void updateBotStatus(String uuid, BotStatus status) {
-    state.firstWhere((b) => b.uuid == uuid).status = status;
+    state.firstWhere((p) => p.bot.uuid == uuid).bot.pipelineData.status =
+        status;
     state = [...state];
   }
 
@@ -72,14 +74,15 @@ class BotProvider extends StateNotifier<List<Bot>> {
     for (final b in bots) {
       var found = false;
       for (var i = 0; i < state.length; i++) {
-        if (state[i].uuid == b.uuid) {
-          state[i] = b;
+        if (state[i].bot.uuid == b.uuid) {
+          state[i] = _createBotPipeline(b);
           found = true;
         }
       }
 
       if (found == false) {
-        state.add(b);
+        final pipeline = _createBotPipeline(b);
+        state.add(pipeline);
       }
     }
 
@@ -95,19 +98,29 @@ class BotProvider extends StateNotifier<List<Bot>> {
     required double percentageSellOrder,
     required Duration timerBuyOrder,
   }) {
-    final bot = MinimizeLossesBot.create(
+    final bot = MinimizeLossesBot(
+      const Uuid().v4(),
+      MinimizeLossesPipeLineData(),
       name: name,
       testNet: testNet,
-      symbol: symbol,
-      dailyLossSellOrders: dailyLossSellOrders,
-      maxQuantityPerOrder: maxQuantityPerOrder,
-      percentageSellOrder: percentageSellOrder,
-      timerBuyOrder: timerBuyOrder,
+      config: MinimizeLossesConfig.create(
+        dailyLossSellOrders: dailyLossSellOrders,
+        maxQuantityPerOrder: maxQuantityPerOrder,
+        percentageSellOrder: percentageSellOrder,
+        symbol: symbol,
+        timerBuyOrder: timerBuyOrder,
+      ),
     );
 
-    state = <Bot>[...state, bot];
+    final pipeline = MinimizeLossesPipeline(_ref, bot);
+
+    state = [...state, pipeline];
 
     return bot;
+  }
+
+  void removeBot() {
+    /// TODO implement remove
   }
 
   void _loadBotsFromFile(Map<String, dynamic> data) {
@@ -119,6 +132,13 @@ class BotProvider extends StateNotifier<List<Bot>> {
 
       addBots(bots);
     }
+  }
+
+  Pipeline _createBotPipeline(Bot bot) {
+    return bot.map(
+      minimizeLosses: (minimizeLosses) =>
+          MinimizeLossesPipeline(_ref, minimizeLosses),
+    );
   }
 
   void _saveBot(Bot bot) {

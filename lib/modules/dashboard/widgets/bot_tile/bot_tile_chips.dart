@@ -10,10 +10,10 @@ class BotTileChips extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final botStatus = ref.watch(
-        botProvider.select((p) => p.firstWhere((b) => b.uuid == uuid).status));
-    final testNet = ref.watch(
-        botProvider.select((p) => p.firstWhere((b) => b.uuid == uuid).testNet));
+    final botStatus = ref.watch(pipelineProvider.select((p) =>
+        p.firstWhere((pi) => pi.bot.uuid == uuid).bot.pipelineData.status));
+    final testNet = ref.watch(pipelineProvider
+        .select((p) => p.firstWhere((pi) => pi.bot.uuid == uuid).bot.testNet));
     return Wrap(
       spacing: 8,
       runSpacing: 5,

@@ -1,70 +1,22 @@
 part of minimize_losses_bot;
 
-@JsonSerializable()
-class MinimizeLossesBot implements Bot {
+class MinimizeLossesPipeline implements Pipeline {
   @override
-  late final String uuid;
+  final Ref ref;
   @override
-  late final BotTypes type;
-  @override
-  late final bool testNet;
-  @override
-  late final MinimizeLossesConfig config;
-  @override
-  final String name;
-  @override
-  @JsonKey(ignore: true)
-  late WidgetRef ref;
-  @override
-  final ordersHistory = const OrdersHistory([]);
-  @override
-  @JsonKey(ignore: true)
-  BotStatus status = const BotStatus(BotPhases.offline, 'offline');
+  final MinimizeLossesBot bot;
 
-  @JsonKey(ignore: true)
-  Timer? timer;
-  @JsonKey(ignore: true)
-  AveragePrice? lastAveragePrice;
-  OrderNew? lastBuyOrder;
-  OrderNew? lastSellOrder;
-  int lossSellOrderCounter = 0;
-
-  MinimizeLossesBot(this.name, this.testNet, this.config);
-
-  MinimizeLossesBot.create({
-    required this.name,
-    required this.testNet,
-    required String symbol,
-    required int dailyLossSellOrders,
-    required double maxQuantityPerOrder,
-    required double percentageSellOrder,
-    required Duration timerBuyOrder,
-  }) {
-    uuid = const Uuid().v4();
-    type = BotTypes.minimizeLosses;
-    config = MinimizeLossesConfig.create(
-      symbol: symbol,
-      dailyLossSellOrders: dailyLossSellOrders,
-      maxQuantityPerOrder: maxQuantityPerOrder,
-      percentageSellOrder: percentageSellOrder,
-      timerBuyOrder: timerBuyOrder,
-    );
-  }
+  const MinimizeLossesPipeline(this.ref, this.bot);
 
   @override
-  void remove(WidgetRef ref) {
-    /// TODO implement remove
-  }
-
-  @override
-  void start(WidgetRef ref) async {
-    if (timer != null && !timer!.isActive) return;
-
-    this.ref = ref;
+  void start() async {
+    var timer = bot.pipelineData.timer;
+    final status = bot.pipelineData.status;
+    if (timer != null && !timer.isActive) return;
 
     changeStatusTo(BotPhases.starting, 'starting');
 
-    if (timer != null) timer!.cancel();
+    if (timer != null) timer.cancel();
 
     final botLimits = _getBotLimitsReached();
     if (botLimits.isNotEmpty) {
@@ -72,9 +24,10 @@ class MinimizeLossesBot implements Bot {
       return;
     }
 
+    final lastBuyOrder = bot.pipelineData.lastBuyOrder;
     // If buyorder does not exists
     if (lastBuyOrder == null) {
-      lastAveragePrice = await _getCurrentCryptoPrice();
+      bot.pipelineData.lastAveragePrice = await _getCurrentCryptoPrice();
 
       // Exit if bot execution has been interrupted
       if (status.phase != BotPhases.starting) return;
@@ -90,7 +43,7 @@ class MinimizeLossesBot implements Bot {
     // ref.read(fileStorageProvider).upsertBots([this]);
 
     // Skip buyOrder pipeline if it has been filled
-    if (lastBuyOrder != null && lastBuyOrder!.status == OrderStatus.FILLED) {
+    if (lastBuyOrder != null && lastBuyOrder.status == OrderStatus.FILLED) {
       timer = Timer.periodic(const Duration(seconds: 10), _runBotPipeline);
       return;
     }
@@ -102,9 +55,8 @@ class MinimizeLossesBot implements Bot {
   }
 
   @override
-  void stop(WidgetRef ref, {String reason = ''}) async {
-    this.ref = ref;
-    timer?.cancel();
+  void stop({String reason = ''}) async {
+    bot.pipelineData.timer?.cancel();
 
     changeStatusTo(BotPhases.stopping, 'stopping' + reason);
 
@@ -112,9 +64,11 @@ class MinimizeLossesBot implements Bot {
       reason = ': $reason';
     }
 
+    final lastBuyOrder = bot.pipelineData.lastBuyOrder;
     if (lastBuyOrder != null) {
-      await _cancelOrder(lastBuyOrder!.orderId);
+      await _cancelOrder(lastBuyOrder.orderId);
     }
+    //TODO cancel sell order
 
     final closingMessage = 'turned off' + reason;
 
@@ -124,15 +78,15 @@ class MinimizeLossesBot implements Bot {
   }
 
   void changeStatusTo(BotPhases phase, String message) {
-    status = BotStatus(phase, message);
-    ref.read(botProvider.notifier).updateBotStatus(uuid, status);
+    final status = BotStatus(phase, message);
+    ref.read(pipelineProvider.notifier).updateBotStatus(bot.uuid, status);
   }
 
   List<BotLimit> _getBotLimitsReached() {
     final limits = <BotLimit>[];
     if (_hasReachDailySellLossLimit()) {
       limits.add(BotLimit(
-          'Daily sell loss limit reached, max ${config.dailyLossSellOrders}'));
+          'Daily sell loss limit reached, max ${bot.config.dailyLossSellOrders}'));
     }
 
     return limits;
@@ -142,12 +96,13 @@ class MinimizeLossesBot implements Bot {
   Future<void> _runCheckBuyOrderPipeline(Timer timer) async {
     if (!timer.isActive) return;
     // Exit if bot execution has been interrupted
-    if (status.phase != BotPhases.starting) return;
+    if (bot.pipelineData.status.phase != BotPhases.starting) return;
 
     // Update order status
+    final lastBuyOrder = bot.pipelineData.lastBuyOrder;
     lastBuyOrder!.copyWith(status: (await _getBuyOrder()).status);
 
-    if (lastBuyOrder!.status == OrderStatus.FILLED) {
+    if (lastBuyOrder.status == OrderStatus.FILLED) {
       timer.cancel();
 
       changeStatusTo(BotPhases.online, 'buy order has been filled');
@@ -163,8 +118,9 @@ class MinimizeLossesBot implements Bot {
   Future<void> _runBotPipeline(Timer timer) async {
     if (!timer.isActive) return;
 
-    lastAveragePrice = await _getCurrentCryptoPrice();
+    bot.pipelineData.lastAveragePrice = await _getCurrentCryptoPrice();
 
+    final lastSellOrder = bot.pipelineData.lastSellOrder;
     if (lastSellOrder == null) {
       await _trySubmitSellOrder();
       changeStatusTo(BotPhases.online, 'submitted sell order');
@@ -176,8 +132,8 @@ class MinimizeLossesBot implements Bot {
     final sellOrder = await _getSellOrder();
 
     print(_calculateNewOrderPrice());
-    print(lastSellOrder!.price);
-    print(lastSellOrder!.price);
+    print(lastSellOrder.price);
+    print(lastSellOrder.price);
 
     // if order status is open or partially closed
     if (sellOrder.status == OrderStatus.NEW ||
@@ -193,25 +149,28 @@ class MinimizeLossesBot implements Bot {
     else if (sellOrder.status == OrderStatus.FILLED) {
       // TODO resume a buy order
       final buyOrder = await _getBuyOrder();
-      ordersHistory.add(buyOrder: buyOrder, sellOrder: sellOrder);
+      bot.pipelineData.ordersHistory
+          .add(buyOrder: buyOrder, sellOrder: sellOrder);
 
-      lastBuyOrder = null;
-      lastSellOrder = null;
-      timer.cancel();
+      var reason = 'Sell order executed';
 
       // Check if is a loss
-      if (sellOrder.executedQty < lastBuyOrder!.executedQty) {
+      if (sellOrder.executedQty < bot.pipelineData.lastBuyOrder!.executedQty) {
         // add to loss counter
-        lossSellOrderCounter += 1;
+        bot.pipelineData.lossSellOrderCounter += 1;
 
         /// TODO transform lossSellOrderCounter to dailyLossSellOrderCounter
         // check if is major or equal to loss counter
         if (_hasReachDailySellLossLimit()) {
-          return stop(ref, reason: 'Daily loss sell orders reached');
+          reason = 'Daily loss sell orders reached';
         }
       }
 
-      return stop(ref, reason: 'Sell order executed');
+      bot.pipelineData.lastBuyOrder = null;
+      bot.pipelineData.lastSellOrder = null;
+      timer.cancel();
+
+      return stop(reason: reason);
     } else {
       /// TODO throw error
     }
@@ -222,7 +181,7 @@ class MinimizeLossesBot implements Bot {
   }
 
   ApiConnection _getApiConnection() {
-    if (testNet) {
+    if (bot.testNet) {
       return ref.read(settingsProvider).testNetConnection;
     }
     return ref.read(settingsProvider).pubNetConnection;
@@ -233,13 +192,13 @@ class MinimizeLossesBot implements Bot {
         .read(apiProvider)
         .spot
         .market
-        .getAveragePrice(_getApiConnection(), config.symbol!);
+        .getAveragePrice(_getApiConnection(), bot.config.symbol!);
     return res.body;
   }
 
   Future<void> _trySubmitBuyOrder() async {
     try {
-      lastBuyOrder = await _submitBuyOrder();
+      bot.pipelineData.lastBuyOrder = await _submitBuyOrder();
     } on ApiException catch (_, __) {
       const message = 'Failed to submit buy order. Retry in 10s';
 
@@ -247,20 +206,21 @@ class MinimizeLossesBot implements Bot {
 
       _showSnackBar(message);
 
-      timer?.cancel();
-      timer = Timer(const Duration(seconds: 10), () => start(ref));
+      bot.pipelineData.timer?.cancel();
+      bot.pipelineData.timer = Timer(const Duration(seconds: 10), start);
     }
   }
 
   /// Submit a new Buy Order with the last average price approximated
   Future<OrderNew> _submitBuyOrder() async {
-    final currentApproxPrice = _approxPrice(lastAveragePrice!.price);
+    final currentApproxPrice =
+        _approxPrice(bot.pipelineData.lastAveragePrice!.price);
     final res = await ref.read(apiProvider).spot.trade.newOrder(
         _getApiConnection(),
-        config.symbol!,
+        bot.config.symbol!,
         OrderSides.BUY,
         OrderTypes.LIMIT,
-        config.maxQuantityPerOrder!,
+        bot.config.maxQuantityPerOrder!,
         currentApproxPrice);
 
     return res.body;
@@ -268,14 +228,16 @@ class MinimizeLossesBot implements Bot {
 
   Future<Order> _getBuyOrder() async {
     final res = await ref.read(apiProvider).spot.trade.getQueryOrder(
-        _getApiConnection(), config.symbol!, lastBuyOrder!.orderId);
+        _getApiConnection(),
+        bot.config.symbol!,
+        bot.pipelineData.lastBuyOrder!.orderId);
 
     return res.body;
   }
 
   Future<void> _trySubmitSellOrder() async {
     try {
-      lastSellOrder = await _submitSellOrder();
+      bot.pipelineData.lastSellOrder = await _submitSellOrder();
     } on ApiException catch (_, __) {
       const message = 'Failed to submit sell order';
 
@@ -290,17 +252,19 @@ class MinimizeLossesBot implements Bot {
 
     final res = await ref.read(apiProvider).spot.trade.newOrder(
         _getApiConnection(),
-        config.symbol!,
+        bot.config.symbol!,
         OrderSides.SELL,
         OrderTypes.LIMIT,
-        config.maxQuantityPerOrder!,
+        bot.config.maxQuantityPerOrder!,
         currentApproxPrice);
     return res.body;
   }
 
   Future<Order> _getSellOrder() async {
     final res = await ref.read(apiProvider).spot.trade.getQueryOrder(
-        _getApiConnection(), config.symbol!, lastBuyOrder!.orderId);
+        _getApiConnection(),
+        bot.config.symbol!,
+        bot.pipelineData.lastBuyOrder!.orderId);
     return res.body;
   }
 
@@ -314,18 +278,20 @@ class MinimizeLossesBot implements Bot {
         .read(apiProvider)
         .spot
         .trade
-        .cancelOrder(_getApiConnection(), config.symbol!, orderId);
+        .cancelOrder(_getApiConnection(), bot.config.symbol!, orderId);
 
     return res.body;
   }
 
   bool _hasToMoveOrder() {
-    return _calculateNewOrderPrice() > lastSellOrder!.price;
+    return _calculateNewOrderPrice() > bot.pipelineData.lastSellOrder!.price;
   }
 
   double _calculateNewOrderPrice() {
+    final lastAveragePrice = bot.pipelineData.lastAveragePrice;
+    final lastBuyOrder = bot.pipelineData.lastBuyOrder;
     return lastAveragePrice!.price -
-        (lastBuyOrder!.price * config.percentageSellOrder! / 100);
+        (lastBuyOrder!.price * bot.config.percentageSellOrder! / 100);
   }
 
   /// TODO put buy order price as parameter
@@ -334,12 +300,7 @@ class MinimizeLossesBot implements Bot {
   }
 
   bool _hasReachDailySellLossLimit() {
-    return lossSellOrderCounter >= config.dailyLossSellOrders!;
+    return bot.pipelineData.lossSellOrderCounter >=
+        bot.config.dailyLossSellOrders!;
   }
-
-  factory MinimizeLossesBot.fromJson(Map<String, dynamic> json) =>
-      _$MinimizeLossesBotFromJson(json);
-
-  @override
-  Map<String, dynamic> toJson() => _$MinimizeLossesBotToJson(this);
 }

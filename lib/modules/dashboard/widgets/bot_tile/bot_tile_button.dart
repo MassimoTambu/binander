@@ -23,9 +23,9 @@ class BotTileButton extends ConsumerWidget {
               ? null
               : () {
                   if (!isStarted) {
-                    _botTileProvider.bot.start(ref);
+                    _botTileProvider.pipeline.start();
                   } else {
-                    _botTileProvider.bot.stop(ref);
+                    _botTileProvider.pipeline.stop();
                   }
                 },
         ),

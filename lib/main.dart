@@ -25,8 +25,12 @@ class BottinoFortino extends ConsumerWidget {
     return Container(
       child: ref.watch(initProvider).when(
             data: (_) {
-              ref.listen<List<Bot>>(botProvider, (prevBots, newBots) {
-                ref.watch(fileStorageProvider).upsertBots(newBots);
+              // Autosave bots to file when pipelineProvider changes
+              ref.listen<List<Pipeline>>(pipelineProvider,
+                  (prevPipelines, newPipelines) {
+                ref
+                    .watch(fileStorageProvider)
+                    .upsertBots(newPipelines.map((e) => e.bot).toList());
               });
               return MaterialApp.router(
                 scaffoldMessengerKey: snackbarKey,
