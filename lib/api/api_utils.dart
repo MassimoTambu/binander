@@ -83,7 +83,7 @@ class ApiUtils {
     return signature.toString();
   }
 
-  ApiException buildApiException<T>(String method, dio.Response<T> response) {
+  ApiException buildApiException<T>(String method, Response<T> response) {
     return ApiException(method, response.statusCode!, response.statusMessage!);
   }
 }

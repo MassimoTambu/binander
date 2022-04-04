@@ -17,17 +17,17 @@ class MarketProvider {
     apiUtils.addSecurityToHeader(
         conn.apiKey, headers, API_SECURITY_TYPE.userData);
 
-    final options = dio.Options(headers: headers);
+    final options = Options(headers: headers);
 
     final query = {'symbol': symbol};
     final secureQuery = apiUtils.createQueryWithSecurity(
         conn.apiSecret, query, API_SECURITY_TYPE.none);
 
-    late final dio.Response<String> response;
+    late final Response<String> response;
     try {
       response = await _ref.read(dioProvider).get('${conn.url}/api/v3/avgPrice',
           options: options, queryParameters: secureQuery);
-    } on dio.DioError catch (_) {
+    } on DioError catch (_) {
       return Future.error(_ref
           .read(_apiUtilsProvider)
           .buildApiException('getAveragePrice', response));

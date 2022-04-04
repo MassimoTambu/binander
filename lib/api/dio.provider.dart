@@ -1,6 +1,6 @@
 part of api;
 
-final dioProvider = Provider<dio.Dio>((_) {
-  final _dio = dio.Dio();
+final dioProvider = Provider<Dio>((_) {
+  final _dio = Dio();
   return _dio;
 });

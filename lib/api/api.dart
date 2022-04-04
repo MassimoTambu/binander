@@ -2,7 +2,7 @@ library api;
 
 import 'package:bottino_fortino/modules/settings/settings.dart';
 import 'package:bottino_fortino/utils/utils.dart';
-import 'package:dio/dio.dart' as dio;
+import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'dart:convert';
