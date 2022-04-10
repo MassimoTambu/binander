@@ -3,7 +3,7 @@ part of minimize_losses_bot;
 @JsonSerializable()
 class MinimizeLossesPipeLineData implements PipelineData {
   @override
-  late final OrdersHistory ordersHistory;
+  final OrdersHistory ordersHistory;
   @override
   @JsonKey(ignore: true)
   var status = const BotStatus(BotPhases.offline, 'offline');
@@ -17,11 +17,10 @@ class MinimizeLossesPipeLineData implements PipelineData {
   OrderNew? lastSellOrder;
   int lossSellOrderCounter = 0;
 
-  MinimizeLossesPipeLineData({OrdersHistory? ordersHistory}) {
-    ordersHistory == null
-        ? this.ordersHistory = OrdersHistory([])
-        : this.ordersHistory = ordersHistory;
-  }
+  MinimizeLossesPipeLineData({OrdersHistory? ordersHistory})
+      : ordersHistory = ordersHistory == null
+            ? ordersHistory = OrdersHistory([])
+            : ordersHistory = ordersHistory;
 
   factory MinimizeLossesPipeLineData.fromJson(Map<String, dynamic> json) =>
       _$MinimizeLossesPipeLineDataFromJson(json);
