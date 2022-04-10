@@ -58,10 +58,11 @@ void main() {
       () async {
     // Set api calls for providers
     const startPrice = 100.0;
+    // Trend crypto prices
     final prices = [
       const AveragePrice(1, startPrice),
       const AveragePrice(1, 125),
-      const AveragePrice(1, 150),
+      const AveragePrice(1, 120),
     ];
     final List<OrderData> orders = [];
     when(mockMarketProvider.getAveragePrice(any, any)).thenAnswer(
@@ -199,9 +200,17 @@ void main() {
 
       async.elapse(const Duration(seconds: 120));
 
+      // Should be offline
+      expect(bot.pipelineData.status.phase, BotPhases.offline);
       expect(bot.pipelineData.ordersHistory.orders.length, 1);
       // Is a profit
       expect(bot.pipelineData.lossSellOrderCounter, 0);
     });
+
+    /// Prossimi test
+    /// - con un ordine in perdita
+    /// - con limite "giornaliero" di ordini in perdita raggiunto
+    /// - con il seguente ordine: 1 ordine in profitto, 1 in perdita e 1 in profitto
+    /// - con 13 giri cicli senza vendere e poi vendita in profitto spostando il sell order al 7° e 9° ciclo
   });
 }
