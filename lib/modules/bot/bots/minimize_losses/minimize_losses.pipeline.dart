@@ -1,17 +1,24 @@
 part of minimize_losses_bot;
 
-class MinimizeLossesPipeline implements Pipeline {
-  @override
-  final Ref ref;
-  @override
-  final MinimizeLossesBot bot;
+@freezed
+class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
+  // @override
+  // final Ref ref;
+  // @override
+  // final MinimizeLossesBot bot;
+  const MinimizeLossesPipeline._();
 
-  const MinimizeLossesPipeline(this.ref, this.bot);
+  const factory MinimizeLossesPipeline(Ref ref, MinimizeLossesBot bot) =
+      _MinimizeLossesPipeline;
 
   @override
   void start() async {
     var timer = bot.pipelineData.timer;
-    final status = bot.pipelineData.status;
+
+    // We can't create a status variable because with freezed
+    //  if the state changes (like below) we will have the old reference
+    // final status = bot.pipelineData.status;
+
     if (timer != null && !timer.isActive) return;
 
     changeStatusTo(BotPhases.starting, 'starting');
@@ -30,7 +37,7 @@ class MinimizeLossesPipeline implements Pipeline {
       bot.pipelineData.lastAveragePrice = await _getCurrentCryptoPrice();
 
       // Exit if bot execution has been interrupted
-      if (status.phase != BotPhases.starting) return;
+      if (bot.pipelineData.status.phase != BotPhases.starting) return;
 
       changeStatusTo(BotPhases.starting, 'submitting buy order');
 
@@ -38,9 +45,7 @@ class MinimizeLossesPipeline implements Pipeline {
     }
 
     // Exit if bot execution has been interrupted
-    if (status.phase != BotPhases.starting) return;
-
-    // ref.read(fileStorageProvider).upsertBots([this]);
+    if (bot.pipelineData.status.phase != BotPhases.starting) return;
 
     // Skip buyOrder pipeline if it has been filled
     if (lastBuyOrder != null && lastBuyOrder.status == OrderStatus.FILLED) {
@@ -99,10 +104,10 @@ class MinimizeLossesPipeline implements Pipeline {
     if (bot.pipelineData.status.phase != BotPhases.starting) return;
 
     // Update order status
-    final lastBuyOrder = bot.pipelineData.lastBuyOrder;
-    lastBuyOrder!.copyWith(status: (await _getBuyOrder()).status);
+    bot.pipelineData.lastBuyOrder = bot.pipelineData.lastBuyOrder!
+        .copyWith(status: (await _getBuyOrder()).status);
 
-    if (lastBuyOrder.status == OrderStatus.FILLED) {
+    if (bot.pipelineData.lastBuyOrder!.status == OrderStatus.FILLED) {
       timer.cancel();
 
       changeStatusTo(BotPhases.online, 'buy order has been filled');
@@ -131,10 +136,6 @@ class MinimizeLossesPipeline implements Pipeline {
 
     final sellOrder = await _getSellOrder();
 
-    print(_calculateNewOrderPrice());
-    print(lastSellOrder.price);
-    print(lastSellOrder.price);
-
     // if order status is open or partially closed
     if (sellOrder.status == OrderStatus.NEW ||
         sellOrder.status == OrderStatus.PARTIALLY_FILLED) {
@@ -148,14 +149,14 @@ class MinimizeLossesPipeline implements Pipeline {
     // if order status is closed
     else if (sellOrder.status == OrderStatus.FILLED) {
       // TODO resume a buy order
-      final buyOrder = await _getBuyOrder();
-      bot.pipelineData.ordersHistory
-          .add(buyOrder: buyOrder, sellOrder: sellOrder);
+      final ordersPair =
+          OrdersPair(buyOrder: await _getBuyOrder(), sellOrder: sellOrder);
+      bot.pipelineData.ordersHistory.orders.add(ordersPair);
 
       var reason = 'Sell order executed';
 
       // Check if is a loss
-      if (sellOrder.executedQty < bot.pipelineData.lastBuyOrder!.executedQty) {
+      if (!ordersPair.isProfit) {
         // add to loss counter
         bot.pipelineData.lossSellOrderCounter += 1;
 
@@ -226,7 +227,7 @@ class MinimizeLossesPipeline implements Pipeline {
     return res.body;
   }
 
-  Future<Order> _getBuyOrder() async {
+  Future<OrderData> _getBuyOrder() async {
     final res = await ref.read(apiProvider).spot.trade.getQueryOrder(
         _getApiConnection(),
         bot.config.symbol!,
@@ -260,11 +261,11 @@ class MinimizeLossesPipeline implements Pipeline {
     return res.body;
   }
 
-  Future<Order> _getSellOrder() async {
+  Future<OrderData> _getSellOrder() async {
     final res = await ref.read(apiProvider).spot.trade.getQueryOrder(
         _getApiConnection(),
         bot.config.symbol!,
-        bot.pipelineData.lastBuyOrder!.orderId);
+        bot.pipelineData.lastSellOrder!.orderId);
     return res.body;
   }
 

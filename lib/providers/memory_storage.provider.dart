@@ -14,7 +14,7 @@ class MemoryStorageProvider extends StateNotifier<Map<String, String>> {
     if (kDebugMode) {
       print('init memoryStorage');
     }
-    state = await ref.watch(_secureStorageProvider).readAll();
+    state = await ref.watch(secureStorageProvider).readAll();
 
     return true;
   }
@@ -28,17 +28,17 @@ class MemoryStorageProvider extends StateNotifier<Map<String, String>> {
   }
 
   void write(SecureStorageKey key, String value) {
-    ref.watch(_secureStorageProvider).write(key, value);
+    ref.watch(secureStorageProvider).write(key, value);
     state[key.name] = value;
   }
 
   String? delete(SecureStorageKey key) {
-    ref.watch(_secureStorageProvider).delete(key);
+    ref.watch(secureStorageProvider).delete(key);
     return state.remove(key);
   }
 
   void deleteAll() {
-    ref.watch(_secureStorageProvider).deleteAll();
+    ref.watch(secureStorageProvider).deleteAll();
     state = {};
   }
 }

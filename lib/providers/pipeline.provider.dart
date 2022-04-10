@@ -112,7 +112,7 @@ class PipelineProvider extends StateNotifier<List<Pipeline>> {
       ),
     );
 
-    final pipeline = MinimizeLossesPipeline(_ref, bot);
+    final pipeline = MinimizeLossesPipeline(_ref, bot) as Pipeline;
 
     state = [...state, pipeline];
 
@@ -137,7 +137,7 @@ class PipelineProvider extends StateNotifier<List<Pipeline>> {
   Pipeline _createBotPipeline(Bot bot) {
     return bot.map(
       minimizeLosses: (minimizeLosses) =>
-          MinimizeLossesPipeline(_ref, minimizeLosses),
+          MinimizeLossesPipeline(_ref, minimizeLosses) as Pipeline,
     );
   }
 

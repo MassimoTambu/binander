@@ -13,8 +13,9 @@ class WalletProvider {
     late final Response<String> response;
 
     try {
-      response =
-          await _ref.read(dioProvider).get('${conn.url}/sapi/v1/system/status');
+      response = await _ref
+          .read(_dioProvider)
+          .get('${conn.url}/sapi/v1/system/status');
     } on DioError catch (_) {
       return Future.error(_ref
           .read(_apiUtilsProvider)
@@ -45,7 +46,7 @@ class WalletProvider {
 
     late final Response<String> response;
     try {
-      response = await _ref.read(dioProvider).get(
+      response = await _ref.read(_dioProvider).get(
           '${conn.url}/sapi/v1/account/apiRestrictions',
           options: options,
           queryParameters: secureQuery);

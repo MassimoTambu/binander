@@ -26,7 +26,7 @@ class TradeProvider {
 
     late final Response<String> response;
     try {
-      response = await _ref.read(dioProvider).get(
+      response = await _ref.read(_dioProvider).get(
           '${conn.url}/api/v3/allOrders',
           options: options,
           queryParameters: secureQuery);
@@ -44,7 +44,7 @@ class TradeProvider {
     return res;
   }
 
-  Future<ApiResponse<Order>> getQueryOrder(
+  Future<ApiResponse<OrderData>> getQueryOrder(
       ApiConnection conn, String symbol, int orderId) async {
     final headers = <String, dynamic>{};
 
@@ -60,7 +60,7 @@ class TradeProvider {
 
     late final Response<String> response;
     try {
-      response = await _ref.read(dioProvider).get('${conn.url}/api/v3/order',
+      response = await _ref.read(_dioProvider).get('${conn.url}/api/v3/order',
           options: options, queryParameters: secureQuery);
     } on DioError catch (_) {
       return Future.error(_ref
@@ -69,7 +69,7 @@ class TradeProvider {
     }
 
     final res = ApiResponse(
-        Order.fromJson(jsonDecode(response.data!)), response.statusCode!);
+        OrderData.fromJson(jsonDecode(response.data!)), response.statusCode!);
 
     return res;
   }
@@ -104,7 +104,7 @@ class TradeProvider {
 
     late final Response<String> response;
     try {
-      response = await _ref.read(dioProvider).post('${conn.url}/api/v3/order',
+      response = await _ref.read(_dioProvider).post('${conn.url}/api/v3/order',
           options: options, queryParameters: secureQuery);
     } on DioError catch (_) {
       return Future.error(
@@ -139,8 +139,10 @@ class TradeProvider {
 
     late final Response<String> response;
     try {
-      response = await _ref.read(dioProvider).delete('${conn.url}/api/v3/order',
-          options: options, queryParameters: secureQuery);
+      response = await _ref.read(_dioProvider).delete(
+          '${conn.url}/api/v3/order',
+          options: options,
+          queryParameters: secureQuery);
     } on DioError catch (_) {
       return Future.error(_ref
           .read(_apiUtilsProvider)
@@ -167,7 +169,7 @@ class TradeProvider {
 
     late final Response<String> response;
     try {
-      response = await _ref.read(dioProvider).get('${conn.url}/api/v3/account',
+      response = await _ref.read(_dioProvider).get('${conn.url}/api/v3/account',
           options: options, queryParameters: secureQuery);
     } on DioError catch (_) {
       return Future.error(_ref

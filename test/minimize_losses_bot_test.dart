@@ -8,81 +8,165 @@
 import 'package:bottino_fortino/api/api.dart';
 import 'package:bottino_fortino/modules/bot/bot.dart';
 import 'package:bottino_fortino/modules/bot/bots/minimize_losses/minimize_losses.dart';
-import 'package:bottino_fortino/modules/settings/settings.dart';
 import 'package:bottino_fortino/providers/providers.dart';
-import 'package:dio/dio.dart';
+import 'package:fake_async/fake_async.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:http_mock_adapter/http_mock_adapter.dart';
-// import 'package:mockito/annotations.dart';
+import 'package:mockito/annotations.dart';
+import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
 import 'package:uuid/uuid.dart';
 
-class MockApiProvider implements ApiProvider {
-  @override
-  SpotProvider get spot => MockSpotProvider(MockMarketProvider());
-}
+import 'minimize_losses_bot_test.mocks.dart';
 
-class MockSpotProvider implements SpotProvider {
-  @override
-  MarketProvider market;
-
-  @override
-  late TradeProvider trade;
-
-  @override
-  late WalletProvider wallet;
-
-  MockSpotProvider(this.market);
-}
-
-class MockMarketProvider implements MarketProvider {
-  @override
-  ApiUtils get apiUtils => throw UnimplementedError();
-
-  @override
-  Future<ApiResponse<AveragePrice>> getAveragePrice(
-      ApiConnection conn, String symbol) {
-    return Future.value(const ApiResponse(AveragePrice(0, 20), 200));
-  }
-}
-
-// @GenerateMocks([])
+@GenerateMocks([
+  SecureStorageProvider,
+  ApiProvider,
+  SpotProvider,
+  MarketProvider,
+  TradeProvider
+])
 void main() {
-  late DioAdapter dioAdapter;
+  final mockSecureStorageProvider = MockSecureStorageProvider();
+  final mockApiProvider = MockApiProvider();
+  final mockSpotProvider = MockSpotProvider();
+  final mockMarketProvider = MockMarketProvider();
+  final mockTradeProvider = MockTradeProvider();
   late ProviderContainer container;
 
   setUp(() async {
     // For initialize SecureStorage package
     WidgetsFlutterBinding.ensureInitialized();
-    dioAdapter = DioAdapter(dio: Dio());
     container = ProviderContainer(
       overrides: [
-        dioProvider.overrideWithValue(dioAdapter.dio),
-        apiProvider.overrideWithValue(MockApiProvider())
+        secureStorageProvider.overrideWithValue(mockSecureStorageProvider),
+        apiProvider.overrideWithValue(mockApiProvider),
       ],
     );
+
+    // Setup API providers
+    when(mockApiProvider.spot).thenReturn(mockSpotProvider);
+    when(mockSpotProvider.market).thenReturn(mockMarketProvider);
+    when(mockSpotProvider.trade).thenReturn(mockTradeProvider);
   });
 
   tearDown(() async {
     container.dispose();
   });
 
-  test('Class initialization test', () async {
-    // dioAdapter.onGet('https://testnet.binance.vision/api/v3/avgPrice',
-    //     (server) {
-    //   print('dio bubu');
-    //   server.reply(201, {'dio merda': 'si'});
-    // });
+  test('Submit buy order and sell order, then close sell order in profit',
+      () async {
+    // Set api calls for providers
+    const startPrice = 100.0;
+    final prices = [
+      const AveragePrice(1, startPrice),
+      const AveragePrice(1, 125),
+      const AveragePrice(1, 150),
+    ];
+    final List<OrderData> orders = [];
+    when(mockMarketProvider.getAveragePrice(any, any)).thenAnswer(
+      (_) async => ApiResponse(prices.removeAt(0), 200),
+    );
 
-    final foo = container.read(dioProvider);
+    when(mockTradeProvider.newOrder(
+            any, any, OrderSides.BUY, OrderTypes.LIMIT, any, any))
+        .thenAnswer(
+      (i) async {
+        final buyOrder = OrderNew(
+            'BNBUSDT',
+            1,
+            12,
+            '1',
+            DateTime.now(),
+            i.positionalArguments[5],
+            i.positionalArguments[4],
+            0,
+            0,
+            OrderStatus.NEW,
+            TimeInForce.GTC,
+            OrderTypes.LIMIT,
+            OrderSides.BUY,
+            const [Fill(startPrice, 99, 1, 'USDT', 52)]);
 
-    // try {
-    //   final res = await foo
-    //       .get<dynamic>('https://testnet.binance.vision/api/v3/avgPrice');
-    // } catch (e) {
-    //   print(e.toString());
-    // }
+        orders.add(OrderData(
+            buyOrder.symbol,
+            buyOrder.orderId,
+            buyOrder.orderListId,
+            buyOrder.clientOrderId,
+            buyOrder.price,
+            buyOrder.origQty,
+            buyOrder.executedQty,
+            buyOrder.cummulativeQuoteQty,
+            buyOrder.status,
+            buyOrder.timeInForce,
+            buyOrder.type,
+            buyOrder.side,
+            0,
+            0,
+            DateTime.now(),
+            DateTime.now(),
+            true,
+            0));
+        return ApiResponse(buyOrder, 201);
+      },
+    );
+
+    when(mockTradeProvider.newOrder(
+            any, any, OrderSides.SELL, OrderTypes.LIMIT, any, any))
+        .thenAnswer(
+      (i) async {
+        final sellOrder = OrderNew(
+            'BNBUSDT',
+            2,
+            13,
+            '2',
+            DateTime.now(),
+            i.positionalArguments[5],
+            i.positionalArguments[4],
+            0,
+            0,
+            OrderStatus.NEW,
+            TimeInForce.GTC,
+            OrderTypes.LIMIT,
+            OrderSides.BUY,
+            const [Fill(startPrice, 99, 1, 'USDT', 52)]);
+
+        orders.add(OrderData(
+            sellOrder.symbol,
+            sellOrder.orderId,
+            sellOrder.orderListId,
+            sellOrder.clientOrderId,
+            sellOrder.price,
+            sellOrder.origQty,
+            sellOrder.executedQty,
+            sellOrder.cummulativeQuoteQty,
+            sellOrder.status,
+            sellOrder.timeInForce,
+            sellOrder.type,
+            sellOrder.side,
+            0,
+            0,
+            DateTime.now(),
+            DateTime.now(),
+            true,
+            0));
+        return ApiResponse(sellOrder, 201);
+      },
+    );
+
+    when(mockTradeProvider.getQueryOrder(any, any, any)).thenAnswer(
+      (i) async {
+        final order = orders
+            .where((o) => o.orderId == i.positionalArguments[2])
+            .map((o) => o.copyWith(
+                status: OrderStatus.FILLED,
+                cummulativeQuoteQty: o.origQty,
+                executedQty: o.origQty))
+            .first;
+
+        return ApiResponse(order, 201);
+      },
+    );
 
     final bot = Bot.minimizeLosses(
       const Uuid().v4(),
@@ -99,8 +183,25 @@ void main() {
     );
     container.read(pipelineProvider.notifier).addBots([bot]);
 
+    // Ensure is a clean start
+    expect(bot.testNet, isTrue);
+    expect(bot.pipelineData.timer, isNull);
+    expect(bot.pipelineData.lastAveragePrice, isNull);
+    expect(bot.pipelineData.lastBuyOrder, isNull);
+    expect(bot.pipelineData.lastSellOrder, isNull);
+    expect(bot.pipelineData.lossSellOrderCounter, isZero);
+    expect(bot.pipelineData.ordersHistory.orders.length, isZero);
+
     final pipeline = container.read(pipelineProvider).first;
 
-    pipeline.start();
+    fakeAsync((async) {
+      pipeline.start();
+
+      async.elapse(const Duration(seconds: 120));
+
+      expect(bot.pipelineData.ordersHistory.orders.length, 1);
+      // Is a profit
+      expect(bot.pipelineData.lossSellOrderCounter, 0);
+    });
   });
 }

@@ -25,8 +25,10 @@ class MarketProvider {
 
     late final Response<String> response;
     try {
-      response = await _ref.read(dioProvider).get('${conn.url}/api/v3/avgPrice',
-          options: options, queryParameters: secureQuery);
+      response = await _ref.read(_dioProvider).get(
+          '${conn.url}/api/v3/avgPrice',
+          options: options,
+          queryParameters: secureQuery);
     } on DioError catch (_) {
       return Future.error(_ref
           .read(_apiUtilsProvider)
