@@ -27,7 +27,8 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
 
     final botLimits = _getBotLimitsReached();
     if (botLimits.isNotEmpty) {
-      changeStatusTo(BotPhases.error, botLimits.first.cause);
+      changeStatusTo(
+          BotPhases.error, botLimits.map((l) => l.cause).join(" - "));
       return;
     }
 
@@ -163,7 +164,7 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
         /// TODO transform lossSellOrderCounter to dailyLossSellOrderCounter
         // check if is major or equal to loss counter
         if (_hasReachDailySellLossLimit()) {
-          reason = 'Daily loss sell orders reached';
+          reason += ' - Daily loss sell orders reached';
         }
       }
 
