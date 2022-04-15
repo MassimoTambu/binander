@@ -370,8 +370,177 @@ void main() {
     });
   });
 
-  /// Prossimi test
   /// - con buy order rimandato ad una seconda volta perché ha raggiunto il timeout impostato
+  test(
+      'Submit buy order, reach buy order limit, cancel buy order and submit it again with the new actual price. Then place a sell order and sell it in profit',
+      () async {
+    // Set api calls for providers
+    const startPrice = 100.0;
+    // Trend crypto prices
+    final prices = [
+      const AveragePrice(1, startPrice),
+      const AveragePrice(1, 90),
+      for (var i = 0; i <= 10; i++) const AveragePrice(1, 80),
+      const AveragePrice(1, startPrice),
+    ];
+    var currentPrice = const AveragePrice(1, 0);
+    final List<OrderData> orders = [];
+    var buyOrdersCount = 0;
+    when(mockMarketProvider.getAveragePrice(any, any)).thenAnswer(
+      (_) async {
+        currentPrice = prices.removeAt(0);
+        return ApiResponse(currentPrice, 200);
+      },
+    );
+
+    when(mockTradeProvider.newOrder(
+            any, any, OrderSides.BUY, OrderTypes.LIMIT, any, any))
+        .thenAnswer(
+      (i) async {
+        buyOrdersCount++;
+        final buyOrder = OrderNew(
+            'BNBUSDT',
+            buyOrdersCount,
+            11 + buyOrdersCount,
+            '$buyOrdersCount',
+            DateTime.now(),
+            i.positionalArguments[5],
+            i.positionalArguments[4],
+            0,
+            0,
+            OrderStatus.NEW,
+            TimeInForce.GTC,
+            OrderTypes.LIMIT,
+            OrderSides.BUY, [
+          Fill(
+              i.positionalArguments[5], i.positionalArguments[4], 1, 'USDT', 52)
+        ]);
+
+        orders.add(OrderData(
+            buyOrder.symbol,
+            buyOrder.orderId,
+            buyOrder.orderListId,
+            buyOrder.clientOrderId,
+            buyOrder.price,
+            buyOrder.origQty,
+            buyOrder.executedQty,
+            buyOrder.cummulativeQuoteQty,
+            buyOrder.status,
+            buyOrder.timeInForce,
+            buyOrder.type,
+            buyOrder.side,
+            0,
+            0,
+            DateTime.now(),
+            DateTime.now(),
+            true,
+            0));
+        return ApiResponse(buyOrder, 201);
+      },
+    );
+
+    when(mockTradeProvider.newOrder(
+            any, any, OrderSides.SELL, OrderTypes.LIMIT, any, any))
+        .thenAnswer(
+      (i) async {
+        final sellOrder = OrderNew(
+            'BNBUSDT',
+            2,
+            13,
+            '2',
+            DateTime.now(),
+            i.positionalArguments[5],
+            i.positionalArguments[4],
+            0,
+            0,
+            OrderStatus.NEW,
+            TimeInForce.GTC,
+            OrderTypes.LIMIT,
+            OrderSides.BUY, [
+          Fill(
+              i.positionalArguments[5], i.positionalArguments[4], 1, 'USDT', 52)
+        ]);
+
+        orders.add(OrderData(
+            sellOrder.symbol,
+            sellOrder.orderId,
+            sellOrder.orderListId,
+            sellOrder.clientOrderId,
+            sellOrder.price,
+            sellOrder.origQty,
+            sellOrder.executedQty,
+            sellOrder.cummulativeQuoteQty,
+            sellOrder.status,
+            sellOrder.timeInForce,
+            sellOrder.type,
+            sellOrder.side,
+            0,
+            0,
+            DateTime.now(),
+            DateTime.now(),
+            true,
+            0));
+        return ApiResponse(sellOrder, 201);
+      },
+    );
+
+    when(mockTradeProvider.getQueryOrder(any, any, any)).thenAnswer(
+      (i) async {
+        final order =
+            orders.where((o) => o.orderId == i.positionalArguments[2]).map((o) {
+          if (o.price >= currentPrice.price) {
+            return o.copyWith(
+                status: OrderStatus.FILLED,
+                cummulativeQuoteQty: o.origQty * o.price,
+                executedQty: o.origQty);
+          }
+          return o;
+        }).first;
+
+        return ApiResponse(order, 201);
+      },
+    );
+
+    final bot = Bot.minimizeLosses(
+      const Uuid().v4(),
+      MinimizeLossesPipeLineData(),
+      name: "BOB",
+      testNet: true,
+      config: MinimizeLossesConfig(
+        symbol: "BNBUSDT",
+        dailyLossSellOrders: 3,
+        maxQuantityPerOrder: 100,
+        percentageSellOrder: 3,
+        timerBuyOrder: const Duration(minutes: 1),
+      ),
+    );
+    container.read(pipelineProvider.notifier).addBots([bot]);
+
+    // Ensure is a clean start
+    expect(bot.testNet, isTrue);
+    expect(bot.pipelineData.timer, isNull);
+    expect(bot.pipelineData.lastAveragePrice, isNull);
+    expect(bot.pipelineData.lastBuyOrder, isNull);
+    expect(bot.pipelineData.lastSellOrder, isNull);
+    expect(bot.pipelineData.lossSellOrderCounter, isZero);
+    expect(bot.pipelineData.ordersHistory.orders.length, isZero);
+
+    final pipeline = container.read(pipelineProvider).first;
+
+    fakeAsync((async) {
+      pipeline.start();
+
+      async.elapse(const Duration(seconds: 120));
+
+      // Should be offline
+      expect(bot.pipelineData.status.phase, BotPhases.offline);
+      expect(bot.pipelineData.ordersHistory.orders.length, 1);
+      // Is a loss
+      expect(bot.pipelineData.lossSellOrderCounter, 1);
+    });
+  });
+
+  /// Prossimi test
   /// - con limite "giornaliero" di ordini in perdita raggiunto
   /// - con il seguente ordine: 1 ordine in profitto, 1 in perdita e 1 in profitto
   /// - con 13 giri cicli senza vendere e poi vendita in profitto spostando il sell order al 7° e 9° ciclo

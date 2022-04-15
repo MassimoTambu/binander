@@ -104,6 +104,8 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
     // Exit if bot execution has been interrupted
     if (bot.pipelineData.status.phase != BotPhases.starting) return;
 
+    if (bot.config.timerBuyOrder.)
+
     // Update order status
     bot.pipelineData.lastBuyOrder = bot.pipelineData.lastBuyOrder!
         .copyWith(status: (await _getBuyOrder()).status);
