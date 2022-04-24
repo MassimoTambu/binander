@@ -7,6 +7,7 @@ import 'package:bottino_fortino/modules/bot/bot.dart';
 import 'package:bottino_fortino/models/models.dart';
 import 'package:bottino_fortino/modules/settings/settings.dart';
 import 'package:bottino_fortino/providers/providers.dart';
+import 'package:clock/clock.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 

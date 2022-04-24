@@ -2,10 +2,6 @@ part of minimize_losses_bot;
 
 @freezed
 class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
-  // @override
-  // final Ref ref;
-  // @override
-  // final MinimizeLossesBot bot;
   const MinimizeLossesPipeline._();
 
   const factory MinimizeLossesPipeline(Ref ref, MinimizeLossesBot bot) =
@@ -13,6 +9,7 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
 
   @override
   void start() async {
+    _incrementPipelineCounter();
     var timer = bot.pipelineData.timer;
 
     // We can't create a status variable because with freezed
@@ -43,6 +40,7 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
       changeStatusTo(BotPhases.starting, 'submitting buy order');
 
       await _trySubmitBuyOrder();
+      bot.pipelineData.buyOrderStartedAt = clock.now();
     }
 
     // Exit if bot execution has been interrupted
@@ -88,6 +86,10 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
     ref.read(pipelineProvider.notifier).updateBotStatus(bot.uuid, status);
   }
 
+  void _incrementPipelineCounter() {
+    bot.pipelineData.pipelineCounter += 1;
+  }
+
   List<BotLimit> _getBotLimitsReached() {
     final limits = <BotLimit>[];
     if (_hasReachDailySellLossLimit()) {
@@ -100,11 +102,29 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
 
   /// Check if buy order has been filled. If so, fetch run Bot Pipeline every 10s
   Future<void> _runCheckBuyOrderPipeline(Timer timer) async {
+    _incrementPipelineCounter();
     if (!timer.isActive) return;
     // Exit if bot execution has been interrupted
     if (bot.pipelineData.status.phase != BotPhases.starting) return;
 
-    if (bot.config.timerBuyOrder.)
+    final expireDate =
+        bot.pipelineData.buyOrderStartedAt!.add(bot.config.timerBuyOrder!);
+    final dateNow = clock.now();
+
+    if (dateNow.isAfter(expireDate)) {
+      // Should retry and submit another buy order
+      changeStatusTo(BotPhases.starting,
+          "buy order time limit reached. I'm about to try again..");
+
+      await _cancelOrder(bot.pipelineData.lastBuyOrder!.orderId);
+      bot.pipelineData.lastBuyOrder = null;
+      bot.pipelineData.buyOrderStartedAt = null;
+      timer.cancel();
+
+      bot.pipelineData.timer =
+          Timer.periodic(const Duration(seconds: 2), (_) => start());
+      return;
+    }
 
     // Update order status
     bot.pipelineData.lastBuyOrder = bot.pipelineData.lastBuyOrder!
@@ -124,6 +144,7 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
   /// - Memorizzare se l'ordine eseguito è risultato una perdita o un profitto.
   /// - Controllare all'avvio se è presente un ordine in corso che è stato piazzato dall'ultimo avvio e ancora non si è concluso.
   Future<void> _runBotPipeline(Timer timer) async {
+    _incrementPipelineCounter();
     if (!timer.isActive) return;
 
     bot.pipelineData.lastAveragePrice = await _getCurrentCryptoPrice();
@@ -170,6 +191,7 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
         }
       }
 
+      bot.pipelineData.buyOrderStartedAt = null;
       bot.pipelineData.lastBuyOrder = null;
       bot.pipelineData.lastSellOrder = null;
       timer.cancel();
@@ -299,8 +321,9 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
   }
 
   /// TODO put buy order price as parameter
+  /// Approximate price's second number after comma to floor
   double _approxPrice(double price) {
-    return price.floorToDouble();
+    return num.parse((price * 100).toStringAsFixed(2)) / 100;
   }
 
   bool _hasReachDailySellLossLimit() {

@@ -5,6 +5,9 @@ class MinimizeLossesPipeLineData implements PipelineData {
   @override
   final OrdersHistory ordersHistory;
   @override
+  @JsonKey()
+  int pipelineCounter = 0;
+  @override
   @JsonKey(ignore: true)
   var status = const BotStatus(BotPhases.offline, 'offline');
   @override
@@ -13,8 +16,11 @@ class MinimizeLossesPipeLineData implements PipelineData {
 
   @JsonKey(ignore: true)
   AveragePrice? lastAveragePrice;
+  DateTime? buyOrderStartedAt;
   OrderNew? lastBuyOrder;
   OrderNew? lastSellOrder;
+
+  /// TODO replace with check loss sell orders every day
   int lossSellOrderCounter = 0;
 
   MinimizeLossesPipeLineData({OrdersHistory? ordersHistory})
