@@ -226,7 +226,6 @@ void main() {
     });
   });
 
-  /// - con buy order rimandato ad una seconda volta perché ha raggiunto il timeout impostato
   test(
       'Submit buy order, reach buy order limit, cancel buy order and submit it again with the new actual price. Then place a sell order and sell it in profit',
       () async {
@@ -270,8 +269,61 @@ void main() {
     });
   });
 
+  test('Reach daily loss sell order limit', () async {
+    getPriceStrategy = () {
+      // First lap is for buy order submission without filling it.
+      // The second one it will fill the buy order.
+      // Third lap the price will be lower to submitting sell order.
+      // Fourth lap is for trigger sell order.
+      if (bot.pipelineData.pipelineCounter == 1 ||
+          bot.pipelineData.pipelineCounter == 2) {
+        return startPrice;
+      }
+      if (bot.pipelineData.pipelineCounter == 3) return 90;
+      return 80;
+    };
+
+    bot = TestUtils.createMinimizeLossesBot(dailyLossSellOrders: 1);
+    container.read(pipelineProvider.notifier).addBots([bot]);
+
+    ensureIsACleanStart(bot);
+
+    final pipeline = container.read(pipelineProvider).first;
+
+    fakeAsync((async) {
+      pipeline.start();
+
+      async.elapse(const Duration(seconds: 120));
+
+      // Should be offline
+      expect(bot.pipelineData.status.phase, BotPhases.offline);
+      expect(bot.pipelineData.ordersHistory.orders.length, 1);
+      // Is a loss
+      expect(bot.pipelineData.ordersHistory.lossesOnly.length, 1);
+      // No profits
+      expect(bot.pipelineData.ordersHistory.profitsOnly.length, 0);
+
+      verify(mockMarketProvider.getAveragePrice(any, any));
+      verify(mockTradeProvider.newOrder(any, any, any, any, any, any));
+      verify(mockTradeProvider.getQueryOrder(any, any, any));
+      verifyNoMoreInteractions(mockMarketProvider);
+      verifyNoMoreInteractions(mockTradeProvider);
+
+      // try restart bot
+      pipeline.start();
+
+      async.elapse(const Duration(seconds: 5));
+
+      expect(bot.pipelineData.status.phase, BotPhases.error);
+      expect(bot.pipelineData.status.reason,
+          contains('Daily sell loss limit reached'));
+    });
+  });
+
   /// Prossimi test
-  /// - con limite "giornaliero" di ordini in perdita raggiunto
+  /// - Aggiungere i seguenti controlli sui precedenti orders:
+  ///   - Al 1° giro esegue il buy order senza fillarlo e al 2° gira lo filla.
+  ///   - Controllare anche il sell order
   /// - con il seguente ordine: 1 ordine in profitto, 1 in perdita e 1 in profitto
   /// - con 13 giri cicli senza vendere e poi vendita in profitto spostando il sell order al 7° e 9° ciclo
 }
