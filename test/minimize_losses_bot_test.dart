@@ -159,11 +159,21 @@ void main() {
       // The second one it will fill the buy order.
       // Third lap will submit a sell order.
       // Fourth lap is for trigger sell order.
-      if (bot.pipelineData.pipelineCounter == 1 ||
-          bot.pipelineData.pipelineCounter == 2) {
+      if (bot.pipelineData.pipelineCounter == 1) {
         return startPrice;
       }
-      if (bot.pipelineData.pipelineCounter == 3) return 125;
+      if (bot.pipelineData.pipelineCounter == 2) {
+        expect(bot.pipelineData.lastBuyOrder, isNotNull);
+        return startPrice;
+      }
+      if (bot.pipelineData.pipelineCounter == 3) {
+        expect(bot.pipelineData.lastBuyOrder, isNotNull);
+        expect(bot.pipelineData.lastBuyOrder!.status, OrderStatus.FILLED);
+        return 125;
+      }
+
+      expect(bot.pipelineData.lastSellOrder, isNotNull);
+      expect(bot.pipelineData.lastSellOrder!.status, OrderStatus.NEW);
       return 120;
     };
 
@@ -177,11 +187,12 @@ void main() {
     fakeAsync((async) {
       pipeline.start();
 
-      async.elapse(const Duration(seconds: 120));
+      async.elapse(const Duration(seconds: 30));
 
       // Should be offline
       expect(bot.pipelineData.status.phase, BotPhases.offline);
       expect(bot.pipelineData.ordersHistory.orders.length, 1);
+      expect(bot.pipelineData.pipelineCounter, 4);
       // Is a profit
       expect(bot.pipelineData.ordersHistory.profitsOnly.length, 1);
       // No losses
@@ -214,11 +225,12 @@ void main() {
     fakeAsync((async) {
       pipeline.start();
 
-      async.elapse(const Duration(seconds: 120));
+      async.elapse(const Duration(seconds: 30));
 
       // Should be offline
       expect(bot.pipelineData.status.phase, BotPhases.offline);
       expect(bot.pipelineData.ordersHistory.orders.length, 1);
+      expect(bot.pipelineData.pipelineCounter, 4);
       // Is a loss
       expect(bot.pipelineData.ordersHistory.lossesOnly.length, 1);
       // No profits
@@ -255,11 +267,12 @@ void main() {
       // fake Datetime with clock package
       pipeline.start();
 
-      async.elapse(const Duration(seconds: 300));
+      async.elapse(const Duration(seconds: 102));
 
       // Should be offline
       expect(bot.pipelineData.status.phase, BotPhases.offline);
       expect(bot.pipelineData.ordersHistory.orders.length, 1);
+      expect(bot.pipelineData.pipelineCounter, 12);
       // Is a profit
       expect(bot.pipelineData.ordersHistory.profitsOnly.length, 1);
       // No losses
@@ -293,11 +306,12 @@ void main() {
     fakeAsync((async) {
       pipeline.start();
 
-      async.elapse(const Duration(seconds: 120));
+      async.elapse(const Duration(seconds: 30));
 
       // Should be offline
       expect(bot.pipelineData.status.phase, BotPhases.offline);
       expect(bot.pipelineData.ordersHistory.orders.length, 1);
+      expect(bot.pipelineData.pipelineCounter, 4);
       // Is a loss
       expect(bot.pipelineData.ordersHistory.lossesOnly.length, 1);
       // No profits
@@ -320,10 +334,102 @@ void main() {
     });
   });
 
+  test(
+      'Run bot three times with the following orders history results: profit, loss, profit',
+      () async {
+    getPriceStrategy = () {
+      // First lap is for buy order submission without filling it.
+      // The second one it will fill the buy order.
+      // Third lap will submit a sell order.
+      // Fourth lap is for trigger sell order.
+      if (bot.pipelineData.pipelineCounter == 1 ||
+          bot.pipelineData.pipelineCounter == 2) {
+        return startPrice;
+      }
+      if (bot.pipelineData.pipelineCounter == 3) {
+        return 125;
+      }
+      if (bot.pipelineData.pipelineCounter == 4) {
+        return 120;
+      }
+      // These are the laps for the 2nd bot start
+      if (bot.pipelineData.pipelineCounter == 5 ||
+          bot.pipelineData.pipelineCounter == 6) {
+        return startPrice;
+      }
+      if (bot.pipelineData.pipelineCounter == 7) return 90;
+      if (bot.pipelineData.pipelineCounter == 8) return 80;
+      // 3nd bot start
+      if (bot.pipelineData.pipelineCounter == 9 ||
+          bot.pipelineData.pipelineCounter == 10) {
+        return startPrice;
+      }
+      if (bot.pipelineData.pipelineCounter == 11) {
+        return 125;
+      }
+
+      return 120;
+    };
+
+    bot = TestUtils.createMinimizeLossesBot();
+    container.read(pipelineProvider.notifier).addBots([bot]);
+
+    ensureIsACleanStart(bot);
+
+    final pipeline = container.read(pipelineProvider).first;
+
+    fakeAsync((async) {
+      pipeline.start();
+
+      async.elapse(const Duration(seconds: 30));
+
+      // Should be offline
+      expect(bot.pipelineData.status.phase, BotPhases.offline);
+      expect(bot.pipelineData.ordersHistory.orders.length, 1);
+      expect(bot.pipelineData.pipelineCounter, 4);
+      // Is a profit
+      expect(bot.pipelineData.ordersHistory.profitsOnly.length, 1);
+      // No losses
+      expect(bot.pipelineData.ordersHistory.lossesOnly.length, 0);
+
+      expect(bot.pipelineData.timer, isNull);
+      expect(bot.pipelineData.lastBuyOrder, isNull);
+      expect(bot.pipelineData.lastSellOrder, isNull);
+
+      pipeline.start();
+
+      async.elapse(const Duration(seconds: 30));
+
+      // Should be offline
+      expect(bot.pipelineData.status.phase, BotPhases.offline);
+      expect(bot.pipelineData.ordersHistory.orders.length, 2);
+      expect(bot.pipelineData.pipelineCounter, 8);
+      // Is a profit
+      expect(bot.pipelineData.ordersHistory.profitsOnly.length, 1);
+      // No losses
+      expect(bot.pipelineData.ordersHistory.lossesOnly.length, 1);
+
+      expect(bot.pipelineData.timer, isNull);
+      expect(bot.pipelineData.lastBuyOrder, isNull);
+      expect(bot.pipelineData.lastSellOrder, isNull);
+
+      pipeline.start();
+
+      async.elapse(const Duration(seconds: 30));
+
+      // Should be offline
+      expect(bot.pipelineData.status.phase, BotPhases.offline);
+      expect(bot.pipelineData.ordersHistory.orders.length, 3);
+      expect(bot.pipelineData.pipelineCounter, 12);
+      // Is a profit
+      expect(bot.pipelineData.ordersHistory.profitsOnly.length, 2);
+      // No losses
+      expect(bot.pipelineData.ordersHistory.lossesOnly.length, 1);
+    });
+  });
+
   /// Prossimi test
-  /// - Aggiungere i seguenti controlli sui precedenti orders:
-  ///   - Al 1° giro esegue il buy order senza fillarlo e al 2° gira lo filla.
-  ///   - Controllare anche il sell order
-  /// - con il seguente ordine: 1 ordine in profitto, 1 in perdita e 1 in profitto
-  /// - con 13 giri cicli senza vendere e poi vendita in profitto spostando il sell order al 7° e 9° ciclo
+  /// - con 13 cicli senza vendere e poi vendita in profitto spostando il sell order al 7° e 9° ciclo
+  /// - test sui soldi rimanenti
+  /// - partenza, stop e ripresa del bot: assicurarsi che non cambi niente
 }
