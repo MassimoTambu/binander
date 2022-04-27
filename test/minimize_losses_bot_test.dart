@@ -428,8 +428,55 @@ void main() {
     });
   });
 
+  test(
+      'Submit buy order and sell order, move sell order at 7th and 9th lap and sell it in profit at 13th lap',
+      () async {
+    getPriceStrategy = () {
+      // First lap is for buy order submission without filling it.
+      // The second one it will fill the buy order.
+      // Third lap will submit a sell order.
+      // Fourth lap is for trigger sell order.
+      if (bot.pipelineData.pipelineCounter <= 6) {
+        return startPrice;
+      }
+      if (bot.pipelineData.pipelineCounter == 7 ||
+          bot.pipelineData.pipelineCounter == 8) {
+        return 125;
+      }
+      if (bot.pipelineData.pipelineCounter <= 12) {
+        return 150;
+      }
+
+      return 120;
+    };
+
+    bot = TestUtils.createMinimizeLossesBot();
+    container.read(pipelineProvider.notifier).addBots([bot]);
+
+    ensureIsACleanStart(bot);
+
+    final pipeline = container.read(pipelineProvider).first;
+
+    fakeAsync((async) {
+      pipeline.start();
+
+      async.elapse(const Duration(seconds: 120));
+
+      // Should be offline
+      expect(bot.pipelineData.status.phase, BotPhases.offline);
+      expect(bot.pipelineData.ordersHistory.orders.length, 1);
+      expect(bot.pipelineData.pipelineCounter, 13);
+      // Is a profit
+      expect(bot.pipelineData.ordersHistory.profitsOnly.length, 1);
+      // No losses
+      expect(bot.pipelineData.ordersHistory.lossesOnly.length, 0);
+      // 2 cancel orders: one cancelled at 7th lap and the other at 9th lap
+      // Cancelled to moving the sell order higher
+      verify(mockTradeProvider.cancelOrder(any, any, any)).called(2);
+    });
+  });
+
   /// Prossimi test
-  /// - con 13 cicli senza vendere e poi vendita in profitto spostando il sell order al 7° e 9° ciclo
   /// - test sui soldi rimanenti
   /// - partenza, stop e ripresa del bot: assicurarsi che non cambi niente
 }
