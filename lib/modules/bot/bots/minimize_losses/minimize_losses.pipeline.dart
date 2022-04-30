@@ -127,8 +127,21 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
     }
 
     // Update order status
-    bot.pipelineData.lastBuyOrder = bot.pipelineData.lastBuyOrder!
-        .copyWith(status: (await _getBuyOrder()).status);
+    final buyOrderData = await _getBuyOrder();
+    bot.pipelineData.lastBuyOrder = bot.pipelineData.lastBuyOrder!.copyWith(
+      clientOrderId: buyOrderData.clientOrderId,
+      cummulativeQuoteQty: buyOrderData.cummulativeQuoteQty,
+      executedQty: buyOrderData.executedQty,
+      orderId: buyOrderData.orderId,
+      orderListId: buyOrderData.orderListId,
+      origQty: buyOrderData.origQty,
+      price: buyOrderData.price,
+      side: buyOrderData.side,
+      symbol: buyOrderData.symbol,
+      status: buyOrderData.status,
+      timeInForce: buyOrderData.timeInForce,
+      type: buyOrderData.type,
+    );
 
     if (bot.pipelineData.lastBuyOrder!.status == OrderStatus.FILLED) {
       timer.cancel();
@@ -246,10 +259,15 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
         bot.config.symbol!,
         OrderSides.BUY,
         OrderTypes.LIMIT,
-        bot.config.maxQuantityPerOrder!,
+        _calculateBuyOrderQuantity(currentApproxPrice),
         currentApproxPrice);
 
     return res.body;
+  }
+
+  double _calculateBuyOrderQuantity(double currentPrice) {
+    final qty = bot.config.maxQuantityPerOrder! / currentPrice;
+    return (qty * 100).floorToDouble() / 100;
   }
 
   Future<OrderData> _getBuyOrder() async {
@@ -281,7 +299,7 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
         bot.config.symbol!,
         OrderSides.SELL,
         OrderTypes.LIMIT,
-        bot.config.maxQuantityPerOrder!,
+        bot.pipelineData.lastBuyOrder!.executedQty,
         currentApproxPrice);
     return res.body;
   }
@@ -323,7 +341,7 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
   /// TODO put buy order price as parameter
   /// Approximate price's second number after comma to floor
   double _approxPrice(double price) {
-    return num.parse((price * 100).toStringAsFixed(2)) / 100;
+    return (price * 100).floorToDouble() / 100;
   }
 
   bool _hasReachDailySellLossLimit() {

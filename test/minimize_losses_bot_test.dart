@@ -432,10 +432,6 @@ void main() {
       'Submit buy order and sell order, move sell order at 7th and 9th lap and sell it in profit at 13th lap',
       () async {
     getPriceStrategy = () {
-      // First lap is for buy order submission without filling it.
-      // The second one it will fill the buy order.
-      // Third lap will submit a sell order.
-      // Fourth lap is for trigger sell order.
       if (bot.pipelineData.pipelineCounter <= 6) {
         return startPrice;
       }
