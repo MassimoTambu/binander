@@ -1,5 +1,6 @@
 library api;
 
+import 'package:bottino_fortino/models/models.dart';
 import 'package:bottino_fortino/modules/settings/settings.dart';
 import 'package:bottino_fortino/utils/utils.dart';
 import 'package:dio/dio.dart';

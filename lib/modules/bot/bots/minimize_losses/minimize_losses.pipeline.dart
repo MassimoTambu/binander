@@ -39,7 +39,18 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
 
       changeStatusTo(BotPhases.starting, 'submitting buy order');
 
-      await _trySubmitBuyOrder();
+      final accInfo = await _getAccountInformation();
+      final accBalances = accInfo.balances.where(
+        (b) => b.asset == bot.config.symbol!.rightPair,
+      );
+      // Asset not found in account
+      if (accBalances.isEmpty) {
+        return stop(reason: 'Asset not found on account');
+      }
+
+      final double rightPairQty = getRightPairQty(accBalances.first);
+
+      await _trySubmitBuyOrder(rightPairQty);
       bot.pipelineData.buyOrderStartedAt = clock.now();
     }
 
@@ -62,17 +73,26 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
   void stop({String reason = ''}) async {
     bot.pipelineData.timer?.cancel();
 
-    changeStatusTo(BotPhases.stopping, 'stopping' + reason);
-
     if (reason.isNotEmpty) {
       reason = ': $reason';
     }
 
+    changeStatusTo(BotPhases.stopping, 'stopping' + reason);
+
+    // We should leave a clean environment before stopping the bot.
+    // If for some reason the bot has going to stop we should cancel the opened orders
     final lastBuyOrder = bot.pipelineData.lastBuyOrder;
-    if (lastBuyOrder != null) {
+    if (lastBuyOrder != null && lastBuyOrder.status != OrderStatus.FILLED) {
       await _cancelOrder(lastBuyOrder.orderId);
     }
-    //TODO cancel sell order
+    final lastSellOrder = bot.pipelineData.lastSellOrder;
+    if (lastSellOrder != null && lastSellOrder.status != OrderStatus.FILLED) {
+      await _cancelOrder(lastSellOrder.orderId);
+    }
+
+    bot.pipelineData.buyOrderStartedAt = null;
+    bot.pipelineData.lastBuyOrder = null;
+    bot.pipelineData.lastSellOrder = null;
 
     final closingMessage = 'turned off' + reason;
 
@@ -162,8 +182,7 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
 
     bot.pipelineData.lastAveragePrice = await _getCurrentCryptoPrice();
 
-    final lastSellOrder = bot.pipelineData.lastSellOrder;
-    if (lastSellOrder == null) {
+    if (bot.pipelineData.lastSellOrder == null) {
       await _trySubmitSellOrder();
       changeStatusTo(BotPhases.online, 'submitted sell order');
       return;
@@ -172,9 +191,24 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
     changeStatusTo(BotPhases.online, 'pipeline has been started');
 
     final sellOrder = await _getSellOrder();
+    bot.pipelineData.lastSellOrder = bot.pipelineData.lastSellOrder!.copyWith(
+      clientOrderId: sellOrder.clientOrderId,
+      cummulativeQuoteQty: sellOrder.cummulativeQuoteQty,
+      executedQty: sellOrder.executedQty,
+      orderId: sellOrder.orderId,
+      orderListId: sellOrder.orderListId,
+      origQty: sellOrder.origQty,
+      price: sellOrder.price,
+      side: sellOrder.side,
+      symbol: sellOrder.symbol,
+      status: sellOrder.status,
+      timeInForce: sellOrder.timeInForce,
+      type: sellOrder.type,
+    );
 
     // if order status is open or partially closed
     if (sellOrder.status == OrderStatus.NEW ||
+        //TODO find a solution for PARTIALLY_FILLED: it could probably break a lot of things
         sellOrder.status == OrderStatus.PARTIALLY_FILLED) {
       if (_hasToMoveOrder()) {
         await _moveOrder(sellOrder.orderId);
@@ -186,8 +220,8 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
     // if order status is closed
     else if (sellOrder.status == OrderStatus.FILLED) {
       // TODO resume a buy order
-      final ordersPair =
-          OrdersPair(buyOrder: await _getBuyOrder(), sellOrder: sellOrder);
+      final ordersPair = OrdersPair(
+          buyOrder: bot.pipelineData.lastBuyOrder!, sellOrder: sellOrder);
       bot.pipelineData.ordersHistory.orders.add(ordersPair);
 
       var reason = 'Sell order executed';
@@ -204,9 +238,6 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
         }
       }
 
-      bot.pipelineData.buyOrderStartedAt = null;
-      bot.pipelineData.lastBuyOrder = null;
-      bot.pipelineData.lastSellOrder = null;
       timer.cancel();
 
       return stop(reason: reason);
@@ -235,9 +266,25 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
     return res.body;
   }
 
-  Future<void> _trySubmitBuyOrder() async {
+  Future<AccountInformation> _getAccountInformation() async {
+    final res = await ref
+        .read(apiProvider)
+        .spot
+        .trade
+        .getAccountInformation(_getApiConnection());
+    return res.body;
+  }
+
+  double getRightPairQty(AccountBalance balance) {
+    if (bot.config.maxInvestmentPerOrder! > balance.free) {
+      return balance.free;
+    }
+    return bot.config.maxInvestmentPerOrder!;
+  }
+
+  Future<void> _trySubmitBuyOrder(double rightPairQty) async {
     try {
-      bot.pipelineData.lastBuyOrder = await _submitBuyOrder();
+      bot.pipelineData.lastBuyOrder = await _submitBuyOrder(rightPairQty);
     } on ApiException catch (_, __) {
       const message = 'Failed to submit buy order. Retry in 10s';
 
@@ -251,7 +298,7 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
   }
 
   /// Submit a new Buy Order with the last average price approximated
-  Future<OrderNew> _submitBuyOrder() async {
+  Future<OrderNew> _submitBuyOrder(double rightPairQty) async {
     final currentApproxPrice =
         _approxPrice(bot.pipelineData.lastAveragePrice!.price);
     final res = await ref.read(apiProvider).spot.trade.newOrder(
@@ -259,14 +306,14 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
         bot.config.symbol!,
         OrderSides.BUY,
         OrderTypes.LIMIT,
-        _calculateBuyOrderQuantity(currentApproxPrice),
+        _calculateBuyOrderQuantity(rightPairQty, currentApproxPrice),
         currentApproxPrice);
 
     return res.body;
   }
 
-  double _calculateBuyOrderQuantity(double currentPrice) {
-    final qty = bot.config.maxQuantityPerOrder! / currentPrice;
+  double _calculateBuyOrderQuantity(double rightPairQty, double currentPrice) {
+    final qty = rightPairQty / currentPrice;
     return (qty * 100).floorToDouble() / 100;
   }
 
@@ -332,10 +379,10 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
   }
 
   double _calculateNewOrderPrice() {
-    final lastAveragePrice = bot.pipelineData.lastAveragePrice;
-    final lastBuyOrder = bot.pipelineData.lastBuyOrder;
-    return lastAveragePrice!.price -
-        (lastBuyOrder!.price * bot.config.percentageSellOrder! / 100);
+    final lastAveragePrice = bot.pipelineData.lastAveragePrice!;
+    final lastBuyOrder = bot.pipelineData.lastBuyOrder!;
+    return lastAveragePrice.price -
+        (lastBuyOrder.price * bot.config.percentageSellOrder! / 100);
   }
 
   /// TODO put buy order price as parameter

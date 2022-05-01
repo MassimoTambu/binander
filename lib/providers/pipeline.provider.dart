@@ -36,7 +36,7 @@ class PipelineProvider extends StateNotifier<List<Pipeline>> {
           symbol: fields[MinimizeLossesConfig.symbolName]!.value,
           dailyLossSellOrders: int.parse(
               fields[MinimizeLossesConfig.dailyLossSellOrdersName]!.value),
-          maxQuantityPerOrder: double.parse(
+          maxInvestmentPerOrder: double.parse(
               fields[MinimizeLossesConfig.maxInvestmentPerOrderName]!.value),
           percentageSellOrder: double.parse(
               fields[MinimizeLossesConfig.percentageSellOrderName]!.value),
@@ -53,7 +53,7 @@ class PipelineProvider extends StateNotifier<List<Pipeline>> {
           symbol: fields[MinimizeLossesConfig.symbolName]!.value,
           dailyLossSellOrders: int.parse(
               fields[MinimizeLossesConfig.dailyLossSellOrdersName]!.value),
-          maxQuantityPerOrder: double.parse(
+          maxInvestmentPerOrder: double.parse(
               fields[MinimizeLossesConfig.maxInvestmentPerOrderName]!.value),
           percentageSellOrder: double.parse(
               fields[MinimizeLossesConfig.percentageSellOrderName]!.value),
@@ -92,9 +92,9 @@ class PipelineProvider extends StateNotifier<List<Pipeline>> {
   MinimizeLossesBot createMinimizeLossesBot({
     required String name,
     required bool testNet,
-    required String symbol,
+    required CryptoSymbol symbol,
     required int dailyLossSellOrders,
-    required double maxQuantityPerOrder,
+    required double maxInvestmentPerOrder,
     required double percentageSellOrder,
     required Duration timerBuyOrder,
   }) {
@@ -105,14 +105,14 @@ class PipelineProvider extends StateNotifier<List<Pipeline>> {
       testNet: testNet,
       config: MinimizeLossesConfig.create(
         dailyLossSellOrders: dailyLossSellOrders,
-        maxQuantityPerOrder: maxQuantityPerOrder,
+        maxInvestmentPerOrder: maxInvestmentPerOrder,
         percentageSellOrder: percentageSellOrder,
         symbol: symbol,
         timerBuyOrder: timerBuyOrder,
       ),
     );
 
-    final pipeline = MinimizeLossesPipeline(_ref, bot) as Pipeline;
+    final pipeline = MinimizeLossesPipeline(_ref, bot);
 
     state = [...state, pipeline];
 

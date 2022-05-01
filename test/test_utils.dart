@@ -1,17 +1,26 @@
 import 'package:bottino_fortino/api/api.dart';
+import 'package:bottino_fortino/models/models.dart';
 import 'package:bottino_fortino/modules/bot/bot.dart';
 import 'package:bottino_fortino/modules/bot/bots/minimize_losses/minimize_losses.dart';
 import 'package:clock/clock.dart';
 import 'package:uuid/uuid.dart';
 
 class TestUtils {
-  static const String defaultSymbol = "BNBUSDT";
+  static const defaultSymbol = 'BNB-USDT';
+
+  static List<AccountBalance> fillWalletWithAccountBalances() => [
+        const AccountBalance('BTC', 10, 0),
+        const AccountBalance('BNB', 300, 0),
+        const AccountBalance('USDT', 1000, 0),
+        const AccountBalance('BUSD', 5000, 0),
+        const AccountBalance('ADA', 15000, 0),
+      ];
 
   static MinimizeLossesBot createMinimizeLossesBot({
     String name = "CABAL",
     String symbol = defaultSymbol,
     int dailyLossSellOrders = 3,
-    double maxQuantityPerOrder = 100,
+    double maxInvestmentPerOrder = 100,
     double percentageSellOrder = 3,
     Duration timerBuyOrder = const Duration(minutes: 30),
   }) =>
@@ -21,9 +30,9 @@ class TestUtils {
         name: name,
         testNet: true,
         config: MinimizeLossesConfig(
-          symbol: symbol,
+          symbol: CryptoSymbol(symbol),
           dailyLossSellOrders: dailyLossSellOrders,
-          maxQuantityPerOrder: maxQuantityPerOrder,
+          maxInvestmentPerOrder: maxInvestmentPerOrder,
           percentageSellOrder: percentageSellOrder,
           timerBuyOrder: timerBuyOrder,
         ),
@@ -37,22 +46,24 @@ class TestUtils {
     required double price,
     required double origQty,
     required OrderSides orderSides,
-  }) =>
-      OrderNew(
-          symbol,
-          orderId,
-          orderListId,
-          clientOrderId,
-          clock.now(),
-          price,
-          origQty,
-          0,
-          0,
-          OrderStatus.NEW,
-          TimeInForce.GTC,
-          OrderTypes.LIMIT,
-          orderSides,
-          [Fill(price, origQty, 1, 'USDT', 52)]);
+  }) {
+    final cryptoSymbol = CryptoSymbol(symbol);
+    return OrderNew(
+        cryptoSymbol.toString(),
+        orderId,
+        orderListId,
+        clientOrderId,
+        clock.now(),
+        price,
+        origQty,
+        0,
+        0,
+        OrderStatus.NEW,
+        TimeInForce.GTC,
+        OrderTypes.LIMIT,
+        orderSides,
+        [Fill(price, origQty, 0, cryptoSymbol.rightPair, orderId)]);
+  }
 
   static OrderData createOrderData(OrderNew orderNew) => OrderData(
       orderNew.symbol,
@@ -84,8 +95,11 @@ class TestUtils {
       order.origQty,
       order.executedQty,
       order.cummulativeQuoteQty,
-      order.status,
+      OrderStatus.CANCELED,
       order.timeInForce,
       order.type,
       order.side);
+
+  static double approxPriceToFloor(double price) =>
+      (price * 100).floorToDouble() / 100;
 }

@@ -11,7 +11,7 @@ class TradeProvider {
   TradeProvider(this._ref);
 
   Future<ApiResponse<List<Order>>> getAllOrders(
-      ApiConnection conn, String symbol) async {
+      ApiConnection conn, CryptoSymbol symbol) async {
     final headers = <String, dynamic>{};
 
     apiUtils.addSecurityToHeader(
@@ -19,7 +19,7 @@ class TradeProvider {
 
     final options = Options(headers: headers);
 
-    final query = {'symbol': symbol};
+    final query = {'symbol': symbol.toString()};
     // 'symbol=$symbol&timestamp=$timestamp&signature=';
     final secureQuery = apiUtils.createQueryWithSecurity(
         conn.apiSecret, query, API_SECURITY_TYPE.userData);
@@ -45,7 +45,7 @@ class TradeProvider {
   }
 
   Future<ApiResponse<OrderData>> getQueryOrder(
-      ApiConnection conn, String symbol, int orderId) async {
+      ApiConnection conn, CryptoSymbol symbol, int orderId) async {
     final headers = <String, dynamic>{};
 
     apiUtils.addSecurityToHeader(
@@ -53,7 +53,7 @@ class TradeProvider {
 
     final options = Options(headers: headers);
 
-    final query = {'symbol': symbol, 'orderId': orderId.toString()};
+    final query = {'symbol': symbol.toString(), 'orderId': orderId.toString()};
     // 'symbol=$symbol&timestamp=$timestamp&signature=';
     final secureQuery = apiUtils.createQueryWithSecurity(
         conn.apiSecret, query, API_SECURITY_TYPE.userData);
@@ -76,7 +76,7 @@ class TradeProvider {
 
   Future<ApiResponse<OrderNew>> newOrder(
     ApiConnection conn,
-    String symbol,
+    CryptoSymbol symbol,
     OrderSides side,
     OrderTypes type,
     double quantity,
@@ -91,7 +91,7 @@ class TradeProvider {
     final options = Options(headers: headers);
 
     final query = {
-      'symbol': symbol,
+      'symbol': symbol.toString(),
       'side': side.name,
       'type': type.name,
       'quantity': quantity.toString(),
@@ -119,7 +119,7 @@ class TradeProvider {
 
   Future<ApiResponse<OrderCancel>> cancelOrder(
     ApiConnection conn,
-    String symbol,
+    CryptoSymbol symbol,
     int orderId,
   ) async {
     final headers = <String, dynamic>{};
@@ -130,7 +130,7 @@ class TradeProvider {
     final options = Options(headers: headers);
 
     final query = {
-      'symbol': symbol,
+      'symbol': symbol.toString(),
       'orderId': orderId.toString(),
     };
     // 'symbol=$symbol&timestamp=$timestamp&signature=';

@@ -1,13 +1,7 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility that Flutter provides. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
 import 'package:bottino_fortino/api/api.dart';
 import 'package:bottino_fortino/modules/bot/bot.dart';
 import 'package:bottino_fortino/providers/providers.dart';
+import 'package:clock/clock.dart';
 import 'package:fake_async/fake_async.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -17,6 +11,7 @@ import 'package:test/test.dart';
 
 import 'minimize_losses_bot_test.mocks.dart';
 import 'test_utils.dart';
+import 'test_wallet.dart';
 
 @GenerateMocks([
   SecureStorageProvider,
@@ -32,6 +27,7 @@ void main() {
   final mockMarketProvider = MockMarketProvider();
   final mockTradeProvider = MockTradeProvider();
   late ProviderContainer container;
+  var wallet = TestWallet([]);
   late MinimizeLossesBot bot;
 
   const double startPrice = 100.0;
@@ -56,9 +52,14 @@ void main() {
 
     // Setup API calls
 
-    when(mockMarketProvider.getAveragePrice(any, any)).thenAnswer((i) async {
-      return ApiResponse(AveragePrice(1, getPriceStrategy()), 200);
-    });
+    when(mockMarketProvider.getAveragePrice(any, any)).thenAnswer(
+        (_) async => ApiResponse(AveragePrice(1, getPriceStrategy()), 200));
+
+    when(mockTradeProvider.getAccountInformation(any)).thenAnswer((_) async =>
+        ApiResponse(
+            AccountInformation(0, 0, 0, 0, true, false, false, clock.now(),
+                'SPOT', wallet.balances.toList(), ['SPOT']),
+            200));
 
     when(mockTradeProvider.newOrder(
             any, any, OrderSides.BUY, OrderTypes.LIMIT, any, any))
@@ -72,6 +73,17 @@ void main() {
             price: i.positionalArguments[5],
             origQty: i.positionalArguments[4],
             orderSides: OrderSides.BUY);
+
+        wallet.balances = wallet.balances.map((b) {
+          if (buyOrder.symbol.endsWith(b.asset)) {
+            final cummulativeQuoteQty = buyOrder.price * buyOrder.origQty;
+            return b.copyWith(
+              free: b.free - cummulativeQuoteQty,
+              locked: b.locked + cummulativeQuoteQty,
+            );
+          }
+          return b;
+        }).toList();
 
         orders.add(TestUtils.createOrderData(buyOrder));
         return ApiResponse(buyOrder, 201);
@@ -91,6 +103,16 @@ void main() {
             origQty: i.positionalArguments[4],
             orderSides: OrderSides.SELL);
 
+        wallet.balances = wallet.balances.map((b) {
+          if (sellOrder.symbol.startsWith(b.asset)) {
+            return b.copyWith(
+              free: b.free - sellOrder.origQty,
+              locked: b.locked + sellOrder.origQty,
+            );
+          }
+          return b;
+        }).toList();
+
         orders.add(TestUtils.createOrderData(sellOrder));
         return ApiResponse(sellOrder, 201);
       },
@@ -105,10 +127,38 @@ void main() {
           final currentPrice = getPriceStrategy();
           if ((o.side == OrderSides.BUY && currentPrice >= o.price) ||
               (o.side == OrderSides.SELL && currentPrice <= o.price)) {
-            return o.copyWith(
+            final updatedOrderData = o.copyWith(
                 status: OrderStatus.FILLED,
                 cummulativeQuoteQty: o.origQty * o.price,
                 executedQty: o.origQty);
+
+            wallet.balances = wallet.balances.map((b) {
+              // Check whether balance has been used in this order and if so update the account wallet
+              if (updatedOrderData.side == OrderSides.BUY) {
+                if (updatedOrderData.symbol.startsWith(b.asset)) {
+                  return b.copyWith(
+                      free: b.free + updatedOrderData.executedQty);
+                }
+                if (updatedOrderData.symbol.endsWith(b.asset)) {
+                  return b.copyWith(
+                      locked: b.locked - updatedOrderData.cummulativeQuoteQty);
+                }
+              }
+              if (updatedOrderData.side == OrderSides.SELL) {
+                if (updatedOrderData.symbol.startsWith(b.asset)) {
+                  return b.copyWith(
+                      locked: b.locked - updatedOrderData.executedQty);
+                }
+                if (updatedOrderData.symbol.endsWith(b.asset)) {
+                  return b.copyWith(
+                      free: b.free + updatedOrderData.cummulativeQuoteQty);
+                }
+              }
+
+              return b;
+            }).toList();
+
+            return updatedOrderData;
           }
 
           return o;
@@ -130,16 +180,44 @@ void main() {
 
         final orderCancel = TestUtils.createOrderCancel(order);
 
+        wallet.balances = wallet.balances.map((b) {
+          // Check whether balance has been used in this order and if so update the account wallet
+          if (orderCancel.side == OrderSides.BUY) {
+            if (orderCancel.symbol.endsWith(b.asset)) {
+              final cummulativeQuoteQty =
+                  orderCancel.price * orderCancel.origQty;
+              return b.copyWith(
+                  free: b.free + cummulativeQuoteQty,
+                  locked: b.locked - cummulativeQuoteQty);
+            }
+          }
+          if (orderCancel.side == OrderSides.SELL) {
+            if (orderCancel.symbol.startsWith(b.asset)) {
+              return b.copyWith(
+                  free: b.free + orderCancel.origQty,
+                  locked: b.locked - orderCancel.origQty);
+            }
+          }
+
+          return b;
+        }).toList();
+
         return ApiResponse(orderCancel, 201);
       },
     );
   });
 
   tearDown(() async {
+    reset(mockSecureStorageProvider);
+    reset(mockApiProvider);
+    reset(mockSpotProvider);
+    reset(mockMarketProvider);
+    reset(mockTradeProvider);
     container.dispose();
     ordersCount = 0;
     orders.removeWhere((_) => true);
     getPriceStrategy = () => 0.0;
+    wallet.balances = [];
   });
 
   void ensureIsACleanStart(Bot bot) {
@@ -150,6 +228,11 @@ void main() {
     expect(bot.pipelineData.lastSellOrder, isNull);
     expect(bot.pipelineData.lossSellOrderCounter, isZero);
     expect(bot.pipelineData.ordersHistory.orders.length, isZero);
+    expect(bot.pipelineData.pipelineCounter, isZero);
+  }
+
+  double getAllLockedAssetFromWallet() {
+    return wallet.balances.map((b) => b.locked).reduce((acc, b) => acc + b);
   }
 
   test('Submit buy order and sell order, then close sell order in profit',
@@ -177,7 +260,8 @@ void main() {
       return 120;
     };
 
-    bot = TestUtils.createMinimizeLossesBot();
+    wallet.balances = TestUtils.fillWalletWithAccountBalances();
+    bot = TestUtils.createMinimizeLossesBot(maxInvestmentPerOrder: 200);
     container.read(pipelineProvider.notifier).addBots([bot]);
 
     ensureIsACleanStart(bot);
@@ -197,6 +281,12 @@ void main() {
       expect(bot.pipelineData.ordersHistory.profitsOnly.length, 1);
       // No losses
       expect(bot.pipelineData.ordersHistory.lossesOnly.length, 0);
+      expect(bot.pipelineData.ordersHistory.getTotalGains(), 44);
+      final testAsset = wallet.findBalanceByAsset('USDT');
+      expect(TestUtils.approxPriceToFloor(testAsset.free), 1044);
+      expect(testAsset.locked, 0);
+      // There should not be any locked asset
+      expect(getAllLockedAssetFromWallet(), 0);
     });
   });
 
@@ -215,6 +305,7 @@ void main() {
       return 80;
     };
 
+    wallet.balances = TestUtils.fillWalletWithAccountBalances();
     bot = TestUtils.createMinimizeLossesBot();
     container.read(pipelineProvider.notifier).addBots([bot]);
 
@@ -235,6 +326,12 @@ void main() {
       expect(bot.pipelineData.ordersHistory.lossesOnly.length, 1);
       // No profits
       expect(bot.pipelineData.ordersHistory.profitsOnly.length, 0);
+      expect(bot.pipelineData.ordersHistory.getTotalGains(), -13);
+      final testAsset = wallet.findBalanceByAsset('USDT');
+      expect(TestUtils.approxPriceToFloor(testAsset.free), 987);
+      expect(testAsset.locked, 0);
+      // There should not be any locked asset
+      expect(getAllLockedAssetFromWallet(), 0);
     });
   });
 
@@ -255,6 +352,7 @@ void main() {
       return 90;
     };
 
+    wallet.balances = TestUtils.fillWalletWithAccountBalances();
     bot = TestUtils.createMinimizeLossesBot(
         timerBuyOrder: const Duration(minutes: 1));
     container.read(pipelineProvider.notifier).addBots([bot]);
@@ -277,6 +375,12 @@ void main() {
       expect(bot.pipelineData.ordersHistory.profitsOnly.length, 1);
       // No losses
       expect(bot.pipelineData.ordersHistory.lossesOnly.length, 0);
+      expect(bot.pipelineData.ordersHistory.getTotalGains(), 8.1);
+      final testedAsset = wallet.findBalanceByAsset('USDT');
+      expect(TestUtils.approxPriceToFloor(testedAsset.free), 1008.1);
+      expect(testedAsset.locked, 0);
+      // There should not be any locked asset
+      expect(getAllLockedAssetFromWallet(), 0);
 
       verify(mockTradeProvider.cancelOrder(any, any, any)).called(1);
     });
@@ -296,6 +400,7 @@ void main() {
       return 80;
     };
 
+    wallet.balances = TestUtils.fillWalletWithAccountBalances();
     bot = TestUtils.createMinimizeLossesBot(dailyLossSellOrders: 1);
     container.read(pipelineProvider.notifier).addBots([bot]);
 
@@ -316,10 +421,17 @@ void main() {
       expect(bot.pipelineData.ordersHistory.lossesOnly.length, 1);
       // No profits
       expect(bot.pipelineData.ordersHistory.profitsOnly.length, 0);
+      expect(bot.pipelineData.ordersHistory.getTotalGains(), -13);
+      final testAsset = wallet.findBalanceByAsset('USDT');
+      expect(TestUtils.approxPriceToFloor(testAsset.free), 987);
+      expect(testAsset.locked, 0);
+      // There should not be any locked asset
+      expect(getAllLockedAssetFromWallet(), 0);
 
       verify(mockMarketProvider.getAveragePrice(any, any));
       verify(mockTradeProvider.newOrder(any, any, any, any, any, any));
       verify(mockTradeProvider.getQueryOrder(any, any, any));
+      verify(mockTradeProvider.getAccountInformation(any));
       verifyNoMoreInteractions(mockMarketProvider);
       verifyNoMoreInteractions(mockTradeProvider);
 
@@ -371,6 +483,7 @@ void main() {
       return 120;
     };
 
+    wallet.balances = TestUtils.fillWalletWithAccountBalances();
     bot = TestUtils.createMinimizeLossesBot();
     container.read(pipelineProvider.notifier).addBots([bot]);
 
@@ -391,6 +504,7 @@ void main() {
       expect(bot.pipelineData.ordersHistory.profitsOnly.length, 1);
       // No losses
       expect(bot.pipelineData.ordersHistory.lossesOnly.length, 0);
+      expect(bot.pipelineData.ordersHistory.getTotalGains(), 22);
 
       expect(bot.pipelineData.timer, isNull);
       expect(bot.pipelineData.lastBuyOrder, isNull);
@@ -408,6 +522,7 @@ void main() {
       expect(bot.pipelineData.ordersHistory.profitsOnly.length, 1);
       // No losses
       expect(bot.pipelineData.ordersHistory.lossesOnly.length, 1);
+      expect(bot.pipelineData.ordersHistory.getTotalGains(), 9);
 
       expect(bot.pipelineData.timer, isNull);
       expect(bot.pipelineData.lastBuyOrder, isNull);
@@ -425,6 +540,12 @@ void main() {
       expect(bot.pipelineData.ordersHistory.profitsOnly.length, 2);
       // No losses
       expect(bot.pipelineData.ordersHistory.lossesOnly.length, 1);
+      expect(bot.pipelineData.ordersHistory.getTotalGains(), 31);
+      final testAsset = wallet.findBalanceByAsset('USDT');
+      expect(TestUtils.approxPriceToFloor(testAsset.free), 1031);
+      expect(testAsset.locked, 0);
+      // There should not be any locked asset
+      expect(getAllLockedAssetFromWallet(), 0);
     });
   });
 
@@ -446,6 +567,7 @@ void main() {
       return 120;
     };
 
+    wallet.balances = TestUtils.fillWalletWithAccountBalances();
     bot = TestUtils.createMinimizeLossesBot();
     container.read(pipelineProvider.notifier).addBots([bot]);
 
@@ -466,6 +588,12 @@ void main() {
       expect(bot.pipelineData.ordersHistory.profitsOnly.length, 1);
       // No losses
       expect(bot.pipelineData.ordersHistory.lossesOnly.length, 0);
+      expect(bot.pipelineData.ordersHistory.getTotalGains(), 47);
+      final testAsset = wallet.findBalanceByAsset('USDT');
+      expect(TestUtils.approxPriceToFloor(testAsset.free), 1047);
+      expect(testAsset.locked, 0);
+      // There should not be any locked asset
+      expect(getAllLockedAssetFromWallet(), 0);
       // 2 cancel orders: one cancelled at 7th lap and the other at 9th lap
       // Cancelled to moving the sell order higher
       verify(mockTradeProvider.cancelOrder(any, any, any)).called(2);
@@ -473,6 +601,8 @@ void main() {
   });
 
   /// Prossimi test
-  /// - test sui soldi rimanenti
+  /// - test sui soldi rimanenti e su quanto rimane nel wallet
+  /// - test con crypto non presente sul wallet
+  /// - test generali con il wallet
   /// - partenza, stop e ripresa del bot: assicurarsi che non cambi niente
 }

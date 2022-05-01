@@ -11,7 +11,7 @@ class MarketProvider {
   MarketProvider(this._ref);
 
   Future<ApiResponse<AveragePrice>> getAveragePrice(
-      ApiConnection conn, String symbol) async {
+      ApiConnection conn, CryptoSymbol symbol) async {
     final headers = <String, dynamic>{};
 
     apiUtils.addSecurityToHeader(
@@ -19,7 +19,7 @@ class MarketProvider {
 
     final options = Options(headers: headers);
 
-    final query = {'symbol': symbol};
+    final query = {'symbol': symbol.toString()};
     final secureQuery = apiUtils.createQueryWithSecurity(
         conn.apiSecret, query, API_SECURITY_TYPE.none);
 
