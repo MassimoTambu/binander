@@ -9,7 +9,6 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
 
   @override
   void start() async {
-    _incrementPipelineCounter();
     var timer = bot.pipelineData.timer;
 
     // We can't create a status variable because with freezed
@@ -18,22 +17,22 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
 
     if (timer != null && !timer.isActive) return;
 
+    _incrementPipelineCounter();
+
     changeStatusTo(BotPhases.starting, 'starting');
 
     if (timer != null) timer.cancel();
 
     final botLimits = _getBotLimitsReached();
     if (botLimits.isNotEmpty) {
-      changeStatusTo(
-          BotPhases.error, botLimits.map((l) => l.cause).join(" - "));
-      return;
+      return shutdown(
+          phase: BotPhases.error,
+          reason: botLimits.map((l) => l.cause).join(" - "));
     }
 
     final lastBuyOrder = bot.pipelineData.lastBuyOrder;
     // If buyorder does not exists
     if (lastBuyOrder == null) {
-      bot.pipelineData.lastAveragePrice = await _getCurrentCryptoPrice();
-
       // Exit if bot execution has been interrupted
       if (bot.pipelineData.status.phase != BotPhases.starting) return;
 
@@ -45,8 +44,12 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
       );
       // Asset not found in account
       if (accBalances.isEmpty) {
-        return stop(reason: 'Asset not found on account');
+        return shutdown(
+            phase: BotPhases.error,
+            reason: 'asset not found on wallet account');
       }
+
+      bot.pipelineData.lastAveragePrice = await _getCurrentCryptoPrice();
 
       final double rightPairQty = getRightPairQty(accBalances.first);
 
@@ -59,6 +62,7 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
 
     // Skip buyOrder pipeline if it has been filled
     if (lastBuyOrder != null && lastBuyOrder.status == OrderStatus.FILLED) {
+      changeStatusTo(BotPhases.online, 'resumed');
       timer = Timer.periodic(const Duration(seconds: 10), _runBotPipeline);
       return;
     }
@@ -70,7 +74,19 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
   }
 
   @override
-  void stop({String reason = ''}) async {
+  void pause() {
+    bot.pipelineData.timer?.cancel();
+
+    const message = 'Paused by user';
+
+    changeStatusTo(BotPhases.offline, message);
+
+    _showSnackBar(message);
+  }
+
+  @override
+  void shutdown(
+      {BotPhases phase = BotPhases.offline, String reason = ''}) async {
     bot.pipelineData.timer?.cancel();
 
     if (reason.isNotEmpty) {
@@ -94,9 +110,9 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
     bot.pipelineData.lastBuyOrder = null;
     bot.pipelineData.lastSellOrder = null;
 
-    final closingMessage = 'turned off' + reason;
+    final closingMessage = 'Turned off' + reason;
 
-    changeStatusTo(BotPhases.offline, closingMessage);
+    changeStatusTo(phase, closingMessage);
 
     _showSnackBar(closingMessage);
   }
@@ -122,10 +138,13 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
 
   /// Check if buy order has been filled. If so, fetch run Bot Pipeline every 10s
   Future<void> _runCheckBuyOrderPipeline(Timer timer) async {
-    _incrementPipelineCounter();
-    if (!timer.isActive) return;
     // Exit if bot execution has been interrupted
-    if (bot.pipelineData.status.phase != BotPhases.starting) return;
+    if (!timer.isActive ||
+        bot.pipelineData.status.phase != BotPhases.starting) {
+      timer.cancel();
+      return;
+    }
+    _incrementPipelineCounter();
 
     final expireDate =
         bot.pipelineData.buyOrderStartedAt!.add(bot.config.timerBuyOrder!);
@@ -177,8 +196,12 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
   /// - Memorizzare se l'ordine eseguito è risultato una perdita o un profitto.
   /// - Controllare all'avvio se è presente un ordine in corso che è stato piazzato dall'ultimo avvio e ancora non si è concluso.
   Future<void> _runBotPipeline(Timer timer) async {
+    // Exit if bot execution has been interrupted
+    if (!timer.isActive || bot.pipelineData.status.phase != BotPhases.online) {
+      timer.cancel();
+      return;
+    }
     _incrementPipelineCounter();
-    if (!timer.isActive) return;
 
     bot.pipelineData.lastAveragePrice = await _getCurrentCryptoPrice();
 
@@ -240,7 +263,7 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
 
       timer.cancel();
 
-      return stop(reason: reason);
+      return shutdown(reason: reason);
     } else {
       /// TODO throw error
     }

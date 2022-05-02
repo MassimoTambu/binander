@@ -376,9 +376,9 @@ void main() {
       // No losses
       expect(bot.pipelineData.ordersHistory.lossesOnly.length, 0);
       expect(bot.pipelineData.ordersHistory.getTotalGains(), 8.1);
-      final testedAsset = wallet.findBalanceByAsset('USDT');
-      expect(TestUtils.approxPriceToFloor(testedAsset.free), 1008.1);
-      expect(testedAsset.locked, 0);
+      final testAsset = wallet.findBalanceByAsset('USDT');
+      expect(TestUtils.approxPriceToFloor(testAsset.free), 1008.1);
+      expect(testAsset.locked, 0);
       // There should not be any locked asset
       expect(getAllLockedAssetFromWallet(), 0);
 
@@ -600,9 +600,108 @@ void main() {
     });
   });
 
-  /// Prossimi test
-  /// - test sui soldi rimanenti e su quanto rimane nel wallet
-  /// - test con crypto non presente sul wallet
-  /// - test generali con il wallet
-  /// - partenza, stop e ripresa del bot: assicurarsi che non cambi niente
+  test('Try to submit a buy order with an asset not stored in wallet',
+      () async {
+    getPriceStrategy = () => startPrice;
+
+    wallet.balances = TestUtils.fillWalletWithAccountBalances();
+    bot = TestUtils.createMinimizeLossesBot(symbol: 'BNB-NAZD');
+    container.read(pipelineProvider.notifier).addBots([bot]);
+
+    ensureIsACleanStart(bot);
+
+    final pipeline = container.read(pipelineProvider).first;
+
+    fakeAsync((async) {
+      pipeline.start();
+
+      async.elapse(const Duration(seconds: 20));
+
+      // Should be offline
+      expect(bot.pipelineData.status.phase, BotPhases.error);
+      expect(bot.pipelineData.ordersHistory.orders.length, 0);
+      expect(bot.pipelineData.pipelineCounter, 1);
+      // There should not be any locked asset
+      expect(getAllLockedAssetFromWallet(), 0);
+      verify(mockTradeProvider.getAccountInformation(any)).called(1);
+      verifyNoMoreInteractions(mockMarketProvider);
+      verifyNoMoreInteractions(mockTradeProvider);
+      expect(bot.pipelineData.status.reason,
+          contains('asset not found on wallet account'));
+    });
+  });
+
+  test(
+      'Submit buy order and sell order, stop the bot and resume it. Finally close sell order in profit',
+      () async {
+    getPriceStrategy = () {
+      // First lap is for buy order submission without filling it.
+      // The second one it will fill the buy order.
+      // Third lap will submit a sell order.
+      // Fourth lap is for trigger sell order.
+      if (bot.pipelineData.pipelineCounter == 1) {
+        return startPrice;
+      }
+      if (bot.pipelineData.pipelineCounter == 2) {
+        expect(bot.pipelineData.lastBuyOrder, isNotNull);
+        return startPrice;
+      }
+      if (bot.pipelineData.pipelineCounter == 3) {
+        expect(bot.pipelineData.lastBuyOrder, isNotNull);
+        expect(bot.pipelineData.lastBuyOrder!.status, OrderStatus.FILLED);
+        return 125;
+      }
+      if (bot.pipelineData.pipelineCounter == 4) {
+        return 120;
+      }
+
+      return 110;
+    };
+
+    wallet.balances = TestUtils.fillWalletWithAccountBalances();
+    bot = TestUtils.createMinimizeLossesBot(maxInvestmentPerOrder: 200);
+    container.read(pipelineProvider.notifier).addBots([bot]);
+
+    ensureIsACleanStart(bot);
+
+    final pipeline = container.read(pipelineProvider).first;
+
+    fakeAsync((async) {
+      pipeline.start();
+
+      async.elapse(const Duration(seconds: 10));
+
+      expect(bot.pipelineData.status.phase, BotPhases.online);
+      expect(bot.pipelineData.pipelineCounter, 2);
+
+      pipeline.pause();
+      expect(bot.pipelineData.status.phase, BotPhases.offline);
+      expect(bot.pipelineData.status.reason, contains('Paused by user'));
+      expect(bot.pipelineData.pipelineCounter, 2);
+      expect(bot.pipelineData.lastSellOrder, isNull);
+      expect(bot.pipelineData.lastBuyOrder?.status, OrderStatus.FILLED);
+      expect(bot.pipelineData.ordersHistory.orders.length, 0);
+
+      async.elapse(const Duration(seconds: 20));
+
+      pipeline.start();
+
+      async.elapse(const Duration(seconds: 20));
+
+      // Should be offline
+      expect(bot.pipelineData.status.phase, BotPhases.offline);
+      expect(bot.pipelineData.ordersHistory.orders.length, 1);
+      expect(bot.pipelineData.pipelineCounter, 5);
+      // Is a profit
+      expect(bot.pipelineData.ordersHistory.profitsOnly.length, 1);
+      // No losses
+      expect(bot.pipelineData.ordersHistory.lossesOnly.length, 0);
+      expect(bot.pipelineData.ordersHistory.getTotalGains(), 34);
+      final testAsset = wallet.findBalanceByAsset('USDT');
+      expect(TestUtils.approxPriceToFloor(testAsset.free), 1034);
+      expect(testAsset.locked, 0);
+      // There should not be any locked asset
+      expect(getAllLockedAssetFromWallet(), 0);
+    });
+  });
 }

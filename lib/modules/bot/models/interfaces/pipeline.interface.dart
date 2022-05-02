@@ -7,5 +7,6 @@ abstract class Pipeline {
   const Pipeline(this.ref, this.bot);
 
   void start();
-  void stop({String reason = ''});
+  void pause();
+  void shutdown({String reason = ''});
 }
