@@ -9,7 +9,7 @@ class DashboardPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final bots = ref.watch(botProvider);
+    final pipelines = ref.watch(pipelineProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -38,12 +38,13 @@ class DashboardPage extends ConsumerWidget {
               ((_, i) {
                 return ProviderScope(
                   overrides: [
-                    botTileProvider.overrideWithValue(BotTileProvider(bots[i])),
+                    botTileProvider
+                        .overrideWithValue(BotTileProvider(pipelines[i])),
                   ],
                   child: const BotTile(),
                 );
               }),
-              childCount: bots.length,
+              childCount: pipelines.length,
             ),
           ),
         ],

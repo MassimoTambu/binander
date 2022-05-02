@@ -9,10 +9,16 @@ class Order with _$Order {
     String clientOrderId,
     @JsonKey(fromJson: ParseUtils.stringToDouble, toJson: ParseUtils.doubleToString)
         double price,
+
+    /// Original quantity inserted when order was submitted by user (OrderStatus = NEW)
     @JsonKey(fromJson: ParseUtils.stringToDouble, toJson: ParseUtils.doubleToString)
         double origQty,
+
+    /// Actual executed quantity
     @JsonKey(fromJson: ParseUtils.stringToDouble, toJson: ParseUtils.doubleToString)
         double executedQty,
+
+    /// Is the multiplication between executedQty and price
     @JsonKey(fromJson: ParseUtils.stringToDouble, toJson: ParseUtils.doubleToString)
         double cummulativeQuoteQty,
     OrderStatus status,
@@ -41,10 +47,16 @@ class Order with _$Order {
         DateTime transactTime,
     @JsonKey(fromJson: ParseUtils.stringToDouble, toJson: ParseUtils.doubleToString)
         double price,
+
+    /// Original quantity inserted when order was submitted by user (OrderStatus = NEW)
     @JsonKey(fromJson: ParseUtils.stringToDouble, toJson: ParseUtils.doubleToString)
         double origQty,
+
+    /// Actual executed quantity
     @JsonKey(fromJson: ParseUtils.stringToDouble, toJson: ParseUtils.doubleToString)
         double executedQty,
+
+    /// Is the multiplication between executedQty and price
     @JsonKey(fromJson: ParseUtils.stringToDouble, toJson: ParseUtils.doubleToString)
         double cummulativeQuoteQty,
     OrderStatus status,
@@ -63,10 +75,16 @@ class Order with _$Order {
         DateTime transactTime,
     @JsonKey(fromJson: ParseUtils.stringToDouble, toJson: ParseUtils.doubleToString)
         double price,
+
+    /// Original quantity inserted when order was submitted by user (OrderStatus = NEW)
     @JsonKey(fromJson: ParseUtils.stringToDouble, toJson: ParseUtils.doubleToString)
         double origQty,
+
+    /// Actual executed quantity
     @JsonKey(fromJson: ParseUtils.stringToDouble, toJson: ParseUtils.doubleToString)
         double executedQty,
+
+    /// Is the multiplication between executedQty and price
     @JsonKey(fromJson: ParseUtils.stringToDouble, toJson: ParseUtils.doubleToString)
         double cummulativeQuoteQty,
     OrderStatus status,

@@ -5,7 +5,7 @@ class BotTile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final bot = ref.watch(botTileProvider).bot;
+    final bot = ref.watch(botTileProvider.select((p) => p.pipeline.bot));
     return ExpansionTile(
       title: Wrap(
         spacing: 8,

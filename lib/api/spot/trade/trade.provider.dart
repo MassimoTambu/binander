@@ -11,26 +11,26 @@ class TradeProvider {
   TradeProvider(this._ref);
 
   Future<ApiResponse<List<Order>>> getAllOrders(
-      ApiConnection conn, String symbol) async {
+      ApiConnection conn, CryptoSymbol symbol) async {
     final headers = <String, dynamic>{};
 
     apiUtils.addSecurityToHeader(
         conn.apiKey, headers, API_SECURITY_TYPE.userData);
 
-    final options = dio.Options(headers: headers);
+    final options = Options(headers: headers);
 
-    final query = {'symbol': symbol};
+    final query = {'symbol': symbol.toString()};
     // 'symbol=$symbol&timestamp=$timestamp&signature=';
     final secureQuery = apiUtils.createQueryWithSecurity(
         conn.apiSecret, query, API_SECURITY_TYPE.userData);
 
-    late final dio.Response<String> response;
+    late final Response<String> response;
     try {
       response = await _ref.read(_dioProvider).get(
           '${conn.url}/api/v3/allOrders',
           options: options,
           queryParameters: secureQuery);
-    } on dio.DioError catch (_) {
+    } on DioError catch (_) {
       return Future.error(_ref
           .read(_apiUtilsProvider)
           .buildApiException('getAllorders', response));
@@ -44,39 +44,39 @@ class TradeProvider {
     return res;
   }
 
-  Future<ApiResponse<Order>> getQueryOrder(
-      ApiConnection conn, String symbol, int orderId) async {
+  Future<ApiResponse<OrderData>> getQueryOrder(
+      ApiConnection conn, CryptoSymbol symbol, int orderId) async {
     final headers = <String, dynamic>{};
 
     apiUtils.addSecurityToHeader(
         conn.apiKey, headers, API_SECURITY_TYPE.userData);
 
-    final options = dio.Options(headers: headers);
+    final options = Options(headers: headers);
 
-    final query = {'symbol': symbol, 'orderId': orderId.toString()};
+    final query = {'symbol': symbol.toString(), 'orderId': orderId.toString()};
     // 'symbol=$symbol&timestamp=$timestamp&signature=';
     final secureQuery = apiUtils.createQueryWithSecurity(
         conn.apiSecret, query, API_SECURITY_TYPE.userData);
 
-    late final dio.Response<String> response;
+    late final Response<String> response;
     try {
       response = await _ref.read(_dioProvider).get('${conn.url}/api/v3/order',
           options: options, queryParameters: secureQuery);
-    } on dio.DioError catch (_) {
+    } on DioError catch (_) {
       return Future.error(_ref
           .read(_apiUtilsProvider)
           .buildApiException('getQueryOrder', response));
     }
 
     final res = ApiResponse(
-        Order.fromJson(jsonDecode(response.data!)), response.statusCode!);
+        OrderData.fromJson(jsonDecode(response.data!)), response.statusCode!);
 
     return res;
   }
 
   Future<ApiResponse<OrderNew>> newOrder(
     ApiConnection conn,
-    String symbol,
+    CryptoSymbol symbol,
     OrderSides side,
     OrderTypes type,
     double quantity,
@@ -88,10 +88,10 @@ class TradeProvider {
     apiUtils.addSecurityToHeader(
         conn.apiKey, headers, API_SECURITY_TYPE.userData);
 
-    final options = dio.Options(headers: headers);
+    final options = Options(headers: headers);
 
     final query = {
-      'symbol': symbol,
+      'symbol': symbol.toString(),
       'side': side.name,
       'type': type.name,
       'quantity': quantity.toString(),
@@ -102,11 +102,11 @@ class TradeProvider {
     final secureQuery = apiUtils.createQueryWithSecurity(
         conn.apiSecret, query, API_SECURITY_TYPE.userData);
 
-    late final dio.Response<String> response;
+    late final Response<String> response;
     try {
       response = await _ref.read(_dioProvider).post('${conn.url}/api/v3/order',
           options: options, queryParameters: secureQuery);
-    } on dio.DioError catch (_) {
+    } on DioError catch (_) {
       return Future.error(
           _ref.read(_apiUtilsProvider).buildApiException('newOrder', response));
     }
@@ -119,7 +119,7 @@ class TradeProvider {
 
   Future<ApiResponse<OrderCancel>> cancelOrder(
     ApiConnection conn,
-    String symbol,
+    CryptoSymbol symbol,
     int orderId,
   ) async {
     final headers = <String, dynamic>{};
@@ -127,23 +127,23 @@ class TradeProvider {
     apiUtils.addSecurityToHeader(
         conn.apiKey, headers, API_SECURITY_TYPE.userData);
 
-    final options = dio.Options(headers: headers);
+    final options = Options(headers: headers);
 
     final query = {
-      'symbol': symbol,
+      'symbol': symbol.toString(),
       'orderId': orderId.toString(),
     };
     // 'symbol=$symbol&timestamp=$timestamp&signature=';
     final secureQuery = apiUtils.createQueryWithSecurity(
         conn.apiSecret, query, API_SECURITY_TYPE.userData);
 
-    late final dio.Response<String> response;
+    late final Response<String> response;
     try {
       response = await _ref.read(_dioProvider).delete(
           '${conn.url}/api/v3/order',
           options: options,
           queryParameters: secureQuery);
-    } on dio.DioError catch (_) {
+    } on DioError catch (_) {
       return Future.error(_ref
           .read(_apiUtilsProvider)
           .buildApiException('cancelOrder', response));
@@ -162,16 +162,16 @@ class TradeProvider {
     apiUtils.addSecurityToHeader(
         conn.apiKey, headers, API_SECURITY_TYPE.userData);
 
-    final options = dio.Options(headers: headers);
+    final options = Options(headers: headers);
 
     final secureQuery = apiUtils.createQueryWithSecurity(
         conn.apiSecret, {}, API_SECURITY_TYPE.userData);
 
-    late final dio.Response<String> response;
+    late final Response<String> response;
     try {
       response = await _ref.read(_dioProvider).get('${conn.url}/api/v3/account',
           options: options, queryParameters: secureQuery);
-    } on dio.DioError catch (_) {
+    } on DioError catch (_) {
       return Future.error(_ref
           .read(_apiUtilsProvider)
           .buildApiException('getAccountInformation', response));

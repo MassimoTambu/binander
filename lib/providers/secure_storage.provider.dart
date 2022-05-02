@@ -1,6 +1,6 @@
 part of providers;
 
-final _secureStorageProvider = Provider<SecureStorageProvider>((ref) {
+final secureStorageProvider = Provider<SecureStorageProvider>((ref) {
   return SecureStorageProvider();
 });
 

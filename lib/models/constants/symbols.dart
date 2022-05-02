@@ -1,15 +1,15 @@
 part of models;
 
-/// For TestNet use 'BTCUSDT' and 'BNBUSDT'
+/// For TestNet use 'BTC-USDT' and 'BNB-USDT'
 /// TODO add more
 const symbols = [
-  'BTCUSDT',
-  'BTCETH',
-  'ADABTC',
-  'ADAETH',
-  'ADAUSDT',
-  'BNBBTC',
-  'BNBUSDT',
-  'BNBUSDC',
-  'BTCBUSD',
+  'BTC-USDT',
+  'BTC-ETH',
+  'ADA-BTC',
+  'ADA-ETH',
+  'ADA-USDT',
+  'BNB-BTC',
+  'BNB-USDT',
+  'BNB-USDC',
+  'BTC-BUSD',
 ];
