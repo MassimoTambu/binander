@@ -67,7 +67,7 @@ class FileStorageProvider {
   }
 
   void _loadSchema() {
-    data = {'bots': []};
+    data = {'bots': <Map<String, dynamic>>[]};
   }
 
   Future<void> _saveFile() async {

@@ -11,4 +11,5 @@ part 'provider_logger.utils.dart';
 part 'parse.utils.dart';
 part 'config_field.utils.dart';
 
+part 'extensions/datetime.extension.dart';
 part 'extensions/string.extension.dart';

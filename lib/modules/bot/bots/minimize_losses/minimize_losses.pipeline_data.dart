@@ -17,8 +17,8 @@ class MinimizeLossesPipeLineData implements PipelineData {
   @JsonKey(ignore: true)
   AveragePrice? lastAveragePrice;
   DateTime? buyOrderStartedAt;
-  OrderNew? lastBuyOrder;
-  OrderNew? lastSellOrder;
+  Order? lastBuyOrder;
+  Order? lastSellOrder;
 
   MinimizeLossesPipeLineData({OrdersHistory? ordersHistory})
       : ordersHistory = ordersHistory == null

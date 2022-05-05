@@ -166,21 +166,7 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
     }
 
     // Update order status
-    final buyOrderData = await _getBuyOrder();
-    bot.pipelineData.lastBuyOrder = bot.pipelineData.lastBuyOrder!.copyWith(
-      clientOrderId: buyOrderData.clientOrderId,
-      cummulativeQuoteQty: buyOrderData.cummulativeQuoteQty,
-      executedQty: buyOrderData.executedQty,
-      orderId: buyOrderData.orderId,
-      orderListId: buyOrderData.orderListId,
-      origQty: buyOrderData.origQty,
-      price: buyOrderData.price,
-      side: buyOrderData.side,
-      symbol: buyOrderData.symbol,
-      status: buyOrderData.status,
-      timeInForce: buyOrderData.timeInForce,
-      type: buyOrderData.type,
-    );
+    bot.pipelineData.lastBuyOrder = await _getBuyOrder();
 
     if (bot.pipelineData.lastBuyOrder!.status == OrderStatus.FILLED) {
       timer.cancel();
@@ -214,20 +200,7 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
     changeStatusTo(BotPhases.online, 'pipeline has been started');
 
     final sellOrder = await _getSellOrder();
-    bot.pipelineData.lastSellOrder = bot.pipelineData.lastSellOrder!.copyWith(
-      clientOrderId: sellOrder.clientOrderId,
-      cummulativeQuoteQty: sellOrder.cummulativeQuoteQty,
-      executedQty: sellOrder.executedQty,
-      orderId: sellOrder.orderId,
-      orderListId: sellOrder.orderListId,
-      origQty: sellOrder.origQty,
-      price: sellOrder.price,
-      side: sellOrder.side,
-      symbol: sellOrder.symbol,
-      status: sellOrder.status,
-      timeInForce: sellOrder.timeInForce,
-      type: sellOrder.type,
-    );
+    bot.pipelineData.lastSellOrder = sellOrder;
 
     // if order status is open or partially closed
     if (sellOrder.status == OrderStatus.NEW ||
@@ -235,23 +208,29 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
         sellOrder.status == OrderStatus.PARTIALLY_FILLED) {
       if (_hasToMoveOrder()) {
         await _moveOrder(sellOrder.orderId);
-        //TODO notify order moved
+        _showSnackBar(
+            'Moved sell order to ${sellOrder.price} ${bot.config.symbol!.rightPair}');
       }
 
       return;
     }
-    // if order status is closed
+    // If order status is closed
     else if (sellOrder.status == OrderStatus.FILLED) {
       // TODO resume a buy order
-      final ordersPair = OrdersPair(
-          buyOrder: bot.pipelineData.lastBuyOrder!, sellOrder: sellOrder);
-      bot.pipelineData.ordersHistory.ordersPair.add(ordersPair);
+      final buyOrder = await bot.pipelineData.lastBuyOrder!.maybeMap(
+          orderData: (orderData) => Future.value(orderData),
+          orElse: () => _getBuyOrder());
+      final sellOrder = await bot.pipelineData.lastSellOrder!.maybeMap(
+          orderData: (orderData) => Future.value(orderData),
+          orElse: () => _getSellOrder());
+
+      final ordersPair = OrdersPair(buyOrder: buyOrder, sellOrder: sellOrder);
+      bot.pipelineData.ordersHistory.orderPairs.add(ordersPair);
 
       var reason = 'Sell order executed';
 
       // Check if is a loss
       if (!ordersPair.isProfit) {
-        /// TODO transform lossSellOrderCounter to dailyLossSellOrderCounter
         // check if is major or equal to loss counter
         if (_hasReachDailySellLossLimit()) {
           reason += ' - Daily loss sell orders reached';
@@ -262,11 +241,18 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
 
       return shutdown(reason: reason);
     } else {
-      /// TODO throw error
+      // Unexpected order status:
+      // CANCELED | EXPIRED | PARTIALLY_FILLED | PENDING_CANCEL | REJECTED
+      // Bot will be turned off
+      return shutdown(
+          reason:
+              'Unexpected order status: ${sellOrder.status.name}. Bot will be turned off..');
     }
   }
 
   void _showSnackBar(String message) {
+    // Add bot name to message
+    message = '${bot.name} - $message';
     ref.read(snackBarProvider).show(message);
   }
 
@@ -350,7 +336,7 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
     try {
       bot.pipelineData.lastSellOrder = await _submitSellOrder();
     } on ApiException catch (_, __) {
-      const message = 'Failed to submit sell order';
+      final message = '${bot.name} - Failed to submit sell order';
 
       changeStatusTo(BotPhases.error, message);
 
@@ -419,14 +405,27 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
         (lastBuyOrder.price * bot.config.percentageSellOrder! / 100);
   }
 
-  /// TODO put buy order price as parameter
   /// Approximate price's second number after comma to floor
   double _approxPrice(double price) {
     return (price * 100).floorToDouble() / 100;
   }
 
   bool _hasReachDailySellLossLimit() {
-    return bot.pipelineData.ordersHistory.lossesOnly.length >=
-        bot.config.dailyLossSellOrders!;
+    final sellOrdersExecutedToday =
+        bot.pipelineData.ordersHistory.lossesOnly.where(
+      (o) {
+        final dateTime = o.sellOrder?.map(
+          orderData: (dataOrder) => dataOrder.updateTime,
+          orderNew: (_) => null,
+          orderCancel: (_) => null,
+        );
+
+        if (dateTime == null) return false;
+
+        return dateTime.isSameDate(DateTime.now());
+      },
+    );
+
+    return sellOrdersExecutedToday.length >= bot.config.dailyLossSellOrders!;
   }
 }

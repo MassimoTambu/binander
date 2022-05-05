@@ -2,18 +2,18 @@ part of bot;
 
 @JsonSerializable()
 class OrdersHistory {
-  List<OrdersPair> ordersPair;
+  List<OrdersPair> orderPairs;
   List<OrdersPair> ordersCancelled;
-  OrdersHistory(this.ordersPair, this.ordersCancelled);
+  OrdersHistory(this.orderPairs, this.ordersCancelled);
 
-  Iterable<OrdersPair> get profitsOnly => ordersPair.where((o) => o.isProfit);
-  Iterable<OrdersPair> get lossesOnly => ordersPair.where((o) => !o.isProfit);
+  Iterable<OrdersPair> get profitsOnly => orderPairs.where((o) => o.isProfit);
+  Iterable<OrdersPair> get lossesOnly => orderPairs.where((o) => !o.isProfit);
 
-  Iterable<OrdersPair> get allOrders => ordersPair + ordersCancelled;
+  Iterable<OrdersPair> get allOrders => orderPairs + ordersCancelled;
 
   /// Return the sum of all the orders pair. It could return a negative number
   double getTotalGains() =>
-      ordersPair.map((o) => o.gains).reduce((acc, o) => acc + o);
+      orderPairs.map((o) => o.gains).reduce((acc, o) => acc + o);
 
   factory OrdersHistory.fromJson(Map<String, dynamic> json) =>
       _$OrdersHistoryFromJson(json);
