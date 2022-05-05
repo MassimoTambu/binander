@@ -2,7 +2,7 @@ part of api;
 
 @freezed
 class Order with _$Order {
-  const factory Order(
+  const factory Order.orderData(
     String symbol,
     int orderId,
     int orderListId,
@@ -38,7 +38,7 @@ class Order with _$Order {
         double origQuoteOrderQty,
   ) = OrderData;
 
-  const factory Order.newOrder(
+  const factory Order.orderNew(
     String symbol,
     int orderId,
     int orderListId,
@@ -66,7 +66,7 @@ class Order with _$Order {
     List<Fill> fills,
   ) = OrderNew;
 
-  const factory Order.cancelOrder(
+  const factory Order.orderCancel(
     String symbol,
     int orderId,
     int orderListId,

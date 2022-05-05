@@ -226,8 +226,7 @@ void main() {
     expect(bot.pipelineData.lastAveragePrice, isNull);
     expect(bot.pipelineData.lastBuyOrder, isNull);
     expect(bot.pipelineData.lastSellOrder, isNull);
-    expect(bot.pipelineData.lossSellOrderCounter, isZero);
-    expect(bot.pipelineData.ordersHistory.orders.length, isZero);
+    expect(bot.pipelineData.ordersHistory.ordersPair.length, isZero);
     expect(bot.pipelineData.pipelineCounter, isZero);
   }
 
@@ -275,8 +274,9 @@ void main() {
 
       // Should be offline
       expect(bot.pipelineData.status.phase, BotPhases.offline);
-      expect(bot.pipelineData.ordersHistory.orders.length, 1);
       expect(bot.pipelineData.pipelineCounter, 4);
+      expect(bot.pipelineData.ordersHistory.ordersCancelled.length, 0);
+      expect(bot.pipelineData.ordersHistory.ordersPair.length, 1);
       // Is a profit
       expect(bot.pipelineData.ordersHistory.profitsOnly.length, 1);
       // No losses
@@ -320,8 +320,9 @@ void main() {
 
       // Should be offline
       expect(bot.pipelineData.status.phase, BotPhases.offline);
-      expect(bot.pipelineData.ordersHistory.orders.length, 1);
       expect(bot.pipelineData.pipelineCounter, 4);
+      expect(bot.pipelineData.ordersHistory.ordersCancelled.length, 0);
+      expect(bot.pipelineData.ordersHistory.ordersPair.length, 1);
       // Is a loss
       expect(bot.pipelineData.ordersHistory.lossesOnly.length, 1);
       // No profits
@@ -369,8 +370,9 @@ void main() {
 
       // Should be offline
       expect(bot.pipelineData.status.phase, BotPhases.offline);
-      expect(bot.pipelineData.ordersHistory.orders.length, 1);
       expect(bot.pipelineData.pipelineCounter, 12);
+      expect(bot.pipelineData.ordersHistory.ordersCancelled.length, 1);
+      expect(bot.pipelineData.ordersHistory.ordersPair.length, 1);
       // Is a profit
       expect(bot.pipelineData.ordersHistory.profitsOnly.length, 1);
       // No losses
@@ -415,8 +417,9 @@ void main() {
 
       // Should be offline
       expect(bot.pipelineData.status.phase, BotPhases.offline);
-      expect(bot.pipelineData.ordersHistory.orders.length, 1);
       expect(bot.pipelineData.pipelineCounter, 4);
+      expect(bot.pipelineData.ordersHistory.ordersCancelled.length, 0);
+      expect(bot.pipelineData.ordersHistory.ordersPair.length, 1);
       // Is a loss
       expect(bot.pipelineData.ordersHistory.lossesOnly.length, 1);
       // No profits
@@ -498,8 +501,9 @@ void main() {
 
       // Should be offline
       expect(bot.pipelineData.status.phase, BotPhases.offline);
-      expect(bot.pipelineData.ordersHistory.orders.length, 1);
       expect(bot.pipelineData.pipelineCounter, 4);
+      expect(bot.pipelineData.ordersHistory.ordersCancelled.length, 0);
+      expect(bot.pipelineData.ordersHistory.ordersPair.length, 1);
       // Is a profit
       expect(bot.pipelineData.ordersHistory.profitsOnly.length, 1);
       // No losses
@@ -516,7 +520,7 @@ void main() {
 
       // Should be offline
       expect(bot.pipelineData.status.phase, BotPhases.offline);
-      expect(bot.pipelineData.ordersHistory.orders.length, 2);
+      expect(bot.pipelineData.ordersHistory.ordersPair.length, 2);
       expect(bot.pipelineData.pipelineCounter, 8);
       // Is a profit
       expect(bot.pipelineData.ordersHistory.profitsOnly.length, 1);
@@ -534,7 +538,7 @@ void main() {
 
       // Should be offline
       expect(bot.pipelineData.status.phase, BotPhases.offline);
-      expect(bot.pipelineData.ordersHistory.orders.length, 3);
+      expect(bot.pipelineData.ordersHistory.ordersPair.length, 3);
       expect(bot.pipelineData.pipelineCounter, 12);
       // Is a profit
       expect(bot.pipelineData.ordersHistory.profitsOnly.length, 2);
@@ -582,8 +586,9 @@ void main() {
 
       // Should be offline
       expect(bot.pipelineData.status.phase, BotPhases.offline);
-      expect(bot.pipelineData.ordersHistory.orders.length, 1);
       expect(bot.pipelineData.pipelineCounter, 13);
+      expect(bot.pipelineData.ordersHistory.ordersCancelled.length, 2);
+      expect(bot.pipelineData.ordersHistory.ordersPair.length, 1);
       // Is a profit
       expect(bot.pipelineData.ordersHistory.profitsOnly.length, 1);
       // No losses
@@ -619,8 +624,9 @@ void main() {
 
       // Should be offline
       expect(bot.pipelineData.status.phase, BotPhases.error);
-      expect(bot.pipelineData.ordersHistory.orders.length, 0);
       expect(bot.pipelineData.pipelineCounter, 1);
+      expect(bot.pipelineData.ordersHistory.ordersCancelled.length, 0);
+      expect(bot.pipelineData.ordersHistory.ordersPair.length, 0);
       // There should not be any locked asset
       expect(getAllLockedAssetFromWallet(), 0);
       verify(mockTradeProvider.getAccountInformation(any)).called(1);
@@ -680,7 +686,7 @@ void main() {
       expect(bot.pipelineData.pipelineCounter, 2);
       expect(bot.pipelineData.lastSellOrder, isNull);
       expect(bot.pipelineData.lastBuyOrder?.status, OrderStatus.FILLED);
-      expect(bot.pipelineData.ordersHistory.orders.length, 0);
+      expect(bot.pipelineData.ordersHistory.ordersPair.length, 0);
 
       async.elapse(const Duration(seconds: 20));
 
@@ -690,8 +696,9 @@ void main() {
 
       // Should be offline
       expect(bot.pipelineData.status.phase, BotPhases.offline);
-      expect(bot.pipelineData.ordersHistory.orders.length, 1);
       expect(bot.pipelineData.pipelineCounter, 5);
+      expect(bot.pipelineData.ordersHistory.ordersCancelled.length, 0);
+      expect(bot.pipelineData.ordersHistory.ordersPair.length, 1);
       // Is a profit
       expect(bot.pipelineData.ordersHistory.profitsOnly.length, 1);
       // No losses

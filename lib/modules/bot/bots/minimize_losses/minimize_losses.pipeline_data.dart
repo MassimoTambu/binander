@@ -20,12 +20,9 @@ class MinimizeLossesPipeLineData implements PipelineData {
   OrderNew? lastBuyOrder;
   OrderNew? lastSellOrder;
 
-  /// TODO replace with check loss sell orders every day
-  int lossSellOrderCounter = 0;
-
   MinimizeLossesPipeLineData({OrdersHistory? ordersHistory})
       : ordersHistory = ordersHistory == null
-            ? ordersHistory = OrdersHistory([])
+            ? ordersHistory = OrdersHistory([], [])
             : ordersHistory = ordersHistory;
 
   factory MinimizeLossesPipeLineData.fromJson(Map<String, dynamic> json) =>

@@ -8,6 +8,6 @@ abstract class PipelineData {
 
   PipelineData({OrdersHistory? ordersHistory})
       : ordersHistory = ordersHistory == null
-            ? ordersHistory = OrdersHistory([])
+            ? ordersHistory = OrdersHistory([], [])
             : ordersHistory = ordersHistory;
 }

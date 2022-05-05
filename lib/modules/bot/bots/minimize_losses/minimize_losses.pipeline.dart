@@ -99,11 +99,11 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
     // If for some reason the bot has going to stop we should cancel the opened orders
     final lastBuyOrder = bot.pipelineData.lastBuyOrder;
     if (lastBuyOrder != null && lastBuyOrder.status != OrderStatus.FILLED) {
-      await _cancelOrder(lastBuyOrder.orderId);
+      await _trySubmitCancelOrder(lastBuyOrder.orderId);
     }
     final lastSellOrder = bot.pipelineData.lastSellOrder;
     if (lastSellOrder != null && lastSellOrder.status != OrderStatus.FILLED) {
-      await _cancelOrder(lastSellOrder.orderId);
+      await _trySubmitCancelOrder(lastSellOrder.orderId);
     }
 
     bot.pipelineData.buyOrderStartedAt = null;
@@ -155,7 +155,7 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
       changeStatusTo(BotPhases.starting,
           "buy order time limit reached. I'm about to try again..");
 
-      await _cancelOrder(bot.pipelineData.lastBuyOrder!.orderId);
+      await _trySubmitCancelOrder(bot.pipelineData.lastBuyOrder!.orderId);
       bot.pipelineData.lastBuyOrder = null;
       bot.pipelineData.buyOrderStartedAt = null;
       timer.cancel();
@@ -245,15 +245,12 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
       // TODO resume a buy order
       final ordersPair = OrdersPair(
           buyOrder: bot.pipelineData.lastBuyOrder!, sellOrder: sellOrder);
-      bot.pipelineData.ordersHistory.orders.add(ordersPair);
+      bot.pipelineData.ordersHistory.ordersPair.add(ordersPair);
 
       var reason = 'Sell order executed';
 
       // Check if is a loss
       if (!ordersPair.isProfit) {
-        // add to loss counter
-        bot.pipelineData.lossSellOrderCounter += 1;
-
         /// TODO transform lossSellOrderCounter to dailyLossSellOrderCounter
         // check if is major or equal to loss counter
         if (_hasReachDailySellLossLimit()) {
@@ -355,7 +352,7 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
     } on ApiException catch (_, __) {
       const message = 'Failed to submit sell order';
 
-      changeStatusTo(BotPhases.starting, message);
+      changeStatusTo(BotPhases.error, message);
 
       _showSnackBar(message);
     }
@@ -383,11 +380,25 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
   }
 
   Future<void> _moveOrder(int orderId) async {
-    await _cancelOrder(orderId);
+    await _trySubmitCancelOrder(orderId);
     await _trySubmitSellOrder();
   }
 
-  Future<OrderCancel> _cancelOrder(int orderId) async {
+  Future<void> _trySubmitCancelOrder(int orderId) async {
+    try {
+      final orderCancel = await _submitCancelOrder(orderId);
+      final ordersPair = OrdersPair(buyOrder: orderCancel, sellOrder: null);
+      bot.pipelineData.ordersHistory.ordersCancelled.add(ordersPair);
+    } on ApiException catch (_, __) {
+      const message = 'Failed to submit cancel order';
+
+      changeStatusTo(BotPhases.error, message);
+
+      _showSnackBar(message);
+    }
+  }
+
+  Future<OrderCancel> _submitCancelOrder(int orderId) async {
     final res = await ref
         .read(apiProvider)
         .spot
@@ -415,7 +426,7 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
   }
 
   bool _hasReachDailySellLossLimit() {
-    return bot.pipelineData.lossSellOrderCounter >=
+    return bot.pipelineData.ordersHistory.lossesOnly.length >=
         bot.config.dailyLossSellOrders!;
   }
 }

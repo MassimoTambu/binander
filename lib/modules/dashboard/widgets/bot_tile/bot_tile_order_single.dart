@@ -1,7 +1,7 @@
 part of dashboard_module;
 
-class BotTileDetails extends ConsumerWidget {
-  const BotTileDetails({Key? key}) : super(key: key);
+class BotTileOrderSingle extends ConsumerWidget {
+  const BotTileOrderSingle({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

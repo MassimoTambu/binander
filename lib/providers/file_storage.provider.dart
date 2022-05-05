@@ -41,7 +41,7 @@ class FileStorageProvider {
 
   void upsertBots(List<Bot> bots) {
     for (var bot in bots) {
-      if (bot is MinimizeLossesBot) _upsertBot(bot);
+      _upsertBot(bot);
     }
 
     _saveFile();
