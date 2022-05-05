@@ -3,8 +3,10 @@ part of bot;
 @freezed
 class OrdersPair with _$OrdersPair {
   const OrdersPair._();
-  const factory OrdersPair(
-      {required Order buyOrder, required Order sellOrder}) = _OrdersPair;
+  const factory OrdersPair({
+    required OrderData buyOrder,
+    required OrderData sellOrder,
+  }) = _OrdersPair;
 
   /// Check whether is a profit or a loss orders pair
   bool get isProfit {
