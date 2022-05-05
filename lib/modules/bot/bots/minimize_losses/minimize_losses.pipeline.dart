@@ -208,12 +208,13 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
         sellOrder.status == OrderStatus.PARTIALLY_FILLED) {
       if (_hasToMoveOrder()) {
         await _moveOrder(sellOrder.orderId);
-        //TODO notify order moved
+        _showSnackBar(
+            'Moved sell order to ${sellOrder.price} ${bot.config.symbol!.rightPair}');
       }
 
       return;
     }
-    // if order status is closed
+    // If order status is closed
     else if (sellOrder.status == OrderStatus.FILLED) {
       // TODO resume a buy order
       final buyOrder = await bot.pipelineData.lastBuyOrder!.maybeMap(
@@ -243,11 +244,18 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
 
       return shutdown(reason: reason);
     } else {
-      /// TODO throw error
+      // Unexpected order status:
+      // CANCELED | EXPIRED | PARTIALLY_FILLED | PENDING_CANCEL | REJECTED
+      // Bot will be turned off
+      return shutdown(
+          reason:
+              'Unexpected order status: ${sellOrder.status.name}. Bot will be turned off..');
     }
   }
 
   void _showSnackBar(String message) {
+    // Add bot name to message
+    message = '${bot.name} - $message';
     ref.read(snackBarProvider).show(message);
   }
 
@@ -331,7 +339,7 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
     try {
       bot.pipelineData.lastSellOrder = await _submitSellOrder();
     } on ApiException catch (_, __) {
-      const message = 'Failed to submit sell order';
+      final message = '${bot.name} - Failed to submit sell order';
 
       changeStatusTo(BotPhases.starting, message);
 
@@ -386,7 +394,6 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
         (lastBuyOrder.price * bot.config.percentageSellOrder! / 100);
   }
 
-  /// TODO put buy order price as parameter
   /// Approximate price's second number after comma to floor
   double _approxPrice(double price) {
     return (price * 100).floorToDouble() / 100;
