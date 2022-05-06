@@ -40,25 +40,25 @@ class SettingsProvider extends StateNotifier<Settings> {
       ),
     );
 
-    if (pubNetApiKey != null) {
+    if (pubNetApiKey != null && pubNetApiKey.isNotEmpty) {
       ref
           .read(memoryStorageProvider.notifier)
           .write(SecureStorageKey.pubNetApiKey(), pubNetApiKey);
     }
 
-    if (pubNetApiSecret != null) {
+    if (pubNetApiSecret != null && pubNetApiSecret.isNotEmpty) {
       ref
           .read(memoryStorageProvider.notifier)
           .write(SecureStorageKey.pubNetApiSecret(), pubNetApiSecret);
     }
 
-    if (testNetApiKey != null) {
+    if (testNetApiKey != null && testNetApiKey.isNotEmpty) {
       ref
           .read(memoryStorageProvider.notifier)
           .write(SecureStorageKey.testNetApiKey(), testNetApiKey);
     }
 
-    if (testNetApiSecret != null) {
+    if (testNetApiSecret != null && testNetApiSecret.isNotEmpty) {
       ref
           .read(memoryStorageProvider.notifier)
           .write(SecureStorageKey.testNetApiSecret(), testNetApiSecret);
