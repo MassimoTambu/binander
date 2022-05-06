@@ -24,24 +24,20 @@ class TradeProvider {
     final secureQuery = apiUtils.createQueryWithSecurity(
         conn.apiSecret, query, API_SECURITY_TYPE.userData);
 
-    late final Response<String> response;
     try {
-      response = await _ref.read(_dioProvider).get(
+      final response = await _ref.read(_dioProvider).get<String>(
           '${conn.url}/api/v3/allOrders',
           options: options,
           queryParameters: secureQuery);
-    } on DioError catch (_) {
-      return Future.error(_ref
-          .read(_apiUtilsProvider)
-          .buildApiException('getAllorders', response));
+
+      final rawOrders = jsonDecode(response.data!) as List<dynamic>;
+
+      return ApiResponse(rawOrders.map((o) => Order.fromJson(o)).toList(),
+          response.statusCode!);
+    } on DioError catch (e) {
+      return Future.error(
+          _ref.read(_apiUtilsProvider).buildApiException('getAllorders', e));
     }
-
-    final rawOrders = jsonDecode(response.data!) as List<dynamic>;
-
-    final res = ApiResponse(
-        rawOrders.map((o) => Order.fromJson(o)).toList(), response.statusCode!);
-
-    return res;
   }
 
   Future<ApiResponse<OrderData>> getQueryOrder(
@@ -58,20 +54,18 @@ class TradeProvider {
     final secureQuery = apiUtils.createQueryWithSecurity(
         conn.apiSecret, query, API_SECURITY_TYPE.userData);
 
-    late final Response<String> response;
     try {
-      response = await _ref.read(_dioProvider).get('${conn.url}/api/v3/order',
-          options: options, queryParameters: secureQuery);
-    } on DioError catch (_) {
-      return Future.error(_ref
-          .read(_apiUtilsProvider)
-          .buildApiException('getQueryOrder', response));
+      final response = await _ref.read(_dioProvider).get<String>(
+          '${conn.url}/api/v3/order',
+          options: options,
+          queryParameters: secureQuery);
+
+      return ApiResponse(
+          OrderData.fromJson(jsonDecode(response.data!)), response.statusCode!);
+    } on DioError catch (e) {
+      return Future.error(
+          _ref.read(_apiUtilsProvider).buildApiException('getQueryOrder', e));
     }
-
-    final res = ApiResponse(
-        OrderData.fromJson(jsonDecode(response.data!)), response.statusCode!);
-
-    return res;
   }
 
   Future<ApiResponse<OrderNew>> newOrder(
@@ -102,19 +96,18 @@ class TradeProvider {
     final secureQuery = apiUtils.createQueryWithSecurity(
         conn.apiSecret, query, API_SECURITY_TYPE.userData);
 
-    late final Response<String> response;
     try {
-      response = await _ref.read(_dioProvider).post('${conn.url}/api/v3/order',
-          options: options, queryParameters: secureQuery);
-    } on DioError catch (_) {
+      final response = await _ref.read(_dioProvider).post<String>(
+          '${conn.url}/api/v3/order',
+          options: options,
+          queryParameters: secureQuery);
+
+      return ApiResponse(
+          OrderNew.fromJson(jsonDecode(response.data!)), response.statusCode!);
+    } on DioError catch (e) {
       return Future.error(
-          _ref.read(_apiUtilsProvider).buildApiException('newOrder', response));
+          _ref.read(_apiUtilsProvider).buildApiException('newOrder', e));
     }
-
-    final res = ApiResponse(
-        OrderNew.fromJson(jsonDecode(response.data!)), response.statusCode!);
-
-    return res;
   }
 
   Future<ApiResponse<OrderCancel>> cancelOrder(
@@ -137,22 +130,18 @@ class TradeProvider {
     final secureQuery = apiUtils.createQueryWithSecurity(
         conn.apiSecret, query, API_SECURITY_TYPE.userData);
 
-    late final Response<String> response;
     try {
-      response = await _ref.read(_dioProvider).delete(
+      final response = await _ref.read(_dioProvider).delete<String>(
           '${conn.url}/api/v3/order',
           options: options,
           queryParameters: secureQuery);
-    } on DioError catch (_) {
-      return Future.error(_ref
-          .read(_apiUtilsProvider)
-          .buildApiException('cancelOrder', response));
+
+      return ApiResponse(OrderCancel.fromJson(jsonDecode(response.data!)),
+          response.statusCode!);
+    } on DioError catch (e) {
+      return Future.error(
+          _ref.read(_apiUtilsProvider).buildApiException('cancelOrder', e));
     }
-
-    final res = ApiResponse(
-        OrderCancel.fromJson(jsonDecode(response.data!)), response.statusCode!);
-
-    return res;
   }
 
   Future<ApiResponse<AccountInformation>> getAccountInformation(
@@ -167,19 +156,19 @@ class TradeProvider {
     final secureQuery = apiUtils.createQueryWithSecurity(
         conn.apiSecret, {}, API_SECURITY_TYPE.userData);
 
-    late final Response<String> response;
     try {
-      response = await _ref.read(_dioProvider).get('${conn.url}/api/v3/account',
-          options: options, queryParameters: secureQuery);
-    } on DioError catch (_) {
+      final response = await _ref.read(_dioProvider).get<String>(
+          '${conn.url}/api/v3/account',
+          options: options,
+          queryParameters: secureQuery);
+
+      return ApiResponse(
+          AccountInformation.fromJson(jsonDecode(response.data!)),
+          response.statusCode!);
+    } on DioError catch (e) {
       return Future.error(_ref
           .read(_apiUtilsProvider)
-          .buildApiException('getAccountInformation', response));
+          .buildApiException('getAccountInformation', e));
     }
-
-    final res = ApiResponse(
-        AccountInformation.fromJson(jsonDecode(response.data!)),
-        response.statusCode!);
-    return res;
   }
 }

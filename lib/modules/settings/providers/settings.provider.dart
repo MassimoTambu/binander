@@ -22,16 +22,16 @@ class SettingsProvider extends StateNotifier<Settings> {
   }
 
   void updateFromForm({
-    required String pubNetApiKey,
-    required String pubNetApiSecret,
+    required String? pubNetApiKey,
+    required String? pubNetApiSecret,
     required String? testNetApiKey,
     required String? testNetApiSecret,
   }) {
     state = state.copyWith(
       pubNetConnection: ApiConnection(
         url: pubNetUrl,
-        apiKey: pubNetApiKey,
-        apiSecret: pubNetApiSecret,
+        apiKey: pubNetApiKey ?? '',
+        apiSecret: pubNetApiSecret ?? '',
       ),
       testNetConnection: ApiConnection(
         url: testNetUrl,
@@ -40,13 +40,17 @@ class SettingsProvider extends StateNotifier<Settings> {
       ),
     );
 
-    ref
-        .read(memoryStorageProvider.notifier)
-        .write(SecureStorageKey.pubNetApiKey(), pubNetApiKey);
+    if (pubNetApiKey != null) {
+      ref
+          .read(memoryStorageProvider.notifier)
+          .write(SecureStorageKey.pubNetApiKey(), pubNetApiKey);
+    }
 
-    ref
-        .read(memoryStorageProvider.notifier)
-        .write(SecureStorageKey.pubNetApiSecret(), pubNetApiSecret);
+    if (pubNetApiSecret != null) {
+      ref
+          .read(memoryStorageProvider.notifier)
+          .write(SecureStorageKey.pubNetApiSecret(), pubNetApiSecret);
+    }
 
     if (testNetApiKey != null) {
       ref

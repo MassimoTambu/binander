@@ -25,33 +25,27 @@ class SettingsConfig implements Config {
     // PubNet
     pubNetApiKeyName: ConfigField(
       name: pubNetApiKeyName,
-      publicName: apiKeyPublicName + ' *',
+      publicName: apiKeyPublicName,
       description: apiKeyDescription,
       value: null,
       configFieldTypes: ConfigFieldTypes.textField,
-      validators: [
-        ConfigFieldValidatorsTypes.required,
-      ],
+      validators: [],
     ),
     pubNetApiSecretName: ConfigField(
       name: pubNetApiSecretName,
-      publicName: apiSecretPublicName + ' *',
+      publicName: apiSecretPublicName,
       description: apiSecretDescription,
       value: null,
       configFieldTypes: ConfigFieldTypes.textField,
-      validators: [
-        ConfigFieldValidatorsTypes.required,
-      ],
+      validators: [],
     ),
     pubNetUrlName: ConfigField(
       name: pubNetUrlName,
-      publicName: apiUrlPublicName + ' *',
+      publicName: apiUrlPublicName,
       description: apiUrlDescription,
       value: null,
       configFieldTypes: ConfigFieldTypes.textField,
-      validators: [
-        ConfigFieldValidatorsTypes.required,
-      ],
+      validators: [],
     ),
     // TestNet
     testNetApiKeyName: ConfigField(

@@ -23,21 +23,16 @@ class MarketProvider {
     final secureQuery = apiUtils.createQueryWithSecurity(
         conn.apiSecret, query, API_SECURITY_TYPE.none);
 
-    late final Response<String> response;
     try {
-      response = await _ref.read(_dioProvider).get(
+      final response = await _ref.read(_dioProvider).get<String>(
           '${conn.url}/api/v3/avgPrice',
           options: options,
           queryParameters: secureQuery);
-    } on DioError catch (_) {
-      return Future.error(_ref
-          .read(_apiUtilsProvider)
-          .buildApiException('getAveragePrice', response));
+      return ApiResponse(AveragePrice.fromJson(jsonDecode(response.data!)),
+          response.statusCode!);
+    } on DioError catch (e) {
+      return Future.error(
+          _ref.read(_apiUtilsProvider).buildApiException('getAveragePrice', e));
     }
-
-    final res = ApiResponse(AveragePrice.fromJson(jsonDecode(response.data!)),
-        response.statusCode!);
-
-    return res;
   }
 }
