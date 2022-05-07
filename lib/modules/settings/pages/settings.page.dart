@@ -22,14 +22,23 @@ class SettingsPage extends ConsumerWidget {
               title: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  BinanceStatusIndicator(
+                  BinanceStatusIndicator<ApiKeyPermission>(
                     title: 'Public Network',
                     futureProvider: binancePubNetStatusProvider,
+                    validate: (response) {
+                      final perm = response.body;
+                      return perm.enableSpotAndMarginTrading &&
+                          perm.enableReading &&
+                          perm.tradingAuthorityExpirationTime != null &&
+                          perm.tradingAuthorityExpirationTime!
+                              .isAfter(DateTime.now());
+                    },
                   ),
                   const SizedBox(width: 30),
-                  BinanceStatusIndicator(
+                  BinanceStatusIndicator<AccountInformation>(
                     title: 'Test Network',
                     futureProvider: binanceTestNetStatusProvider,
+                    validate: (response) => response.body.canTrade,
                   ),
                 ],
               ),

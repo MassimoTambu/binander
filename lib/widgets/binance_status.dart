@@ -1,13 +1,15 @@
 part of widgets;
 
-class BinanceStatusIndicator extends ConsumerWidget {
+class BinanceStatusIndicator<T> extends ConsumerWidget {
   final String title;
-  final AutoDisposeFutureProvider<ApiResponse> futureProvider;
+  final AutoDisposeFutureProvider<ApiResponse<T>> futureProvider;
+  final bool Function(ApiResponse<T>) validate;
 
   const BinanceStatusIndicator({
     Key? key,
     required this.title,
     required this.futureProvider,
+    required this.validate,
   }) : super(key: key);
 
   @override
@@ -22,7 +24,11 @@ class BinanceStatusIndicator extends ConsumerWidget {
           const SizedBox(height: 5),
           res.when(
             data: (data) {
-              return const Icon(Icons.check_circle, color: Colors.green);
+              if (validate(data)) {
+                return const Icon(Icons.check_circle, color: Colors.green);
+              }
+
+              return const Icon(Icons.cancel, color: Colors.red);
             },
             loading: () {
               return const SizedBox(
