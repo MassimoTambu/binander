@@ -30,8 +30,8 @@ class ApiKeyPermission with _$ApiKeyPermission {
     bool enableSpotAndMarginTrading,
 
     /// Expiration time for spot and margin trading permission
-    @JsonKey(fromJson: ParseUtils.unixToDateTime, toJson: ParseUtils.dateTimeToUnix)
-        DateTime tradingAuthorityExpirationTime,
+    @JsonKey(required: false, fromJson: ParseUtils.nullUnixToDateTime, toJson: ParseUtils.nullDateTimeToUnix)
+        DateTime? tradingAuthorityExpirationTime,
   ) = _ApiKeyPermission;
 
   factory ApiKeyPermission.fromJson(Map<String, dynamic> json) =>
