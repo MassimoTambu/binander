@@ -1,5 +1,6 @@
 library dashboard_module;
 
+import 'package:bottino_fortino/api/api.dart';
 import 'package:bottino_fortino/modules/bot/bot.dart';
 import 'package:bottino_fortino/modules/bot/bots/minimize_losses/minimize_losses.dart';
 import 'package:bottino_fortino/models/models.dart';
@@ -13,14 +14,20 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:bottino_fortino/utils/utils.dart';
 
+part 'models/orders_order.enum.dart';
 part 'pages/dashboard.page.dart';
 part 'pages/create_bot.page.dart';
+part 'pages/order_detail.page.dart';
 part 'providers/create_bot.provider.dart';
 part 'providers/bot_tile.provider.dart';
+part 'providers/bot_order_tile.provider.dart';
+part 'widgets/total_gains_chip.dart';
 part 'widgets/bot_tile/bot_tile.dart';
-part 'widgets/bot_tile/bot_tile_button.dart';
+part 'widgets/bot_tile/bot_tile_buttons.dart';
 part 'widgets/bot_tile/bot_tile_chips.dart';
-part 'widgets/bot_tile/bot_tile_orders.dart';
-part 'widgets/bot_tile/bot_tile_order_single.dart';
+part 'widgets/bot_tile_orders/bot_tile_orders.dart';
+part 'widgets/bot_tile_orders/bot_tile_orders_pair.dart';
+part 'widgets/bot_tile_orders/order_container.dart';
+part 'widgets/bot_tile_orders/order_status_indicator.dart';
 part 'widgets/crypto_info_container/crypto_info_container.dart';
 part 'widgets/crypto_info_container/crypto_info_title.dart';

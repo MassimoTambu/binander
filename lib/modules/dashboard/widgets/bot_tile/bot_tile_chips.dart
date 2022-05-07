@@ -1,19 +1,15 @@
 part of dashboard_module;
 
 class BotTileChips extends ConsumerWidget {
-  final String uuid;
-
-  const BotTileChips({
-    Key? key,
-    required this.uuid,
-  }) : super(key: key);
+  const BotTileChips({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final botStatus = ref.watch(pipelineProvider.select((p) =>
-        p.firstWhere((pi) => pi.bot.uuid == uuid).bot.pipelineData.status));
-    final testNet = ref.watch(pipelineProvider
-        .select((p) => p.firstWhere((pi) => pi.bot.uuid == uuid).bot.testNet));
+    final botStatus = ref.watch(botTileProvider.notifier
+        .select((p) => p.pipeline.bot.pipelineData.status));
+    final testNet = ref
+        .watch(botTileProvider.notifier.select((p) => p.pipeline.bot.testNet));
+
     return Wrap(
       spacing: 8,
       runSpacing: 5,

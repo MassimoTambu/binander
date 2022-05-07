@@ -5,7 +5,8 @@ class BotTile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final bot = ref.watch(botTileProvider.select((p) => p.pipeline.bot));
+    final bot =
+        ref.watch(botTileProvider.notifier.select((p) => p.pipeline.bot));
     return ExpansionTile(
       title: Wrap(
         spacing: 8,
@@ -13,24 +14,24 @@ class BotTile extends ConsumerWidget {
         alignment: WrapAlignment.spaceBetween,
         crossAxisAlignment: WrapCrossAlignment.center,
         children: [
-          Text(
-            bot.name,
-            style: Theme.of(context).textTheme.headline6,
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                bot.name,
+                style: Theme.of(context).textTheme.headline6,
+              ),
+              const SizedBox(width: 20),
+              GainsChip(bot.pipelineData.ordersHistory.allOrders),
+            ],
           ),
-          BotTileChips(uuid: bot.uuid)
+          const BotTileChips(),
         ],
       ),
-      childrenPadding: const EdgeInsets.all(10),
-      children: [
-        const BotTileDetails(),
-        const BotTileButton(),
-        // TODO add History Orders
-        // ProviderScope(
-        //   overrides: [
-        //     isTestNetProvider.overrideWithValue(bot.testNet),
-        //   ],
-        //   child: const History(),
-        // ),
+      childrenPadding: const EdgeInsets.all(18),
+      children: const [
+        BotTileButtons(),
+        BotTileOrders(),
       ],
     );
   }

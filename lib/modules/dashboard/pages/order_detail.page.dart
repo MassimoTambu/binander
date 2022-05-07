@@ -1,0 +1,60 @@
+part of dashboard_module;
+
+class OrderDetailPage extends StatelessWidget {
+  final Order _order;
+
+  const OrderDetailPage(this._order, {Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final orderInfos = [
+      'Id: ${_order.orderId}',
+      'OrigQty: ${_order.origQty}',
+      'ExecutedQty: ${_order.executedQty}',
+      'Price: ${_order.price}',
+      'Symbol: ${_order.symbol}',
+      'Side: ${_order.side.name}',
+      'Status: ${_order.status.name}',
+      'Type: ${_order.type.name}',
+      ..._order.map(
+        orderData: (o) => [
+          'Time: ${DateTimeUtils.toHmsddMMy(o.time)}',
+          'Updated time: ${DateTimeUtils.toHmsddMMy(o.updateTime)}',
+        ],
+        orderNew: (o) => [
+          'Transact time: ${DateTimeUtils.toHmsddMMy(o.transactTime)}',
+        ],
+        orderCancel: (o) => [
+          'Transact time: ${DateTimeUtils.toHmsddMMy(o.transactTime)}',
+        ],
+      )
+    ];
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Order Detail'),
+        centerTitle: true,
+        actions: [
+          IconButton(
+            onPressed: () => context.router.push(const SettingsRoute()),
+            icon: const Icon(Icons.settings),
+          ),
+        ],
+      ),
+      body: Center(
+        child: ListView.separated(
+          padding: const EdgeInsets.all(18),
+          itemCount: orderInfos.length,
+          itemBuilder: (context, i) => Text(
+            orderInfos[i],
+            style: TextStyle(
+              fontSize: Theme.of(context).textTheme.headline6!.fontSize,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          separatorBuilder: (context, i) => const SizedBox(height: 20),
+        ),
+      ),
+    );
+  }
+}
