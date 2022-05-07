@@ -24,4 +24,16 @@ class ParseUtils {
   static int dateTimeToUnix(DateTime dateTime) {
     return dateTime.millisecondsSinceEpoch;
   }
+
+  static DateTime? nullUnixToDateTime(int? unix) {
+    if (unix == null) return null;
+
+    return DateTime.fromMillisecondsSinceEpoch(unix, isUtc: true);
+  }
+
+  static int? nullDateTimeToUnix(DateTime? dateTime) {
+    if (dateTime == null) return null;
+
+    return dateTime.millisecondsSinceEpoch;
+  }
 }
