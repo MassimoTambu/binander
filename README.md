@@ -1,4 +1,4 @@
-# binander
+# Binander
 
 This app is a personal experiment created to help some friends with daily trading on crypto.
 
