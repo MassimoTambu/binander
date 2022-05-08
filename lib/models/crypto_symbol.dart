@@ -1,6 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'crypto_symbol.freezed.dart';
+part 'crypto_symbol.g.dart';
 
 @freezed
 class CryptoSymbol with _$CryptoSymbol {
