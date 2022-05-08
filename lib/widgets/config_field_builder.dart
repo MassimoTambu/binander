@@ -19,10 +19,8 @@ class ConfigFieldBuilder extends StatelessWidget {
     return FormBuilderTextField(
       name: configField.name,
       decoration: InputDecoration(
-        label: Tooltip(
-          message: configField.description,
-          child: Text(configField.publicName),
-        ),
+        label: Text(configField.publicName),
+        helperText: configField.description,
         filled: !enabled,
       ),
       initialValue: configField.value ?? configField.defaultValue?.toString(),

@@ -121,17 +121,20 @@ class MinimizeLossesConfig implements Config {
   static const String maxInvestmentPerOrderName = 'max_investment_per_order';
   static const String maxInvestmentPerOrderPublicName =
       'Max investment per order';
-  static const String maxInvestmentPerOrderDescription = '';
+  static const String maxInvestmentPerOrderDescription =
+      "If you possess less than 'max investment per order' the bot will invest what you have";
   static const String percentageSellOrderName = 'percentage_sell_order';
   static const String percentageSellOrderPublicName = 'Sell order %';
-  static const String percentageSellOrderDescription = '';
+  static const String percentageSellOrderDescription =
+      'Percentage which bot will submit and move sell orders';
   static const String symbolName = 'symbol';
   static const String symbolPublicName = 'Crypto pair';
   static const String symbolDescription =
-      "The crypto on the left will be used to buy the right one. NOTE: for TestNet use 'BTCUSDT' and 'BNBUSDT'";
+      "The crypto on the right will be used to buy the left one. NOTE: for TestNet use 'BTCUSDT' and 'BNBUSDT'";
   static const String timerBuyOrderName = 'timer_buy_order_name';
   static const String timerBuyOrderPublicName = 'Buy order timer';
-  static const String timerBuyOrderDescription = '';
+  static const String timerBuyOrderDescription =
+      'Time limit in minutes that the bot will try to submit a buy order';
 
   factory MinimizeLossesConfig.fromJson(Map<String, dynamic> json) =>
       _$MinimizeLossesConfigFromJson(json);
