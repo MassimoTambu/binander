@@ -1,5 +1,3 @@
-part of utils;
-
 //TODO use an external library
 class MediaQueryUtils {
   static double resizeBy({

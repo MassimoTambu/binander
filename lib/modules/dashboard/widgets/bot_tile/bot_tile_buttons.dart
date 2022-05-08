@@ -1,4 +1,6 @@
-part of dashboard_module;
+import 'package:bottino_fortino/modules/dashboard/providers/bot_tile.provider.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class BotTileButtons extends ConsumerWidget {
   const BotTileButtons({Key? key}) : super(key: key);

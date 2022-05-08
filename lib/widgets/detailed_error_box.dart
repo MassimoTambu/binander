@@ -1,4 +1,4 @@
-part of widgets;
+import 'package:flutter/material.dart';
 
 class DetailedErrorBox extends StatelessWidget {
   final Object error;

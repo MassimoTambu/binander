@@ -1,4 +1,4 @@
-part of models;
+import 'package:bottino_fortino/models/config_field.dart';
 
 abstract class Config {
   final Map<String, ConfigField> configFields;

@@ -1,5 +1,3 @@
-part of models;
-
 /// For TestNet use 'BTC-USDT' and 'BNB-USDT'
 /// TODO add more
 const symbols = [

@@ -1,4 +1,8 @@
-part of bot;
+import 'package:bottino_fortino/modules/bot/models/bot_phases.enum.dart';
+import 'package:flutter/material.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
+
+part 'bot_status.freezed.dart';
 
 @freezed
 class BotStatus with _$BotStatus {

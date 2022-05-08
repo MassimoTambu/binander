@@ -1,4 +1,7 @@
-part of bot;
+import 'package:bottino_fortino/modules/bot/models/orders_pair.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
+
+part 'orders_history.g.dart';
 
 @JsonSerializable()
 class OrdersHistory {

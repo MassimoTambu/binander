@@ -1,5 +1,3 @@
-part of models;
-
 enum ConfigFieldValidatorsTypes {
   required,
   int,

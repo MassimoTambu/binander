@@ -1,6 +1,9 @@
 // ignore_for_file: prefer_initializing_formals
 
-part of settings_module;
+import 'package:bottino_fortino/models/config_field.dart';
+import 'package:bottino_fortino/models/enums/config_field_types.enum.dart';
+import 'package:bottino_fortino/models/interfaces/config.interface.dart';
+import 'package:bottino_fortino/modules/settings/models/api_connection.dart';
 
 class SettingsConfig implements Config {
   ApiConnection pubNetConnection;

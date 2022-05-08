@@ -1,4 +1,23 @@
-part of minimize_losses_bot;
+import 'dart:async';
+
+import 'package:bottino_fortino/api/api.dart';
+import 'package:bottino_fortino/modules/bot/models/bot.dart';
+import 'package:bottino_fortino/modules/bot/models/bot_limit.dart';
+import 'package:bottino_fortino/modules/bot/models/bot_phases.enum.dart';
+import 'package:bottino_fortino/modules/bot/models/bot_status.dart';
+import 'package:bottino_fortino/modules/bot/models/interfaces/pipeline.interface.dart';
+import 'package:bottino_fortino/modules/bot/models/orders_pair.dart';
+import 'package:bottino_fortino/modules/settings/models/api_connection.dart';
+import 'package:bottino_fortino/modules/settings/providers/settings.provider.dart';
+import 'package:bottino_fortino/providers/pipeline.provider.dart';
+import 'package:bottino_fortino/providers/snackbar.provider.dart';
+import 'package:bottino_fortino/utils/extensions/datetime.extension.dart';
+
+import 'package:clock/clock.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
+
+part 'minimize_losses.pipeline.freezed.dart';
 
 @freezed
 class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {

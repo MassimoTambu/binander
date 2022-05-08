@@ -1,4 +1,10 @@
-part of dashboard_module;
+import 'package:bottino_fortino/modules/dashboard/providers/bot_tile.provider.dart';
+import 'package:bottino_fortino/modules/dashboard/widgets/bot_tile/bot_tile_buttons.dart';
+import 'package:bottino_fortino/modules/dashboard/widgets/bot_tile/bot_tile_chips.dart';
+import 'package:bottino_fortino/modules/dashboard/widgets/bot_tile_orders/bot_tile_orders.dart';
+import 'package:bottino_fortino/modules/dashboard/widgets/total_gains_chip.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class BotTile extends ConsumerWidget {
   const BotTile({Key? key}) : super(key: key);

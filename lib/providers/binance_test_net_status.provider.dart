@@ -1,4 +1,6 @@
-part of providers;
+import 'package:bottino_fortino/api/api.dart';
+import 'package:bottino_fortino/modules/settings/providers/settings.provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final binanceTestNetStatusProvider =
     FutureProvider.autoDispose<ApiResponse<AccountInformation>>((ref) async {

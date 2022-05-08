@@ -1,4 +1,5 @@
-part of dashboard_module;
+import 'package:bottino_fortino/modules/bot/models/orders_pair.dart';
+import 'package:flutter/material.dart';
 
 class GainsChip extends StatelessWidget {
   final Iterable<OrdersPair> _orderPairs;

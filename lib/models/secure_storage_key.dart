@@ -1,5 +1,3 @@
-part of models;
-
 class SecureStorageKey {
   final String name;
 

@@ -1,4 +1,10 @@
-part of widgets;
+import 'package:bottino_fortino/modules/settings/models/api_connection.dart';
+import 'package:bottino_fortino/modules/settings/providers/settings.provider.dart';
+import 'package:bottino_fortino/providers/binance_account_information.provider.dart';
+import 'package:bottino_fortino/widgets/crypto_info/crypto_info_tile.dart';
+import 'package:bottino_fortino/widgets/detailed_error_box.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final isTestNetProvider = Provider<bool>((ref) => throw UnimplementedError());
 
@@ -27,7 +33,7 @@ class CryptoInfo extends ConsumerWidget {
                 currentAccountBalance
                     .overrideWithValue(data.body.balances[index])
               ],
-              child: const _CryptoInfoTile(),
+              child: const CryptoInfoTile(),
             );
           }),
         );

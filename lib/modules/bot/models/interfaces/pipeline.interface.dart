@@ -1,4 +1,5 @@
-part of bot;
+import 'package:bottino_fortino/modules/bot/models/bot.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 abstract class Pipeline {
   final Ref ref;

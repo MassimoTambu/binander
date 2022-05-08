@@ -1,4 +1,4 @@
-part of utils;
+import 'package:intl/intl.dart';
 
 class DateTimeUtils {
   static String toHmsddMMy(DateTime dateTime) {

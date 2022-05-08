@@ -1,9 +1,9 @@
-part of dashboard_module;
+import 'package:flutter/material.dart';
 
-class _CryptoInfoTitle extends StatelessWidget {
+class CryptoInfoTitle extends StatelessWidget {
   final String title;
 
-  const _CryptoInfoTitle(
+  const CryptoInfoTitle(
     this.title, {
     Key? key,
   }) : super(key: key);

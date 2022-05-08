@@ -1,9 +1,10 @@
-library app_router;
-
 import 'package:auto_route/auto_route.dart';
 import 'package:bottino_fortino/api/api.dart';
-import 'package:bottino_fortino/modules/dashboard/dashboard.dart';
-import 'package:bottino_fortino/modules/settings/settings.dart';
+import 'package:bottino_fortino/modules/dashboard/pages/create_bot.page.dart';
+import 'package:bottino_fortino/modules/dashboard/pages/dashboard.page.dart';
+import 'package:bottino_fortino/modules/dashboard/pages/order_detail.page.dart';
+import 'package:bottino_fortino/modules/settings/pages/binance_api_settings.page.dart';
+import 'package:bottino_fortino/modules/settings/pages/settings.page.dart';
 import 'package:flutter/material.dart';
 
 part 'app_router.gr.dart';

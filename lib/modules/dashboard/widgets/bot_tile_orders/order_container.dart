@@ -1,4 +1,9 @@
-part of dashboard_module;
+import 'package:bottino_fortino/api/api.dart';
+import 'package:bottino_fortino/modules/dashboard/widgets/bot_tile_orders/order_status_indicator.dart';
+import 'package:bottino_fortino/router/app_router.dart';
+import 'package:auto_route/auto_route.dart';
+import 'package:bottino_fortino/utils/datetime.utils.dart';
+import 'package:flutter/material.dart';
 
 class OrderContainer extends StatelessWidget {
   final Order _order;

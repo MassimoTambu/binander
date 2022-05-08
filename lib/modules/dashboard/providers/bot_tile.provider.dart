@@ -1,4 +1,8 @@
-part of dashboard_module;
+import 'package:bottino_fortino/modules/bot/models/bot_phases.enum.dart';
+import 'package:bottino_fortino/modules/bot/models/interfaces/pipeline.interface.dart';
+import 'package:bottino_fortino/modules/bot/models/orders_pair.dart';
+import 'package:bottino_fortino/modules/dashboard/models/orders_order.enum.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final botTileProvider =
     StateNotifierProvider<BotTileProvider, List<OrdersPair>>(

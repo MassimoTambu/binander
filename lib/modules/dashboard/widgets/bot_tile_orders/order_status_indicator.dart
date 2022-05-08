@@ -1,4 +1,5 @@
-part of dashboard_module;
+import 'package:bottino_fortino/api/api.dart';
+import 'package:flutter/material.dart';
 
 class OrderStatusIndicator extends StatelessWidget {
   final IconData _icon;

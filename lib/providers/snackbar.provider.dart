@@ -1,4 +1,6 @@
-part of providers;
+import 'package:bottino_fortino/models/constants/globals.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final snackBarProvider = Provider<SnackBarProvider>((ref) {
   return SnackBarProvider();

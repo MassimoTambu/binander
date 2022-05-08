@@ -1,4 +1,8 @@
-part of dashboard_module;
+import 'package:bottino_fortino/modules/bot/models/bot_types.enum.dart';
+import 'package:bottino_fortino/providers/pipeline.provider.dart';
+import 'package:bottino_fortino/providers/snackbar.provider.dart';
+import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final createBotProvider =
     StateNotifierProvider<CreateBotProvider, BotTypes>((ref) {

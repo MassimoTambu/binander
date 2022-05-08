@@ -1,4 +1,4 @@
-part of models;
+import 'package:flutter/material.dart';
 
 final themeLight = ThemeData(
   colorScheme: const ColorScheme(

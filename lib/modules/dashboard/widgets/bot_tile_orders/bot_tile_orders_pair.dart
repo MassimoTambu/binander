@@ -1,4 +1,8 @@
-part of dashboard_module;
+import 'package:bottino_fortino/modules/dashboard/providers/bot_order_tile.provider.dart';
+import 'package:bottino_fortino/modules/dashboard/widgets/bot_tile_orders/order_container.dart';
+import 'package:bottino_fortino/modules/dashboard/widgets/total_gains_chip.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class BotTileOrdersPair extends ConsumerWidget {
   const BotTileOrdersPair({Key? key}) : super(key: key);

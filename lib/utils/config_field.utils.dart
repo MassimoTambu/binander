@@ -1,4 +1,6 @@
-part of utils;
+import 'package:bottino_fortino/models/enums/config_field_validators_types.enum.dart';
+import 'package:flutter/material.dart';
+import 'package:form_builder_validators/form_builder_validators.dart';
 
 class ConfigFieldUtils {
   static List<String? Function(String?)> toFormBuilderValidators(

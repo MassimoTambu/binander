@@ -1,4 +1,9 @@
-part of settings_module;
+import 'package:bottino_fortino/models/secure_storage_key.dart';
+import 'package:bottino_fortino/modules/settings/models/api_connection.dart';
+import 'package:bottino_fortino/modules/settings/models/settings.dart';
+import 'package:bottino_fortino/providers/memory_storage.provider.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final settingsProvider =
     StateNotifierProvider<SettingsProvider, Settings>((ref) {

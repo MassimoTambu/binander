@@ -1,4 +1,8 @@
-part of bot;
+import 'dart:async';
+
+import 'package:bottino_fortino/modules/bot/models/bot_phases.enum.dart';
+import 'package:bottino_fortino/modules/bot/models/bot_status.dart';
+import 'package:bottino_fortino/modules/bot/models/orders_history.dart';
 
 abstract class PipelineData {
   final OrdersHistory ordersHistory;

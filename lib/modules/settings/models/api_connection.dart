@@ -1,4 +1,6 @@
-part of settings_module;
+import 'package:freezed_annotation/freezed_annotation.dart';
+
+part 'api_connection.freezed.dart';
 
 @freezed
 class ApiConnection with _$ApiConnection {

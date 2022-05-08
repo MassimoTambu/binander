@@ -1,7 +1,10 @@
-part of dashboard_module;
+import 'package:bottino_fortino/modules/dashboard/widgets/crypto_info_container/crypto_info_title.dart';
+import 'package:bottino_fortino/widgets/crypto_info/crypto_info.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class _CryptoInfoContainer extends ConsumerWidget {
-  const _CryptoInfoContainer({Key? key}) : super(key: key);
+class CryptoInfoContainer extends ConsumerWidget {
+  const CryptoInfoContainer({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -21,7 +24,7 @@ class _CryptoInfoContainer extends ConsumerWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const _CryptoInfoTitle('Pub Net'),
+                  const CryptoInfoTitle('Pub Net'),
                   SizedBox(
                     width: MediaQuery.of(context).size.width / 2,
                     height: MediaQuery.of(context).size.height / 3,
@@ -35,7 +38,7 @@ class _CryptoInfoContainer extends ConsumerWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const _CryptoInfoTitle('Test Net'),
+                  const CryptoInfoTitle('Test Net'),
                   SizedBox(
                     width: MediaQuery.of(context).size.width / 2,
                     height: MediaQuery.of(context).size.height / 3,

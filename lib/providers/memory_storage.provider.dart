@@ -1,4 +1,7 @@
-part of providers;
+import 'package:bottino_fortino/models/secure_storage_key.dart';
+import 'package:bottino_fortino/providers/secure_storage.provider.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final memoryStorageProvider =
     StateNotifierProvider<MemoryStorageProvider, Map<String, String>>((ref) {

@@ -1,4 +1,6 @@
-part of models;
+import 'package:bottino_fortino/models/config_field.dart';
+import 'package:bottino_fortino/models/enums/config_field_types.enum.dart';
+import 'package:bottino_fortino/models/enums/config_field_validators_types.enum.dart';
 
 class SelectField extends ConfigField {
   final List<String> items;

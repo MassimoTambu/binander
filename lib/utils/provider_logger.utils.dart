@@ -1,4 +1,5 @@
-part of utils;
+import 'package:flutter/foundation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class ProviderLoggerUtils extends ProviderObserver {
   @override

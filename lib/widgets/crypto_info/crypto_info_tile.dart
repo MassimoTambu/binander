@@ -1,10 +1,12 @@
-part of widgets;
+import 'package:bottino_fortino/api/api.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final currentAccountBalance =
     Provider<AccountBalance>((ref) => throw UnimplementedError());
 
-class _CryptoInfoTile extends ConsumerWidget {
-  const _CryptoInfoTile({Key? key}) : super(key: key);
+class CryptoInfoTile extends ConsumerWidget {
+  const CryptoInfoTile({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

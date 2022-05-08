@@ -1,6 +1,8 @@
 import 'package:bottino_fortino/api/api.dart';
-import 'package:bottino_fortino/modules/bot/bot.dart';
-import 'package:bottino_fortino/providers/providers.dart';
+import 'package:bottino_fortino/modules/bot/models/bot.dart';
+import 'package:bottino_fortino/modules/bot/models/bot_phases.enum.dart';
+import 'package:bottino_fortino/providers/pipeline.provider.dart';
+import 'package:bottino_fortino/providers/secure_storage.provider.dart';
 import 'package:clock/clock.dart';
 import 'package:fake_async/fake_async.dart';
 import 'package:flutter/widgets.dart';

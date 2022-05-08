@@ -1,4 +1,7 @@
-part of bot;
+import 'package:bottino_fortino/api/api.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
+
+part 'orders_pair.freezed.dart';
 
 @freezed
 class OrdersPair with _$OrdersPair {

@@ -1,5 +1,3 @@
-part of utils;
-
 class ParseUtils {
   static int stringToInt(String number) {
     return int.parse(number);

@@ -1,4 +1,6 @@
-part of widgets;
+import 'package:bottino_fortino/api/api.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class BinanceStatusIndicator<T> extends ConsumerWidget {
   final String title;
