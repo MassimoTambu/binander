@@ -8,8 +8,13 @@ class GainsChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (_orderPairs.isEmpty) {
+      return Container();
+    }
+
     final totalGains =
         _orderPairs.map((op) => op.gains).reduce((acc, g) => acc + g);
+
     return Chip(
       label: Row(
         mainAxisSize: MainAxisSize.min,
