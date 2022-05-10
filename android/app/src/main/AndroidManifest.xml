@@ -2,7 +2,7 @@
     package="com.example.bottino_fortino">
    <application
         android:label="bottino_fortino"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/launcher_icon">
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"
