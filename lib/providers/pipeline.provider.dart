@@ -44,7 +44,7 @@ class PipelineProvider extends StateNotifier<List<Pipeline>> {
         bot = createMinimizeLossesBot(
           name: fields[Bot.botNameName]!.value,
           testNet: fields[Bot.testNetName]!.value,
-          symbol: fields[MinimizeLossesConfig.symbolName]!.value,
+          symbol: CryptoSymbol(fields[MinimizeLossesConfig.symbolName]!.value),
           dailyLossSellOrders: int.parse(
               fields[MinimizeLossesConfig.dailyLossSellOrdersName]!.value),
           maxInvestmentPerOrder: double.parse(
