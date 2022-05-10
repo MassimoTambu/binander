@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:bottino_fortino/api/api.dart';
 import 'package:bottino_fortino/modules/bot/models/bot.dart';
@@ -12,6 +13,7 @@ import 'package:bottino_fortino/modules/settings/providers/settings.provider.dar
 import 'package:bottino_fortino/providers/pipeline.provider.dart';
 import 'package:bottino_fortino/providers/snackbar.provider.dart';
 import 'package:bottino_fortino/utils/extensions/datetime.extension.dart';
+import 'package:bottino_fortino/utils/extensions/double.extension.dart';
 
 import 'package:clock/clock.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -126,6 +128,7 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
     }
 
     bot.pipelineData.buyOrderStartedAt = null;
+    bot.pipelineData.lastAveragePrice = null;
     bot.pipelineData.lastBuyOrder = null;
     bot.pipelineData.lastSellOrder = null;
 
@@ -188,6 +191,9 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
     bot.pipelineData.lastBuyOrder = await _getBuyOrder();
 
     if (bot.pipelineData.lastBuyOrder!.status == OrderStatus.FILLED) {
+      bot.pipelineData.ordersHistory.orderPairs
+          .add(OrdersPair(buyOrder: bot.pipelineData.lastBuyOrder!));
+
       timer.cancel();
 
       changeStatusTo(BotPhases.online, 'buy order has been filled');
@@ -209,6 +215,7 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
     _incrementPipelineCounter();
 
     bot.pipelineData.lastAveragePrice = await _getCurrentCryptoPrice();
+    print(bot.pipelineData.lastAveragePrice!.price);
 
     if (bot.pipelineData.lastSellOrder == null) {
       await _trySubmitSellOrder();
@@ -243,8 +250,9 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
           orderData: (orderData) => Future.value(orderData),
           orElse: () => _getSellOrder());
 
-      final ordersPair = OrdersPair(buyOrder: buyOrder, sellOrder: sellOrder);
-      bot.pipelineData.ordersHistory.orderPairs.add(ordersPair);
+      final ordersPair = bot.pipelineData.ordersHistory.orderPairs.last
+          .copyWith(buyOrder: buyOrder, sellOrder: sellOrder);
+      bot.pipelineData.ordersHistory.orderPairs.last = ordersPair;
 
       var reason = 'Sell order executed';
 
@@ -325,7 +333,7 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
   /// Submit a new Buy Order with the last average price approximated
   Future<OrderNew> _submitBuyOrder(double rightPairQty) async {
     final currentApproxPrice =
-        _approxPrice(bot.pipelineData.lastAveragePrice!.price);
+        bot.pipelineData.lastAveragePrice!.price.floorToDoubleWithDecimals(2);
     final res = await ref.read(apiProvider).spot.trade.newOrder(
         _getApiConnection(),
         bot.config.symbol!,
@@ -364,7 +372,8 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
   }
 
   Future<OrderNew> _submitSellOrder() async {
-    final currentApproxPrice = _approxPrice(_calculateNewOrderPrice());
+    final currentApproxPrice =
+        _calculateNewOrderPrice().floorToDoubleWithDecimals(2);
 
     final res = await ref.read(apiProvider).spot.trade.newOrder(
         _getApiConnection(),
@@ -422,11 +431,6 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
     final lastBuyOrder = bot.pipelineData.lastBuyOrder!;
     return lastAveragePrice.price -
         (lastBuyOrder.price * bot.config.percentageSellOrder! / 100);
-  }
-
-  /// Approximate price's second number after comma to floor
-  double _approxPrice(double price) {
-    return (price * 100).floorToDouble() / 100;
   }
 
   bool _hasReachDailySellLossLimit() {
