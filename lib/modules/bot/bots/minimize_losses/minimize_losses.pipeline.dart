@@ -215,7 +215,6 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
     _incrementPipelineCounter();
 
     bot.pipelineData.lastAveragePrice = await _getCurrentCryptoPrice();
-    print(bot.pipelineData.lastAveragePrice!.price);
 
     if (bot.pipelineData.lastSellOrder == null) {
       await _trySubmitSellOrder();

@@ -688,7 +688,8 @@ void main() {
       expect(bot.pipelineData.pipelineCounter, 2);
       expect(bot.pipelineData.lastSellOrder, isNull);
       expect(bot.pipelineData.lastBuyOrder?.status, OrderStatus.FILLED);
-      expect(bot.pipelineData.ordersHistory.orderPairs.length, 0);
+      expect(bot.pipelineData.ordersHistory.orderPairs.length, 1);
+      expect(bot.pipelineData.ordersHistory.orderPairs.first.sellOrder, isNull);
 
       async.elapse(const Duration(seconds: 20));
 
