@@ -20,12 +20,6 @@ class PipelineProvider extends StateNotifier<List<Pipeline>> {
   final Ref _ref;
 
   PipelineProvider(this._ref) : super([]) {
-    _ref.listen<Map<String, dynamic>>(fileStorageProvider.select((p) => p.data),
-        (previous, next) {
-      // We can prevent reloading by storinh the hashCode in json and then analyze them
-      _loadBotsFromFile(next);
-    });
-
     _loadBotsFromFile(_ref.watch(fileStorageProvider).data);
   }
 

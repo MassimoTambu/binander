@@ -44,7 +44,7 @@ class FileStorageProvider {
     }
   }
 
-  void upsertBots(List<Bot> bots) {
+  void upsertBots(Iterable<Bot> bots) {
     for (var bot in bots) {
       _upsertBot(bot);
     }
