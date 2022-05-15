@@ -2,13 +2,15 @@ part of api;
 
 @freezed
 class Order with _$Order {
-  const factory Order.orderData(
+  const factory Order.data(
     String symbol,
     int orderId,
     int orderListId,
     String clientOrderId,
     @JsonKey(fromJson: ParseUtils.stringToDouble, toJson: ParseUtils.doubleToString)
         double price,
+    @JsonKey(fromJson: ParseUtils.nullStringToDouble, toJson: ParseUtils.nullDoubleToString)
+        double? stopPrice,
 
     /// Original quantity inserted when order was submitted by user (OrderStatus = NEW)
     @JsonKey(fromJson: ParseUtils.stringToDouble, toJson: ParseUtils.doubleToString)
@@ -26,8 +28,6 @@ class Order with _$Order {
     OrderTypes type,
     OrderSides side,
     @JsonKey(fromJson: ParseUtils.stringToDouble, toJson: ParseUtils.doubleToString)
-        double stopPrice,
-    @JsonKey(fromJson: ParseUtils.stringToDouble, toJson: ParseUtils.doubleToString)
         double icebergQty,
     @JsonKey(fromJson: ParseUtils.unixToDateTime, toJson: ParseUtils.dateTimeToUnix)
         DateTime time,
@@ -38,7 +38,7 @@ class Order with _$Order {
         double origQuoteOrderQty,
   ) = OrderData;
 
-  const factory Order.orderNew(
+  const factory Order.newLimit(
     String symbol,
     int orderId,
     int orderListId,
@@ -64,9 +64,9 @@ class Order with _$Order {
     OrderTypes type,
     OrderSides side,
     List<Fill> fills,
-  ) = OrderNew;
+  ) = OrderNewLimit;
 
-  const factory Order.orderCancel(
+  const factory Order.cancel(
     String symbol,
     int orderId,
     int orderListId,
@@ -75,6 +75,8 @@ class Order with _$Order {
         DateTime transactTime,
     @JsonKey(fromJson: ParseUtils.stringToDouble, toJson: ParseUtils.doubleToString)
         double price,
+    @JsonKey(fromJson: ParseUtils.nullStringToDouble, toJson: ParseUtils.nullDoubleToString)
+        double? stopPrice,
 
     /// Original quantity inserted when order was submitted by user (OrderStatus = NEW)
     @JsonKey(fromJson: ParseUtils.stringToDouble, toJson: ParseUtils.doubleToString)

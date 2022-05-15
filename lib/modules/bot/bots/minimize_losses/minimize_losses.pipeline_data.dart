@@ -27,7 +27,7 @@ class MinimizeLossesPipeLineData implements PipelineData {
   AveragePrice? lastAveragePrice;
   DateTime? buyOrderStartedAt;
   Order? lastBuyOrder;
-  Order? lastSellOrder;
+  OrderData? lastSellOrder;
 
   MinimizeLossesPipeLineData({OrdersHistory? ordersHistory})
       : ordersHistory = ordersHistory == null

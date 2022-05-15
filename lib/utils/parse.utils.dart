@@ -15,6 +15,18 @@ class ParseUtils {
     return "$number";
   }
 
+  static double? nullStringToDouble(String? number) {
+    if (number == null) return null;
+
+    return double.parse(number);
+  }
+
+  static String? nullDoubleToString(double? number) {
+    if (number == null) return null;
+
+    return "$number";
+  }
+
   static DateTime unixToDateTime(int unix) {
     return DateTime.fromMillisecondsSinceEpoch(unix, isUtc: true);
   }

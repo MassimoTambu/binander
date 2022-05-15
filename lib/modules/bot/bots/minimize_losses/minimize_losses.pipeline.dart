@@ -215,7 +215,6 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
     _incrementPipelineCounter();
 
     bot.pipelineData.lastAveragePrice = await _getCurrentCryptoPrice();
-    print(bot.pipelineData.lastAveragePrice!.price);
 
     if (bot.pipelineData.lastSellOrder == null) {
       await _trySubmitSellOrder();
@@ -244,11 +243,9 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
     else if (sellOrder.status == OrderStatus.FILLED) {
       // TODO resume a buy order
       final buyOrder = await bot.pipelineData.lastBuyOrder!.maybeMap(
-          orderData: (orderData) => Future.value(orderData),
+          data: (orderData) => Future.value(orderData),
           orElse: () => _getBuyOrder());
-      final sellOrder = await bot.pipelineData.lastSellOrder!.maybeMap(
-          orderData: (orderData) => Future.value(orderData),
-          orElse: () => _getSellOrder());
+      final sellOrder = bot.pipelineData.lastSellOrder!;
 
       final ordersPair = bot.pipelineData.ordersHistory.orderPairs.last
           .copyWith(buyOrder: buyOrder, sellOrder: sellOrder);
@@ -331,14 +328,13 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
   }
 
   /// Submit a new Buy Order with the last average price approximated
-  Future<OrderNew> _submitBuyOrder(double rightPairQty) async {
+  Future<OrderNewLimit> _submitBuyOrder(double rightPairQty) async {
     final currentApproxPrice =
         bot.pipelineData.lastAveragePrice!.price.floorToDoubleWithDecimals(2);
-    final res = await ref.read(apiProvider).spot.trade.newOrder(
+    final res = await ref.read(apiProvider).spot.trade.newLimitOrder(
         _getApiConnection(),
         bot.config.symbol!,
         OrderSides.BUY,
-        OrderTypes.LIMIT,
         _calculateBuyOrderQuantity(rightPairQty, currentApproxPrice),
         currentApproxPrice);
 
@@ -361,7 +357,14 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
 
   Future<void> _trySubmitSellOrder() async {
     try {
-      bot.pipelineData.lastSellOrder = await _submitSellOrder();
+      final stopLimitOrder = await _submitStopSellOrder();
+      bot.pipelineData.lastSellOrder = (await ref
+              .read(apiProvider)
+              .spot
+              .trade
+              .getQueryOrder(_getApiConnection(), bot.config.symbol!,
+                  stopLimitOrder.orderId))
+          .body;
     } on ApiException catch (_, __) {
       final message = '${bot.name} - Failed to submit sell order';
 
@@ -371,17 +374,18 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
     }
   }
 
-  Future<OrderNew> _submitSellOrder() async {
-    final currentApproxPrice =
-        _calculateNewOrderPrice().floorToDoubleWithDecimals(2);
+  Future<OrderNewStopLimit> _submitStopSellOrder() async {
+    final price = _calculateNewOrderPrice().floorToDoubleWithDecimals(2);
+    final stopPrice =
+        _calculateNewOrderStopPrice().floorToDoubleWithDecimals(2);
 
-    final res = await ref.read(apiProvider).spot.trade.newOrder(
+    final res = await ref.read(apiProvider).spot.trade.newStopLimitOrder(
         _getApiConnection(),
         bot.config.symbol!,
         OrderSides.SELL,
-        OrderTypes.LIMIT,
         bot.pipelineData.lastBuyOrder!.executedQty,
-        currentApproxPrice);
+        price,
+        stopPrice);
     return res.body;
   }
 
@@ -423,14 +427,22 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
   }
 
   bool _hasToMoveOrder() {
-    return _calculateNewOrderPrice() > bot.pipelineData.lastSellOrder!.price;
+    return _calculateNewOrderStopPrice() >
+        bot.pipelineData.lastSellOrder!.stopPrice!;
   }
 
   double _calculateNewOrderPrice() {
-    final lastAveragePrice = bot.pipelineData.lastAveragePrice!;
-    final lastBuyOrder = bot.pipelineData.lastBuyOrder!;
-    return lastAveragePrice.price -
-        (lastBuyOrder.price * bot.config.percentageSellOrder! / 100);
+    final lastAveragePrice = bot.pipelineData.lastAveragePrice!.price;
+    final lastBuyOrder = bot.pipelineData.lastBuyOrder!.price;
+    return lastAveragePrice -
+        (lastBuyOrder * (bot.config.percentageSellOrder! + 1) / 100);
+  }
+
+  double _calculateNewOrderStopPrice() {
+    final lastAveragePrice = bot.pipelineData.lastAveragePrice!.price;
+    final lastBuyOrder = bot.pipelineData.lastBuyOrder!.price;
+    return lastAveragePrice -
+        (lastBuyOrder * bot.config.percentageSellOrder! / 100);
   }
 
   bool _hasReachDailySellLossLimit() {
@@ -438,9 +450,9 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
         bot.pipelineData.ordersHistory.lossesOnly.where(
       (o) {
         final dateTime = o.sellOrder?.map(
-          orderData: (dataOrder) => dataOrder.updateTime,
-          orderNew: (_) => null,
-          orderCancel: (_) => null,
+          data: (dataOrder) => dataOrder.updateTime,
+          newLimit: (_) => null,
+          cancel: (_) => null,
         );
 
         if (dateTime == null) return false;

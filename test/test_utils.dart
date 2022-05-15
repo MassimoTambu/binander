@@ -39,7 +39,7 @@ class TestUtils {
         ),
       );
 
-  static OrderNew createOrderNew({
+  static OrderNewLimit createOrderNewLimit({
     String symbol = defaultSymbol,
     int orderId = 1,
     int orderListId = 1,
@@ -49,7 +49,7 @@ class TestUtils {
     required OrderSides orderSides,
   }) {
     final cryptoSymbol = CryptoSymbol(symbol);
-    return OrderNew(
+    return OrderNewLimit(
         cryptoSymbol.toString(),
         orderId,
         orderListId,
@@ -66,25 +66,73 @@ class TestUtils {
         [Fill(price, origQty, 0, cryptoSymbol.rightPair, orderId)]);
   }
 
-  static OrderData createOrderData(OrderNew orderNew) => OrderData(
-      orderNew.symbol,
-      orderNew.orderId,
-      orderNew.orderListId,
-      orderNew.clientOrderId,
-      orderNew.price,
-      orderNew.origQty,
-      orderNew.executedQty,
-      orderNew.cummulativeQuoteQty,
-      orderNew.status,
-      orderNew.timeInForce,
-      orderNew.type,
-      orderNew.side,
-      0,
-      0,
+  static OrderNewStopLimit createOrderNewStopLimit({
+    String symbol = defaultSymbol,
+    int orderId = 1,
+    int orderListId = 1,
+    String clientOrderId = '1',
+  }) {
+    final cryptoSymbol = CryptoSymbol(symbol);
+    return OrderNewStopLimit.newStopLimit(
+      cryptoSymbol.toString(),
+      orderId,
+      orderListId,
+      clientOrderId,
       clock.now(),
-      clock.now(),
-      true,
-      0);
+    );
+  }
+
+  static OrderData createOrderDataFromNewLimit(OrderNewLimit orderNew) =>
+      OrderData(
+          orderNew.symbol,
+          orderNew.orderId,
+          orderNew.orderListId,
+          orderNew.clientOrderId,
+          orderNew.price,
+          null,
+          orderNew.origQty,
+          orderNew.executedQty,
+          orderNew.cummulativeQuoteQty,
+          orderNew.status,
+          orderNew.timeInForce,
+          orderNew.type,
+          orderNew.side,
+          0,
+          clock.now(),
+          clock.now(),
+          true,
+          0);
+
+  static OrderData createOrderDataFromNewStopLimit(
+    OrderNewStopLimit orderNew,
+    double price,
+    double stopPrice,
+    double origQty,
+    OrderSides side, {
+    double executedQty = 0,
+    double cummulativeQuoteQty = 0,
+    OrderStatus status = OrderStatus.NEW,
+    TimeInForce timeInForce = TimeInForce.GTC,
+  }) =>
+      OrderData(
+          orderNew.symbol,
+          orderNew.orderId,
+          orderNew.orderListId,
+          orderNew.clientOrderId,
+          price,
+          stopPrice,
+          origQty,
+          executedQty,
+          cummulativeQuoteQty,
+          status,
+          timeInForce,
+          OrderTypes.STOP_LOSS_LIMIT,
+          side,
+          0,
+          clock.now(),
+          clock.now(),
+          true,
+          0);
 
   static OrderCancel createOrderCancel(OrderData order) => OrderCancel(
       order.symbol,
@@ -93,6 +141,7 @@ class TestUtils {
       order.clientOrderId,
       clock.now(),
       order.price,
+      null,
       order.origQty,
       order.executedQty,
       order.cummulativeQuoteQty,

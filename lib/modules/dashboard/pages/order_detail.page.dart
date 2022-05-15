@@ -21,17 +21,33 @@ class OrderDetailPage extends StatelessWidget {
       'Status: ${_order.status.name}',
       'Type: ${_order.type.name}',
       ..._order.map(
-        orderData: (o) => [
+        data: (o) => [
           'Time: ${DateTimeUtils.toHmsddMMy(o.time)}',
           'Updated time: ${DateTimeUtils.toHmsddMMy(o.updateTime)}',
         ],
-        orderNew: (o) => [
+        newLimit: (o) {
+          final texts = [
+            'Transact time: ${DateTimeUtils.toHmsddMMy(o.transactTime)}'
+          ];
+          if (o.fills.isNotEmpty) {
+            texts.add('Fills:');
+            for (final fill in o.fills) {
+              texts.addAll([
+                '- TradeId: ${fill.tradeId}',
+                '  Commission: ${fill.commission}',
+                '  CommissionAsset: ${fill.commissionAsset}',
+                '  Price: ${fill.price}',
+                '  Qty: ${fill.qty}',
+              ]);
+            }
+          }
+
+          return texts;
+        },
+        cancel: (o) => [
           'Transact time: ${DateTimeUtils.toHmsddMMy(o.transactTime)}',
         ],
-        orderCancel: (o) => [
-          'Transact time: ${DateTimeUtils.toHmsddMMy(o.transactTime)}',
-        ],
-      )
+      ),
     ];
 
     return Scaffold(

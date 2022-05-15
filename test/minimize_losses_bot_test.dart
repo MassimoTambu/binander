@@ -12,6 +12,7 @@ import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
 
 import 'minimize_losses_bot_test.mocks.dart';
+import 'test_order_book.dart';
 import 'test_utils.dart';
 import 'test_wallet.dart';
 
@@ -30,12 +31,10 @@ void main() {
   final mockTradeProvider = MockTradeProvider();
   late ProviderContainer container;
   var wallet = TestWallet([]);
+  var orderBook = TestOrderBook.create(orders: [], getPriceStrategy: () => 0.0);
   late MinimizeLossesBot bot;
 
   const double startPrice = 100.0;
-  final List<OrderData> orders = [];
-  var ordersCount = 0;
-  var getPriceStrategy = () => 0.0;
 
   setUp(() async {
     // For initialize SecureStorage package
@@ -54,8 +53,8 @@ void main() {
 
     // Setup API calls
 
-    when(mockMarketProvider.getAveragePrice(any, any)).thenAnswer(
-        (_) async => ApiResponse(AveragePrice(1, getPriceStrategy()), 200));
+    when(mockMarketProvider.getAveragePrice(any, any)).thenAnswer((_) async =>
+        ApiResponse(AveragePrice(1, orderBook.getPriceStrategy()), 200));
 
     when(mockTradeProvider.getAccountInformation(any)).thenAnswer((_) async =>
         ApiResponse(
@@ -63,146 +62,45 @@ void main() {
                 'SPOT', wallet.balances.toList(), ['SPOT']),
             200));
 
-    when(mockTradeProvider.newOrder(
-            any, any, OrderSides.BUY, OrderTypes.LIMIT, any, any))
+    when(mockTradeProvider.newLimitOrder(any, any, OrderSides.BUY, any, any))
         .thenAnswer(
       (i) async {
-        ordersCount++;
-        final buyOrder = TestUtils.createOrderNew(
-            orderId: ordersCount,
-            orderListId: ordersCount,
-            clientOrderId: '$ordersCount',
-            price: i.positionalArguments[5],
-            origQty: i.positionalArguments[4],
-            orderSides: OrderSides.BUY);
+        final buyOrder = orderBook.addNewLimitOrder(
+          wallet,
+          price: i.positionalArguments[4],
+          origQty: i.positionalArguments[3],
+        );
 
-        wallet.balances = wallet.balances.map((b) {
-          if (buyOrder.symbol.endsWith(b.asset)) {
-            final cummulativeQuoteQty = buyOrder.price * buyOrder.origQty;
-            return b.copyWith(
-              free: b.free - cummulativeQuoteQty,
-              locked: b.locked + cummulativeQuoteQty,
-            );
-          }
-          return b;
-        }).toList();
-
-        orders.add(TestUtils.createOrderData(buyOrder));
         return ApiResponse(buyOrder, 201);
       },
     );
 
-    when(mockTradeProvider.newOrder(
-            any, any, OrderSides.SELL, OrderTypes.LIMIT, any, any))
+    when(mockTradeProvider.newStopLimitOrder(
+            any, any, OrderSides.SELL, any, any, any))
         .thenAnswer(
       (i) async {
-        ordersCount++;
-        final sellOrder = TestUtils.createOrderNew(
-            orderId: ordersCount,
-            orderListId: ordersCount,
-            clientOrderId: '$ordersCount',
-            price: i.positionalArguments[5],
-            origQty: i.positionalArguments[4],
-            orderSides: OrderSides.SELL);
+        final stopSellOrder = orderBook.addNewStopLimitOrder(
+          wallet,
+          price: i.positionalArguments[4],
+          stopPrice: i.positionalArguments[5],
+          origQty: i.positionalArguments[3],
+        );
 
-        wallet.balances = wallet.balances.map((b) {
-          if (sellOrder.symbol.startsWith(b.asset)) {
-            return b.copyWith(
-              free: b.free - sellOrder.origQty,
-              locked: b.locked + sellOrder.origQty,
-            );
-          }
-          return b;
-        }).toList();
-
-        orders.add(TestUtils.createOrderData(sellOrder));
-        return ApiResponse(sellOrder, 201);
+        return ApiResponse(stopSellOrder, 201);
       },
     );
 
     when(mockTradeProvider.getQueryOrder(any, any, any)).thenAnswer(
       (i) async {
-        final order =
-            orders.where((o) => o.orderId == i.positionalArguments[2]).map((o) {
-          if (o.status == OrderStatus.FILLED) return o;
-
-          final currentPrice = getPriceStrategy();
-          if ((o.side == OrderSides.BUY && currentPrice >= o.price) ||
-              (o.side == OrderSides.SELL && currentPrice <= o.price)) {
-            final updatedOrderData = o.copyWith(
-                status: OrderStatus.FILLED,
-                cummulativeQuoteQty: o.origQty * o.price,
-                executedQty: o.origQty);
-
-            wallet.balances = wallet.balances.map((b) {
-              // Check whether balance has been used in this order and if so update the account wallet
-              if (updatedOrderData.side == OrderSides.BUY) {
-                if (updatedOrderData.symbol.startsWith(b.asset)) {
-                  return b.copyWith(
-                      free: b.free + updatedOrderData.executedQty);
-                }
-                if (updatedOrderData.symbol.endsWith(b.asset)) {
-                  return b.copyWith(
-                      locked: b.locked - updatedOrderData.cummulativeQuoteQty);
-                }
-              }
-              if (updatedOrderData.side == OrderSides.SELL) {
-                if (updatedOrderData.symbol.startsWith(b.asset)) {
-                  return b.copyWith(
-                      locked: b.locked - updatedOrderData.executedQty);
-                }
-                if (updatedOrderData.symbol.endsWith(b.asset)) {
-                  return b.copyWith(
-                      free: b.free + updatedOrderData.cummulativeQuoteQty);
-                }
-              }
-
-              return b;
-            }).toList();
-
-            return updatedOrderData;
-          }
-
-          return o;
-        }).first;
-
-        // Update with new OrderData
-        orders.removeAt(orders.indexWhere((o) => order.orderId == o.orderId));
-        orders.add(order);
-
+        final order = orderBook.updateOrder(wallet, i.positionalArguments[2]);
         return ApiResponse(order, 201);
       },
     );
 
     when(mockTradeProvider.cancelOrder(any, any, any)).thenAnswer(
       (i) async {
-        final orderIndex =
-            orders.indexWhere((o) => o.orderId == i.positionalArguments[2]);
-        final order = orders.removeAt(orderIndex);
-
-        final orderCancel = TestUtils.createOrderCancel(order);
-
-        wallet.balances = wallet.balances.map((b) {
-          // Check whether balance has been used in this order and if so update the account wallet
-          if (orderCancel.side == OrderSides.BUY) {
-            if (orderCancel.symbol.endsWith(b.asset)) {
-              final cummulativeQuoteQty =
-                  orderCancel.price * orderCancel.origQty;
-              return b.copyWith(
-                  free: b.free + cummulativeQuoteQty,
-                  locked: b.locked - cummulativeQuoteQty);
-            }
-          }
-          if (orderCancel.side == OrderSides.SELL) {
-            if (orderCancel.symbol.startsWith(b.asset)) {
-              return b.copyWith(
-                  free: b.free + orderCancel.origQty,
-                  locked: b.locked - orderCancel.origQty);
-            }
-          }
-
-          return b;
-        }).toList();
+        final orderCancel =
+            orderBook.removeOrder(wallet, i.positionalArguments[2]);
 
         return ApiResponse(orderCancel, 201);
       },
@@ -216,9 +114,7 @@ void main() {
     reset(mockMarketProvider);
     reset(mockTradeProvider);
     container.dispose();
-    ordersCount = 0;
-    orders.removeWhere((_) => true);
-    getPriceStrategy = () => 0.0;
+    orderBook.reset();
     wallet.balances = [];
   });
 
@@ -238,28 +134,30 @@ void main() {
 
   test('Submit buy order and sell order, then close sell order in profit',
       () async {
-    getPriceStrategy = () {
-      // First lap is for buy order submission without filling it.
-      // The second one it will fill the buy order.
-      // Third lap will submit a sell order.
-      // Fourth lap is for trigger sell order.
-      if (bot.pipelineData.pipelineCounter == 1) {
-        return startPrice;
-      }
-      if (bot.pipelineData.pipelineCounter == 2) {
-        expect(bot.pipelineData.lastBuyOrder, isNotNull);
-        return startPrice;
-      }
-      if (bot.pipelineData.pipelineCounter == 3) {
-        expect(bot.pipelineData.lastBuyOrder, isNotNull);
-        expect(bot.pipelineData.lastBuyOrder!.status, OrderStatus.FILLED);
-        return 125;
-      }
+    orderBook = TestOrderBook.create(
+        orders: [],
+        getPriceStrategy: () {
+          // First lap is for buy order submission without filling it.
+          // The second one it will fill the buy order.
+          // Third lap will submit a sell order.
+          // Fourth lap is for trigger sell order.
+          if (bot.pipelineData.pipelineCounter == 1) {
+            return startPrice;
+          }
+          if (bot.pipelineData.pipelineCounter == 2) {
+            expect(bot.pipelineData.lastBuyOrder, isNotNull);
+            return startPrice;
+          }
+          if (bot.pipelineData.pipelineCounter == 3) {
+            expect(bot.pipelineData.lastBuyOrder, isNotNull);
+            expect(bot.pipelineData.lastBuyOrder!.status, OrderStatus.FILLED);
+            return 125;
+          }
 
-      expect(bot.pipelineData.lastSellOrder, isNotNull);
-      expect(bot.pipelineData.lastSellOrder!.status, OrderStatus.NEW);
-      return 120;
-    };
+          expect(bot.pipelineData.lastSellOrder, isNotNull);
+          expect(bot.pipelineData.lastSellOrder!.status, OrderStatus.NEW);
+          return 120;
+        });
 
     wallet.balances = TestUtils.fillWalletWithAccountBalances();
     bot = TestUtils.createMinimizeLossesBot(maxInvestmentPerOrder: 200);
@@ -283,9 +181,9 @@ void main() {
       expect(bot.pipelineData.ordersHistory.profitsOnly.length, 1);
       // No losses
       expect(bot.pipelineData.ordersHistory.lossesOnly.length, 0);
-      expect(bot.pipelineData.ordersHistory.getTotalGains(), 44);
+      expect(bot.pipelineData.ordersHistory.getTotalGains(), 42);
       final testAsset = wallet.findBalanceByAsset('USDT');
-      expect(TestUtils.approxPriceToFloor(testAsset.free), 1044);
+      expect(TestUtils.approxPriceToFloor(testAsset.free), 1042);
       expect(testAsset.locked, 0);
       // There should not be any locked asset
       expect(getAllLockedAssetFromWallet(), 0);
@@ -294,18 +192,20 @@ void main() {
 
   test('Submit buy order and sell order, then close sell order in loss',
       () async {
-    getPriceStrategy = () {
-      // First lap is for buy order submission without filling it.
-      // The second one it will fill the buy order.
-      // Third lap the price will be lower to submitting sell order.
-      // Fourth lap is for trigger sell order.
-      if (bot.pipelineData.pipelineCounter == 1 ||
-          bot.pipelineData.pipelineCounter == 2) {
-        return startPrice;
-      }
-      if (bot.pipelineData.pipelineCounter == 3) return 90;
-      return 80;
-    };
+    orderBook = TestOrderBook.create(
+        orders: [],
+        getPriceStrategy: () {
+          // First lap is for buy order submission without filling it.
+          // The second one it will fill the buy order.
+          // Third lap the price will be lower to submitting sell order.
+          // Fourth lap is for trigger sell order.
+          if (bot.pipelineData.pipelineCounter == 1 ||
+              bot.pipelineData.pipelineCounter == 2) {
+            return startPrice;
+          }
+          if (bot.pipelineData.pipelineCounter == 3) return 90;
+          return 80;
+        });
 
     wallet.balances = TestUtils.fillWalletWithAccountBalances();
     bot = TestUtils.createMinimizeLossesBot();
@@ -329,9 +229,9 @@ void main() {
       expect(bot.pipelineData.ordersHistory.lossesOnly.length, 1);
       // No profits
       expect(bot.pipelineData.ordersHistory.profitsOnly.length, 0);
-      expect(bot.pipelineData.ordersHistory.getTotalGains(), -13);
+      expect(bot.pipelineData.ordersHistory.getTotalGains(), -14);
       final testAsset = wallet.findBalanceByAsset('USDT');
-      expect(TestUtils.approxPriceToFloor(testAsset.free), 987);
+      expect(TestUtils.approxPriceToFloor(testAsset.free), 986);
       expect(testAsset.locked, 0);
       // There should not be any locked asset
       expect(getAllLockedAssetFromWallet(), 0);
@@ -341,19 +241,22 @@ void main() {
   test(
       'Submit buy order, reach buy order limit, cancel buy order and submit it again with the new actual price. Then place a sell order and sell it in profit',
       () async {
-    getPriceStrategy = () {
-      // First lap is for buy order submission without filling it.
-      // The second one it will fill the buy order.
-      // From second to ninth the price will remain the same.
-      // The ninth lap the buy order will be cancelled.
-      // Tenth lap will be submitted another buy order and
-      // the eleventh will be fill it.
-      // From twelfth lap the price will be lower to trigger sell price (in profit).
-      if (bot.pipelineData.pipelineCounter == 1) return startPrice;
-      if (bot.pipelineData.pipelineCounter <= 9) return 90;
-      if (bot.pipelineData.pipelineCounter <= 11) return startPrice;
-      return 90;
-    };
+    orderBook = TestOrderBook.create(
+        orders: [],
+        getPriceStrategy: () {
+          // First lap is for buy order submission without filling it.
+          // The second one it will fill the buy order.
+          // From second to ninth the price will remain the same.
+          // The ninth lap the buy order will be cancelled.
+          // Tenth lap will be submitted another buy order and
+          // the eleventh will be fill it.
+          // Twelfth lap will move sell order higher than before.
+          // From thirteenth lap the price will be lower to trigger sell price (in profit).
+          if (bot.pipelineData.pipelineCounter == 1) return startPrice;
+          if (bot.pipelineData.pipelineCounter <= 11) return 110;
+          if (bot.pipelineData.pipelineCounter == 12) return 125;
+          return 90;
+        });
 
     wallet.balances = TestUtils.fillWalletWithAccountBalances();
     bot = TestUtils.createMinimizeLossesBot(
@@ -368,41 +271,44 @@ void main() {
       // fake Datetime with clock package
       pipeline.start();
 
-      async.elapse(const Duration(seconds: 102));
+      async.elapse(const Duration(seconds: 112));
 
       // Should be offline
       expect(bot.pipelineData.status.phase, BotPhases.offline);
-      expect(bot.pipelineData.pipelineCounter, 12);
-      expect(bot.pipelineData.ordersHistory.ordersCancelled.length, 1);
+      expect(bot.pipelineData.pipelineCounter, 13);
+      expect(bot.pipelineData.ordersHistory.ordersCancelled.length, 2);
       expect(bot.pipelineData.ordersHistory.orderPairs.length, 1);
       // Is a profit
       expect(bot.pipelineData.ordersHistory.profitsOnly.length, 1);
       // No losses
       expect(bot.pipelineData.ordersHistory.lossesOnly.length, 0);
-      expect(bot.pipelineData.ordersHistory.getTotalGains(), 8.1);
+      expect(bot.pipelineData.ordersHistory.getTotalGains(), 9.53);
       final testAsset = wallet.findBalanceByAsset('USDT');
-      expect(TestUtils.approxPriceToFloor(testAsset.free), 1008.1);
+      // Approximation
+      expect(TestUtils.approxPriceToFloor(testAsset.free), 1009.54);
       expect(testAsset.locked, 0);
       // There should not be any locked asset
       expect(getAllLockedAssetFromWallet(), 0);
 
-      verify(mockTradeProvider.cancelOrder(any, any, any)).called(1);
+      verify(mockTradeProvider.cancelOrder(any, any, any)).called(2);
     });
   });
 
   test('Reach daily loss sell order limit', () async {
-    getPriceStrategy = () {
-      // First lap is for buy order submission without filling it.
-      // The second one it will fill the buy order.
-      // Third lap the price will be lower to submitting sell order.
-      // Fourth lap is for trigger sell order.
-      if (bot.pipelineData.pipelineCounter == 1 ||
-          bot.pipelineData.pipelineCounter == 2) {
-        return startPrice;
-      }
-      if (bot.pipelineData.pipelineCounter == 3) return 90;
-      return 80;
-    };
+    orderBook = TestOrderBook.create(
+        orders: [],
+        getPriceStrategy: () {
+          // First lap is for buy order submission without filling it.
+          // The second one it will fill the buy order.
+          // Third lap the price will be lower to submitting sell order.
+          // Fourth lap is for trigger sell order.
+          if (bot.pipelineData.pipelineCounter == 1 ||
+              bot.pipelineData.pipelineCounter == 2) {
+            return startPrice;
+          }
+          if (bot.pipelineData.pipelineCounter == 3) return 90;
+          return 80;
+        });
 
     wallet.balances = TestUtils.fillWalletWithAccountBalances();
     bot = TestUtils.createMinimizeLossesBot(dailyLossSellOrders: 1);
@@ -426,15 +332,16 @@ void main() {
       expect(bot.pipelineData.ordersHistory.lossesOnly.length, 1);
       // No profits
       expect(bot.pipelineData.ordersHistory.profitsOnly.length, 0);
-      expect(bot.pipelineData.ordersHistory.getTotalGains(), -13);
+      expect(bot.pipelineData.ordersHistory.getTotalGains(), -14);
       final testAsset = wallet.findBalanceByAsset('USDT');
-      expect(TestUtils.approxPriceToFloor(testAsset.free), 987);
+      expect(TestUtils.approxPriceToFloor(testAsset.free), 986);
       expect(testAsset.locked, 0);
       // There should not be any locked asset
       expect(getAllLockedAssetFromWallet(), 0);
 
       verify(mockMarketProvider.getAveragePrice(any, any));
-      verify(mockTradeProvider.newOrder(any, any, any, any, any, any));
+      verify(mockTradeProvider.newLimitOrder(any, any, any, any, any));
+      verify(mockTradeProvider.newStopLimitOrder(any, any, any, any, any, any));
       verify(mockTradeProvider.getQueryOrder(any, any, any));
       verify(mockTradeProvider.getAccountInformation(any));
       verifyNoMoreInteractions(mockMarketProvider);
@@ -454,39 +361,41 @@ void main() {
   test(
       'Run bot three times with the following orders history results: profit, loss, profit',
       () async {
-    getPriceStrategy = () {
-      // First lap is for buy order submission without filling it.
-      // The second one it will fill the buy order.
-      // Third lap will submit a sell order.
-      // Fourth lap is for trigger sell order.
-      if (bot.pipelineData.pipelineCounter == 1 ||
-          bot.pipelineData.pipelineCounter == 2) {
-        return startPrice;
-      }
-      if (bot.pipelineData.pipelineCounter == 3) {
-        return 125;
-      }
-      if (bot.pipelineData.pipelineCounter == 4) {
-        return 120;
-      }
-      // These are the laps for the 2nd bot start
-      if (bot.pipelineData.pipelineCounter == 5 ||
-          bot.pipelineData.pipelineCounter == 6) {
-        return startPrice;
-      }
-      if (bot.pipelineData.pipelineCounter == 7) return 90;
-      if (bot.pipelineData.pipelineCounter == 8) return 80;
-      // 3nd bot start
-      if (bot.pipelineData.pipelineCounter == 9 ||
-          bot.pipelineData.pipelineCounter == 10) {
-        return startPrice;
-      }
-      if (bot.pipelineData.pipelineCounter == 11) {
-        return 125;
-      }
+    orderBook = TestOrderBook.create(
+        orders: [],
+        getPriceStrategy: () {
+          // First lap is for buy order submission without filling it.
+          // The second one it will fill the buy order.
+          // Third lap will submit a sell order.
+          // Fourth lap is for trigger sell order.
+          if (bot.pipelineData.pipelineCounter == 1 ||
+              bot.pipelineData.pipelineCounter == 2) {
+            return startPrice;
+          }
+          if (bot.pipelineData.pipelineCounter == 3) {
+            return 125;
+          }
+          if (bot.pipelineData.pipelineCounter == 4) {
+            return 120;
+          }
+          // These are the laps for the 2nd bot start
+          if (bot.pipelineData.pipelineCounter == 5 ||
+              bot.pipelineData.pipelineCounter == 6) {
+            return startPrice;
+          }
+          if (bot.pipelineData.pipelineCounter == 7) return 90;
+          if (bot.pipelineData.pipelineCounter == 8) return 80;
+          // 3nd bot start
+          if (bot.pipelineData.pipelineCounter == 9 ||
+              bot.pipelineData.pipelineCounter == 10) {
+            return startPrice;
+          }
+          if (bot.pipelineData.pipelineCounter == 11) {
+            return 125;
+          }
 
-      return 120;
-    };
+          return 120;
+        });
 
     wallet.balances = TestUtils.fillWalletWithAccountBalances();
     bot = TestUtils.createMinimizeLossesBot();
@@ -510,7 +419,7 @@ void main() {
       expect(bot.pipelineData.ordersHistory.profitsOnly.length, 1);
       // No losses
       expect(bot.pipelineData.ordersHistory.lossesOnly.length, 0);
-      expect(bot.pipelineData.ordersHistory.getTotalGains(), 22);
+      expect(bot.pipelineData.ordersHistory.getTotalGains(), 21);
 
       expect(bot.pipelineData.timer, isNull);
       expect(bot.pipelineData.lastBuyOrder, isNull);
@@ -528,7 +437,7 @@ void main() {
       expect(bot.pipelineData.ordersHistory.profitsOnly.length, 1);
       // No losses
       expect(bot.pipelineData.ordersHistory.lossesOnly.length, 1);
-      expect(bot.pipelineData.ordersHistory.getTotalGains(), 9);
+      expect(bot.pipelineData.ordersHistory.getTotalGains(), 7);
 
       expect(bot.pipelineData.timer, isNull);
       expect(bot.pipelineData.lastBuyOrder, isNull);
@@ -546,9 +455,9 @@ void main() {
       expect(bot.pipelineData.ordersHistory.profitsOnly.length, 2);
       // No losses
       expect(bot.pipelineData.ordersHistory.lossesOnly.length, 1);
-      expect(bot.pipelineData.ordersHistory.getTotalGains(), 31);
+      expect(bot.pipelineData.ordersHistory.getTotalGains(), 28);
       final testAsset = wallet.findBalanceByAsset('USDT');
-      expect(TestUtils.approxPriceToFloor(testAsset.free), 1031);
+      expect(TestUtils.approxPriceToFloor(testAsset.free), 1028);
       expect(testAsset.locked, 0);
       // There should not be any locked asset
       expect(getAllLockedAssetFromWallet(), 0);
@@ -558,20 +467,22 @@ void main() {
   test(
       'Submit buy order and sell order, move sell order at 7th and 9th lap and sell it in profit at 13th lap',
       () async {
-    getPriceStrategy = () {
-      if (bot.pipelineData.pipelineCounter <= 6) {
-        return startPrice;
-      }
-      if (bot.pipelineData.pipelineCounter == 7 ||
-          bot.pipelineData.pipelineCounter == 8) {
-        return 125;
-      }
-      if (bot.pipelineData.pipelineCounter <= 12) {
-        return 150;
-      }
+    orderBook = TestOrderBook.create(
+        orders: [],
+        getPriceStrategy: () {
+          if (bot.pipelineData.pipelineCounter <= 6) {
+            return startPrice;
+          }
+          if (bot.pipelineData.pipelineCounter == 7 ||
+              bot.pipelineData.pipelineCounter == 8) {
+            return 125;
+          }
+          if (bot.pipelineData.pipelineCounter <= 12) {
+            return 150;
+          }
 
-      return 120;
-    };
+          return 120;
+        });
 
     wallet.balances = TestUtils.fillWalletWithAccountBalances();
     bot = TestUtils.createMinimizeLossesBot();
@@ -595,9 +506,9 @@ void main() {
       expect(bot.pipelineData.ordersHistory.profitsOnly.length, 1);
       // No losses
       expect(bot.pipelineData.ordersHistory.lossesOnly.length, 0);
-      expect(bot.pipelineData.ordersHistory.getTotalGains(), 47);
+      expect(bot.pipelineData.ordersHistory.getTotalGains(), 46);
       final testAsset = wallet.findBalanceByAsset('USDT');
-      expect(TestUtils.approxPriceToFloor(testAsset.free), 1047);
+      expect(TestUtils.approxPriceToFloor(testAsset.free), 1046);
       expect(testAsset.locked, 0);
       // There should not be any locked asset
       expect(getAllLockedAssetFromWallet(), 0);
@@ -609,7 +520,8 @@ void main() {
 
   test('Try to submit a buy order with an asset not stored in wallet',
       () async {
-    getPriceStrategy = () => startPrice;
+    orderBook =
+        TestOrderBook.create(orders: [], getPriceStrategy: () => startPrice);
 
     wallet.balances = TestUtils.fillWalletWithAccountBalances();
     bot = TestUtils.createMinimizeLossesBot(symbol: 'BNB-NAZD');
@@ -642,29 +554,31 @@ void main() {
   test(
       'Submit buy order and sell order, stop the bot and resume it. Finally close sell order in profit',
       () async {
-    getPriceStrategy = () {
-      // First lap is for buy order submission without filling it.
-      // The second one it will fill the buy order.
-      // Third lap will submit a sell order.
-      // Fourth lap is for trigger sell order.
-      if (bot.pipelineData.pipelineCounter == 1) {
-        return startPrice;
-      }
-      if (bot.pipelineData.pipelineCounter == 2) {
-        expect(bot.pipelineData.lastBuyOrder, isNotNull);
-        return startPrice;
-      }
-      if (bot.pipelineData.pipelineCounter == 3) {
-        expect(bot.pipelineData.lastBuyOrder, isNotNull);
-        expect(bot.pipelineData.lastBuyOrder!.status, OrderStatus.FILLED);
-        return 125;
-      }
-      if (bot.pipelineData.pipelineCounter == 4) {
-        return 120;
-      }
+    orderBook = TestOrderBook.create(
+        orders: [],
+        getPriceStrategy: () {
+          // First lap is for buy order submission without filling it.
+          // The second one it will fill the buy order.
+          // Third lap will submit a sell order.
+          // Fourth lap is for trigger sell order.
+          if (bot.pipelineData.pipelineCounter == 1) {
+            return startPrice;
+          }
+          if (bot.pipelineData.pipelineCounter == 2) {
+            expect(bot.pipelineData.lastBuyOrder, isNotNull);
+            return startPrice;
+          }
+          if (bot.pipelineData.pipelineCounter == 3) {
+            expect(bot.pipelineData.lastBuyOrder, isNotNull);
+            expect(bot.pipelineData.lastBuyOrder!.status, OrderStatus.FILLED);
+            return 125;
+          }
+          if (bot.pipelineData.pipelineCounter == 4) {
+            return 120;
+          }
 
-      return 110;
-    };
+          return 110;
+        });
 
     wallet.balances = TestUtils.fillWalletWithAccountBalances();
     bot = TestUtils.createMinimizeLossesBot(maxInvestmentPerOrder: 200);
@@ -688,7 +602,8 @@ void main() {
       expect(bot.pipelineData.pipelineCounter, 2);
       expect(bot.pipelineData.lastSellOrder, isNull);
       expect(bot.pipelineData.lastBuyOrder?.status, OrderStatus.FILLED);
-      expect(bot.pipelineData.ordersHistory.orderPairs.length, 0);
+      expect(bot.pipelineData.ordersHistory.orderPairs.length, 1);
+      expect(bot.pipelineData.ordersHistory.orderPairs.first.sellOrder, isNull);
 
       async.elapse(const Duration(seconds: 20));
 
@@ -705,9 +620,9 @@ void main() {
       expect(bot.pipelineData.ordersHistory.profitsOnly.length, 1);
       // No losses
       expect(bot.pipelineData.ordersHistory.lossesOnly.length, 0);
-      expect(bot.pipelineData.ordersHistory.getTotalGains(), 34);
+      expect(bot.pipelineData.ordersHistory.getTotalGains(), 32);
       final testAsset = wallet.findBalanceByAsset('USDT');
-      expect(TestUtils.approxPriceToFloor(testAsset.free), 1034);
+      expect(TestUtils.approxPriceToFloor(testAsset.free), 1032);
       expect(testAsset.locked, 0);
       // There should not be any locked asset
       expect(getAllLockedAssetFromWallet(), 0);

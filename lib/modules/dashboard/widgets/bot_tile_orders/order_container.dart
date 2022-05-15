@@ -13,9 +13,9 @@ class OrderContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final dateTime = _order.map(
-      orderData: (o) => o.updateTime,
-      orderNew: (o) => o.transactTime,
-      orderCancel: (o) => o.transactTime,
+      data: (o) => o.updateTime,
+      newLimit: (o) => o.transactTime,
+      cancel: (o) => o.transactTime,
     );
 
     final String formattedDate = DateTimeUtils.toHmsddMMy(dateTime);

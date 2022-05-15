@@ -29,6 +29,7 @@ part 'models/oco/oco_order_status.enum.dart';
 part 'models/account/account_information.dart';
 part 'models/account/account_balance.dart';
 part 'models/order/order.dart';
+part 'models/order/order_new_stop_limit.dart';
 part 'models/order/fill.dart';
 part 'models/order/order_status.enum.dart';
 part 'models/order/order_types.enum.dart';

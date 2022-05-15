@@ -10,6 +10,34 @@ class TradeProvider {
 
   TradeProvider(this._ref);
 
+  Future<ApiResponse<AccountInformation>> getAccountInformation(
+      ApiConnection conn) async {
+    final headers = <String, dynamic>{};
+
+    apiUtils.addSecurityToHeader(
+        conn.apiKey, headers, API_SECURITY_TYPE.userData);
+
+    final options = Options(headers: headers);
+
+    final secureQuery = apiUtils.createQueryWithSecurity(
+        conn.apiSecret, {}, API_SECURITY_TYPE.userData);
+
+    try {
+      final response = await _ref.read(_dioProvider).get<String>(
+          '${conn.url}/api/v3/account',
+          options: options,
+          queryParameters: secureQuery);
+
+      return ApiResponse(
+          AccountInformation.fromJson(jsonDecode(response.data!)),
+          response.statusCode!);
+    } on DioError catch (e) {
+      return Future.error(_ref
+          .read(_apiUtilsProvider)
+          .buildApiException('getAccountInformation', e));
+    }
+  }
+
   Future<ApiResponse<List<Order>>> getAllOrders(
       ApiConnection conn, CryptoSymbol symbol) async {
     final headers = <String, dynamic>{};
@@ -50,64 +78,8 @@ class TradeProvider {
     final options = Options(headers: headers);
 
     final query = {'symbol': symbol.toString(), 'orderId': orderId.toString()};
-    // 'symbol=$symbol&timestamp=$timestamp&signature=';
-    final secureQuery = apiUtils.createQueryWithSecurity(
-        conn.apiSecret, query, API_SECURITY_TYPE.userData);
 
-    try {
-      final response = await _ref.read(_dioProvider).get<String>(
-          '${conn.url}/api/v3/order',
-          options: options,
-          queryParameters: secureQuery);
-
-      return ApiResponse(
-          OrderData.fromJson(jsonDecode(response.data!)), response.statusCode!);
-    } on DioError catch (e) {
-      return Future.error(
-          _ref.read(_apiUtilsProvider).buildApiException('getQueryOrder', e));
-    }
-  }
-
-  Future<ApiResponse<OrderNew>> newOrder(
-    ApiConnection conn,
-    CryptoSymbol symbol,
-    OrderSides side,
-    OrderTypes type,
-    double quantity,
-    double price, {
-    TimeInForce timeInForce = TimeInForce.GTC,
-  }) async {
-    final headers = <String, dynamic>{};
-
-    apiUtils.addSecurityToHeader(
-        conn.apiKey, headers, API_SECURITY_TYPE.userData);
-
-    final options = Options(headers: headers);
-
-    final query = {
-      'symbol': symbol.toString(),
-      'side': side.name,
-      'type': type.name,
-      'quantity': quantity.toString(),
-      'price': price.toString(),
-      'timeInForce': timeInForce.name,
-    };
-    // 'symbol=$symbol&timestamp=$timestamp&signature=';
-    final secureQuery = apiUtils.createQueryWithSecurity(
-        conn.apiSecret, query, API_SECURITY_TYPE.userData);
-
-    try {
-      final response = await _ref.read(_dioProvider).post<String>(
-          '${conn.url}/api/v3/order',
-          options: options,
-          queryParameters: secureQuery);
-
-      return ApiResponse(
-          OrderNew.fromJson(jsonDecode(response.data!)), response.statusCode!);
-    } on DioError catch (e) {
-      return Future.error(
-          _ref.read(_apiUtilsProvider).buildApiException('newOrder', e));
-    }
+    return _sendOrder(conn, options, query);
   }
 
   Future<ApiResponse<OrderCancel>> cancelOrder(
@@ -126,26 +98,18 @@ class TradeProvider {
       'symbol': symbol.toString(),
       'orderId': orderId.toString(),
     };
-    // 'symbol=$symbol&timestamp=$timestamp&signature=';
-    final secureQuery = apiUtils.createQueryWithSecurity(
-        conn.apiSecret, query, API_SECURITY_TYPE.userData);
 
-    try {
-      final response = await _ref.read(_dioProvider).delete<String>(
-          '${conn.url}/api/v3/order',
-          options: options,
-          queryParameters: secureQuery);
-
-      return ApiResponse(OrderCancel.fromJson(jsonDecode(response.data!)),
-          response.statusCode!);
-    } on DioError catch (e) {
-      return Future.error(
-          _ref.read(_apiUtilsProvider).buildApiException('cancelOrder', e));
-    }
+    return _sendOrder(conn, options, query);
   }
 
-  Future<ApiResponse<AccountInformation>> getAccountInformation(
-      ApiConnection conn) async {
+  Future<ApiResponse<OrderNewLimit>> newLimitOrder(
+    ApiConnection conn,
+    CryptoSymbol symbol,
+    OrderSides side,
+    double quantity,
+    double price, {
+    TimeInForce timeInForce = TimeInForce.GTC,
+  }) async {
     final headers = <String, dynamic>{};
 
     apiUtils.addSecurityToHeader(
@@ -153,22 +117,98 @@ class TradeProvider {
 
     final options = Options(headers: headers);
 
+    final query = {
+      'symbol': symbol.toString(),
+      'side': side.name,
+      'type': OrderTypes.LIMIT.name,
+      'quantity': quantity.toString(),
+      'price': price.toString(),
+      'timeInForce': timeInForce.name,
+    };
+
+    return _sendOrder(conn, options, query);
+  }
+
+  Future<ApiResponse<OrderNewStopLimit>> newStopLimitOrder(
+    ApiConnection conn,
+    CryptoSymbol symbol,
+    OrderSides side,
+    double quantity,
+    double price,
+    double stopPrice, {
+    TimeInForce timeInForce = TimeInForce.GTC,
+  }) async {
+    final headers = <String, dynamic>{};
+
+    apiUtils.addSecurityToHeader(
+        conn.apiKey, headers, API_SECURITY_TYPE.userData);
+
+    final options = Options(headers: headers);
+
+    final query = {
+      'symbol': symbol.toString(),
+      'side': side.name,
+      'type': OrderTypes.STOP_LOSS_LIMIT.name,
+      'quantity': quantity.toString(),
+      'price': price.toString(),
+      'stopPrice': stopPrice.toString(),
+      'timeInForce': timeInForce.name,
+    };
+
+    return _sendOrder(conn, options, query);
+  }
+
+  Future<ApiResponse<T>> _sendOrder<T extends Order>(
+    ApiConnection conn,
+    Options options,
+    Map<String, String> query,
+  ) async {
+    // 'symbol=$symbol&timestamp=$timestamp&signature=';
     final secureQuery = apiUtils.createQueryWithSecurity(
-        conn.apiSecret, {}, API_SECURITY_TYPE.userData);
+        conn.apiSecret, query, API_SECURITY_TYPE.userData);
 
     try {
-      final response = await _ref.read(_dioProvider).get<String>(
-          '${conn.url}/api/v3/account',
-          options: options,
-          queryParameters: secureQuery);
+      switch (T) {
+        case OrderData:
+          final response = await _ref.read(_dioProvider).get<String>(
+              '${conn.url}/api/v3/order',
+              options: options,
+              queryParameters: secureQuery);
 
-      return ApiResponse(
-          AccountInformation.fromJson(jsonDecode(response.data!)),
-          response.statusCode!);
+          return ApiResponse<OrderData>(
+              OrderData.fromJson(jsonDecode(response.data!)),
+              response.statusCode!) as ApiResponse<T>;
+        case OrderCancel:
+          final response = await _ref.read(_dioProvider).delete<String>(
+              '${conn.url}/api/v3/order',
+              options: options,
+              queryParameters: secureQuery);
+
+          return ApiResponse(OrderCancel.fromJson(jsonDecode(response.data!)),
+              response.statusCode!) as ApiResponse<T>;
+        case OrderNewLimit:
+          final response = await _ref.read(_dioProvider).post<String>(
+              '${conn.url}/api/v3/order',
+              options: options,
+              queryParameters: secureQuery);
+
+          return ApiResponse(OrderNewLimit.fromJson(jsonDecode(response.data!)),
+              response.statusCode!) as ApiResponse<T>;
+        case OrderNewStopLimit:
+          final response = await _ref.read(_dioProvider).post<String>(
+              '${conn.url}/api/v3/order',
+              options: options,
+              queryParameters: secureQuery);
+
+          return ApiResponse(
+              OrderNewStopLimit.fromJson(jsonDecode(response.data!)),
+              response.statusCode!) as ApiResponse<T>;
+        default:
+          throw UnimplementedError('Order of type $T is not implemented');
+      }
     } on DioError catch (e) {
-      return Future.error(_ref
-          .read(_apiUtilsProvider)
-          .buildApiException('getAccountInformation', e));
+      return Future.error(
+          _ref.read(_apiUtilsProvider).buildApiException('_newOrder', e));
     }
   }
 }
