@@ -14,8 +14,8 @@ import 'package:form_builder_validators/localization/l10n.dart';
 
 Future<void> main() async {
   runApp(ProviderScope(
-    child: BottinoFortino(),
     observers: [ProviderLoggerUtils()],
+    child: BottinoFortino(),
   ));
 }
 

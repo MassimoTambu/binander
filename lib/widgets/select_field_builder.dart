@@ -27,16 +27,13 @@ class SelectFieldBuilder extends StatelessWidget {
       items: configField.items
           .map(
             (c) => DropdownMenuItem<String>(
-              child: Text(c),
               value: c,
+              child: Text(c),
             ),
           )
           .toList(),
       validator: FormBuilderValidators.compose(
-        ConfigFieldUtils.toFormBuilderValidators(
-          context,
-          configField.validators,
-        ),
+        ConfigFieldUtils.toFormBuilderValidators(configField.validators),
       ),
       enabled: enabled,
     );

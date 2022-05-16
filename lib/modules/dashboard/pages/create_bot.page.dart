@@ -56,7 +56,7 @@ class CreateBotPage extends ConsumerWidget {
                       hintText: 'Bob',
                     ),
                     validator: FormBuilderValidators.compose(
-                      [FormBuilderValidators.required(context)],
+                      [FormBuilderValidators.required()],
                     ),
                   ),
                   FormBuilderSwitch(

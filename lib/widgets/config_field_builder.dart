@@ -25,10 +25,7 @@ class ConfigFieldBuilder extends StatelessWidget {
       ),
       initialValue: configField.value ?? configField.defaultValue?.toString(),
       validator: FormBuilderValidators.compose(
-        ConfigFieldUtils.toFormBuilderValidators(
-          context,
-          configField.validators,
-        ),
+        ConfigFieldUtils.toFormBuilderValidators(configField.validators),
       ),
       enabled: enabled,
     );

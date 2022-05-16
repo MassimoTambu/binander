@@ -14,7 +14,6 @@ class MinimizeLossesPipeLineData implements PipelineData {
   @override
   final OrdersHistory ordersHistory;
   @override
-  @JsonKey()
   int pipelineCounter = 0;
   @override
   @JsonKey(ignore: true)
