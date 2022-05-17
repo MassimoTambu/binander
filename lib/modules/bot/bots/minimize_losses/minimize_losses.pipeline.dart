@@ -187,7 +187,13 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
     }
 
     // Update order status
-    bot.pipelineData.lastBuyOrder = await _getBuyOrder();
+    final buyOrder = await _getBuyOrder();
+    if (bot.pipelineData.lastSellOrder == null) {
+      bot.pipelineData.lastBuyOrder = buyOrder;
+      changeStatusTo(BotPhases.starting, 'updated buy order data');
+    } else {
+      bot.pipelineData.lastBuyOrder = buyOrder;
+    }
 
     if (bot.pipelineData.lastBuyOrder!.status == OrderStatus.FILLED) {
       bot.pipelineData.ordersHistory.orderPairs
@@ -224,7 +230,12 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
     changeStatusTo(BotPhases.online, 'pipeline has been started');
 
     final sellOrder = await _getSellOrder();
-    bot.pipelineData.lastSellOrder = sellOrder;
+    if (bot.pipelineData.lastSellOrder == null) {
+      bot.pipelineData.lastSellOrder = sellOrder;
+      changeStatusTo(BotPhases.starting, 'updated sell order data');
+    } else {
+      bot.pipelineData.lastSellOrder = sellOrder;
+    }
 
     // if order status is open or partially closed
     if (sellOrder.status == OrderStatus.NEW ||
@@ -404,6 +415,7 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
   Future<void> _trySubmitCancelOrder(int orderId) async {
     try {
       final orderCancel = await _submitCancelOrder(orderId);
+      print(orderCancel.toJson());
       final ordersPair = OrdersPair(buyOrder: orderCancel, sellOrder: null);
       bot.pipelineData.ordersHistory.ordersCancelled.add(ordersPair);
     } on ApiException catch (_, __) {
@@ -415,7 +427,7 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
     }
   }
 
-  Future<OrderCancel> _submitCancelOrder(int orderId) async {
+  Future<OrderData> _submitCancelOrder(int orderId) async {
     final res = await ref
         .read(apiProvider)
         .spot
@@ -426,6 +438,9 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
   }
 
   bool _hasToMoveOrder() {
+    print("calcNewStopPrice ${_calculateNewOrderStopPrice()}");
+    print("lastAvgPrice: ${bot.pipelineData.lastAveragePrice!.price}");
+    print("stopPrice: ${bot.pipelineData.lastSellOrder!.stopPrice!}");
     return _calculateNewOrderStopPrice() >
         bot.pipelineData.lastSellOrder!.stopPrice!;
   }
@@ -451,7 +466,6 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
         final dateTime = o.sellOrder?.map(
           data: (dataOrder) => dataOrder.updateTime,
           newLimit: (_) => null,
-          cancel: (_) => null,
         );
 
         if (dateTime == null) return false;

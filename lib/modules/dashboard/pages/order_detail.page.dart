@@ -44,9 +44,6 @@ class OrderDetailPage extends StatelessWidget {
 
           return texts;
         },
-        cancel: (o) => [
-          'Transact time: ${DateTimeUtils.toHmsddMMy(o.transactTime)}',
-        ],
       ),
     ];
 

@@ -1,6 +1,6 @@
 part of api;
 
-@freezed
+@Freezed(makeCollectionsUnmodifiable: false)
 class AccountInformation with _$AccountInformation {
   const factory AccountInformation(
     int makerCommission,

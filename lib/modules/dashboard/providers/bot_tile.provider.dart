@@ -49,25 +49,17 @@ class BotTileProvider extends StateNotifier<List<OrdersPair>> {
   }
 
   static int _sortByDate(OrdersPair a, OrdersPair b, {bool newest = true}) {
-    var aTime = a.sellOrder?.map(
-        data: (o) => o.updateTime,
-        newLimit: (o) => o.transactTime,
-        cancel: (o) => o.transactTime);
+    var aTime = a.sellOrder
+        ?.map(data: (o) => o.updateTime, newLimit: (o) => o.transactTime);
 
-    aTime ??= a.buyOrder.map(
-        data: (o) => o.updateTime,
-        newLimit: (o) => o.transactTime,
-        cancel: (o) => o.transactTime);
+    aTime ??= a.buyOrder
+        .map(data: (o) => o.updateTime, newLimit: (o) => o.transactTime);
 
-    var bTime = b.sellOrder?.map(
-        data: (o) => o.updateTime,
-        newLimit: (o) => o.transactTime,
-        cancel: (o) => o.transactTime);
+    var bTime = b.sellOrder
+        ?.map(data: (o) => o.updateTime, newLimit: (o) => o.transactTime);
 
-    bTime ??= b.buyOrder.map(
-        data: (o) => o.updateTime,
-        newLimit: (o) => o.transactTime,
-        cancel: (o) => o.transactTime);
+    bTime ??= b.buyOrder
+        .map(data: (o) => o.updateTime, newLimit: (o) => o.transactTime);
 
     if (newest) {
       return bTime!.compareTo(aTime!);
