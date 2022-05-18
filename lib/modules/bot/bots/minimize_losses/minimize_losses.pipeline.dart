@@ -6,7 +6,7 @@ import 'package:bottino_fortino/modules/bot/models/bot_limit.dart';
 import 'package:bottino_fortino/modules/bot/models/bot_phases.enum.dart';
 import 'package:bottino_fortino/modules/bot/models/bot_status.dart';
 import 'package:bottino_fortino/modules/bot/models/interfaces/pipeline.interface.dart';
-import 'package:bottino_fortino/modules/bot/models/orders_pair.dart';
+import 'package:bottino_fortino/modules/bot/models/run_orders.dart';
 import 'package:bottino_fortino/modules/settings/models/api_connection.dart';
 import 'package:bottino_fortino/modules/settings/providers/settings.provider.dart';
 import 'package:bottino_fortino/providers/pipeline.provider.dart';
@@ -50,7 +50,8 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
           reason: botLimits.map((l) => l.cause).join(" - "));
     }
 
-    final lastBuyOrder = bot.pipelineData.lastBuyOrder;
+    final lastBuyOrder =
+        bot.pipelineData.ordersHistory.lastNotEndedRunOrders?.buyOrder;
     // If buyorder does not exists
     if (lastBuyOrder == null) {
       // Exit if bot execution has been interrupted
@@ -117,19 +118,20 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
 
     // We should leave a clean environment before stopping the bot.
     // If for some reason the bot has going to stop we should cancel the opened orders
-    final lastBuyOrder = bot.pipelineData.lastBuyOrder;
+    final lastBuyOrder =
+        bot.pipelineData.ordersHistory.lastNotEndedRunOrders?.buyOrder;
     if (lastBuyOrder != null && lastBuyOrder.status != OrderStatus.FILLED) {
       await _trySubmitCancelOrder(lastBuyOrder.orderId);
     }
-    final lastSellOrder = bot.pipelineData.lastSellOrder;
+    final lastSellOrder =
+        bot.pipelineData.ordersHistory.lastNotEndedRunOrders?.sellOrder;
     if (lastSellOrder != null && lastSellOrder.status != OrderStatus.FILLED) {
       await _trySubmitCancelOrder(lastSellOrder.orderId);
     }
 
     bot.pipelineData.buyOrderStartedAt = null;
     bot.pipelineData.lastAveragePrice = null;
-    bot.pipelineData.lastBuyOrder = null;
-    bot.pipelineData.lastSellOrder = null;
+    bot.pipelineData.ordersHistory.closeRunOrder();
 
     final closingMessage = 'Turned off' + reason;
 
@@ -176,8 +178,9 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
       changeStatusTo(BotPhases.starting,
           "buy order time limit reached. I'm about to try again..");
 
-      await _trySubmitCancelOrder(bot.pipelineData.lastBuyOrder!.orderId);
-      bot.pipelineData.lastBuyOrder = null;
+      await _trySubmitCancelOrder(bot
+          .pipelineData.ordersHistory.lastNotEndedRunOrders!.buyOrder!.orderId);
+      bot.pipelineData.ordersHistory.closeRunOrder();
       bot.pipelineData.buyOrderStartedAt = null;
       timer.cancel();
 
@@ -186,19 +189,13 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
       return;
     }
 
-    // Update order status
-    final buyOrder = await _getBuyOrder();
-    if (bot.pipelineData.lastSellOrder == null) {
-      bot.pipelineData.lastBuyOrder = buyOrder;
-      changeStatusTo(BotPhases.starting, 'updated buy order data');
-    } else {
-      bot.pipelineData.lastBuyOrder = buyOrder;
-    }
+    // Update order
+    bot.pipelineData.ordersHistory
+        .upsertOrderInNotEndedRunOrder(await _getBuyOrder());
 
-    if (bot.pipelineData.lastBuyOrder!.status == OrderStatus.FILLED) {
-      bot.pipelineData.ordersHistory.orderPairs
-          .add(OrdersPair(buyOrder: bot.pipelineData.lastBuyOrder!));
-
+    if (bot.pipelineData.ordersHistory.lastNotEndedRunOrders!.buyOrder!
+            .status ==
+        OrderStatus.FILLED) {
       timer.cancel();
 
       changeStatusTo(BotPhases.online, 'buy order has been filled');
@@ -207,10 +204,6 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
     }
   }
 
-  /// - Fare in modo che il bot aumenti l'ordine di vendita piazzando un ordine con un valore ricavato da questa formula:
-  /// (prezzo_attuale - (calcolo della % impostata verso il prezzo_iniziale)) > last_prezzo_ordine
-  /// - Memorizzare se l'ordine eseguito è risultato una perdita o un profitto.
-  /// - Controllare all'avvio se è presente un ordine in corso che è stato piazzato dall'ultimo avvio e ancora non si è concluso.
   Future<void> _runBotPipeline(Timer timer) async {
     // Exit if bot execution has been interrupted
     if (!timer.isActive || bot.pipelineData.status.phase != BotPhases.online) {
@@ -221,7 +214,8 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
 
     bot.pipelineData.lastAveragePrice = await _getCurrentCryptoPrice();
 
-    if (bot.pipelineData.lastSellOrder == null) {
+    if (bot.pipelineData.ordersHistory.lastNotEndedRunOrders!.sellOrder ==
+        null) {
       await _trySubmitSellOrder();
       changeStatusTo(BotPhases.online, 'submitted sell order');
       return;
@@ -230,12 +224,7 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
     changeStatusTo(BotPhases.online, 'pipeline has been started');
 
     final sellOrder = await _getSellOrder();
-    if (bot.pipelineData.lastSellOrder == null) {
-      bot.pipelineData.lastSellOrder = sellOrder;
-      changeStatusTo(BotPhases.starting, 'updated sell order data');
-    } else {
-      bot.pipelineData.lastSellOrder = sellOrder;
-    }
+    bot.pipelineData.ordersHistory.upsertOrderInNotEndedRunOrder(sellOrder);
 
     // if order status is open or partially closed
     if (sellOrder.status == OrderStatus.NEW ||
@@ -252,19 +241,11 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
     // If order status is closed
     else if (sellOrder.status == OrderStatus.FILLED) {
       // TODO resume a buy order
-      final buyOrder = await bot.pipelineData.lastBuyOrder!.maybeMap(
-          data: (orderData) => Future.value(orderData),
-          orElse: () => _getBuyOrder());
-      final sellOrder = bot.pipelineData.lastSellOrder!;
-
-      final ordersPair = bot.pipelineData.ordersHistory.orderPairs.last
-          .copyWith(buyOrder: buyOrder, sellOrder: sellOrder);
-      bot.pipelineData.ordersHistory.orderPairs.last = ordersPair;
 
       var reason = 'Sell order executed';
 
       // Check if is a loss
-      if (!ordersPair.isProfit) {
+      if (!bot.pipelineData.ordersHistory.lastNotEndedRunOrders!.isProfit) {
         // check if is major or equal to loss counter
         if (_hasReachDailySellLossLimit()) {
           reason += ' - Daily loss sell orders reached';
@@ -324,7 +305,16 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
 
   Future<void> _trySubmitBuyOrder(double rightPairQty) async {
     try {
-      bot.pipelineData.lastBuyOrder = await _submitBuyOrder(rightPairQty);
+      final newBuyOrder = await _submitBuyOrder(rightPairQty);
+      final buyOrderData = (await ref
+              .read(apiProvider)
+              .spot
+              .trade
+              .getQueryOrder(
+                  _getApiConnection(), bot.config.symbol!, newBuyOrder.orderId))
+          .body;
+      bot.pipelineData.ordersHistory
+          .upsertOrderInNotEndedRunOrder(buyOrderData);
     } on ApiException catch (_, __) {
       const message = 'Failed to submit buy order. Retry in 10s';
 
@@ -360,7 +350,8 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
     final res = await ref.read(apiProvider).spot.trade.getQueryOrder(
         _getApiConnection(),
         bot.config.symbol!,
-        bot.pipelineData.lastBuyOrder!.orderId);
+        bot.pipelineData.ordersHistory.lastNotEndedRunOrders!.buyOrder!
+            .orderId);
 
     return res.body;
   }
@@ -368,13 +359,15 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
   Future<void> _trySubmitSellOrder() async {
     try {
       final stopLimitOrder = await _submitStopSellOrder();
-      bot.pipelineData.lastSellOrder = (await ref
+      final sellOrderData = (await ref
               .read(apiProvider)
               .spot
               .trade
               .getQueryOrder(_getApiConnection(), bot.config.symbol!,
                   stopLimitOrder.orderId))
           .body;
+      bot.pipelineData.ordersHistory
+          .upsertOrderInNotEndedRunOrder(sellOrderData);
     } on ApiException catch (_, __) {
       final message = '${bot.name} - Failed to submit sell order';
 
@@ -393,7 +386,8 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
         _getApiConnection(),
         bot.config.symbol!,
         OrderSides.SELL,
-        bot.pipelineData.lastBuyOrder!.executedQty,
+        bot.pipelineData.ordersHistory.lastNotEndedRunOrders!.buyOrder!
+            .executedQty,
         price,
         stopPrice);
     return res.body;
@@ -403,7 +397,8 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
     final res = await ref.read(apiProvider).spot.trade.getQueryOrder(
         _getApiConnection(),
         bot.config.symbol!,
-        bot.pipelineData.lastSellOrder!.orderId);
+        bot.pipelineData.ordersHistory.lastNotEndedRunOrders!.sellOrder!
+            .orderId);
     return res.body;
   }
 
@@ -415,9 +410,11 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
   Future<void> _trySubmitCancelOrder(int orderId) async {
     try {
       final orderCancel = await _submitCancelOrder(orderId);
-      print(orderCancel.toJson());
-      final ordersPair = OrdersPair(buyOrder: orderCancel, sellOrder: null);
-      bot.pipelineData.ordersHistory.ordersCancelled.add(ordersPair);
+      final orderData = (await ref.read(apiProvider).spot.trade.getQueryOrder(
+              _getApiConnection(), bot.config.symbol!, orderCancel.orderId))
+          .body;
+      bot.pipelineData.ordersHistory.lastNotEndedRunOrders?.orders
+          .add(orderData);
     } on ApiException catch (_, __) {
       const message = 'Failed to submit cancel order';
 
@@ -427,7 +424,7 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
     }
   }
 
-  Future<OrderData> _submitCancelOrder(int orderId) async {
+  Future<OrderCancel> _submitCancelOrder(int orderId) async {
     final res = await ref
         .read(apiProvider)
         .spot
@@ -438,23 +435,26 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
   }
 
   bool _hasToMoveOrder() {
+    final sellOrder =
+        bot.pipelineData.ordersHistory.lastNotEndedRunOrders!.sellOrder!;
     print("calcNewStopPrice ${_calculateNewOrderStopPrice()}");
     print("lastAvgPrice: ${bot.pipelineData.lastAveragePrice!.price}");
-    print("stopPrice: ${bot.pipelineData.lastSellOrder!.stopPrice!}");
-    return _calculateNewOrderStopPrice() >
-        bot.pipelineData.lastSellOrder!.stopPrice!;
+    print("stopPrice: ${sellOrder.stopPrice!}");
+    return _calculateNewOrderStopPrice() > sellOrder.stopPrice!;
   }
 
   double _calculateNewOrderPrice() {
     final lastAveragePrice = bot.pipelineData.lastAveragePrice!.price;
-    final lastBuyOrder = bot.pipelineData.lastBuyOrder!.price;
+    final lastBuyOrder =
+        bot.pipelineData.ordersHistory.lastNotEndedRunOrders!.buyOrder!.price;
     return lastAveragePrice -
         (lastBuyOrder * (bot.config.percentageSellOrder! + 1) / 100);
   }
 
   double _calculateNewOrderStopPrice() {
     final lastAveragePrice = bot.pipelineData.lastAveragePrice!.price;
-    final lastBuyOrder = bot.pipelineData.lastBuyOrder!.price;
+    final lastBuyOrder =
+        bot.pipelineData.ordersHistory.lastNotEndedRunOrders!.buyOrder!.price;
     return lastAveragePrice -
         (lastBuyOrder * bot.config.percentageSellOrder! / 100);
   }
@@ -463,10 +463,7 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
     final sellOrdersExecutedToday =
         bot.pipelineData.ordersHistory.lossesOnly.where(
       (o) {
-        final dateTime = o.sellOrder?.map(
-          data: (dataOrder) => dataOrder.updateTime,
-          newLimit: (_) => null,
-        );
+        final dateTime = o.sellOrder?.updateTime;
 
         if (dateTime == null) return false;
 

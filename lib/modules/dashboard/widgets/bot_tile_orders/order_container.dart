@@ -6,18 +6,13 @@ import 'package:bottino_fortino/utils/datetime.utils.dart';
 import 'package:flutter/material.dart';
 
 class OrderContainer extends StatelessWidget {
-  final Order _order;
+  final OrderData _order;
 
   const OrderContainer(this._order, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final dateTime = _order.map(
-      data: (o) => o.updateTime,
-      newLimit: (o) => o.transactTime,
-    );
-
-    final String formattedDate = DateTimeUtils.toHmsddMMy(dateTime);
+    final String formattedDate = DateTimeUtils.toHmsddMMy(_order.updateTime);
 
     return Card(
       child: InkWell(

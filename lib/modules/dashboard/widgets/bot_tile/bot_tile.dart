@@ -29,7 +29,7 @@ class BotTile extends ConsumerWidget {
                 style: Theme.of(context).textTheme.headline6,
               ),
               const SizedBox(width: 20),
-              GainsChip(bot.pipelineData.ordersHistory.allOrders),
+              TotalGainsChip(bot.pipelineData.ordersHistory.allOrders),
               const SizedBox(width: 8),
               Chip(
                 label: Row(

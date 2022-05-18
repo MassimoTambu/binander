@@ -139,7 +139,7 @@ class TestUtils {
       order.orderId,
       order.orderListId,
       order.clientOrderId,
-      clock.now(),
+      order.clientOrderId,
       order.price,
       null,
       order.origQty,

@@ -16,7 +16,7 @@ class BotTileOrdersPair extends ConsumerWidget {
         if (ordersPair.sellOrder != null && ordersPair.gains != 0)
           Padding(
             padding: const EdgeInsets.only(bottom: 8),
-            child: GainsChip([ordersPair]),
+            child: TotalGainsChip([ordersPair]),
           ),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,

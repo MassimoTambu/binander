@@ -97,7 +97,7 @@ class TradeProvider {
     }
   }
 
-  Future<ApiResponse<OrderData>> cancelOrder(
+  Future<ApiResponse<OrderCancel>> cancelOrder(
     ApiConnection conn,
     CryptoSymbol symbol,
     int orderId,
@@ -123,8 +123,8 @@ class TradeProvider {
           options: options,
           queryParameters: secureQuery);
 
-      return ApiResponse(
-          OrderData.fromJson(jsonDecode(response.data!)), response.statusCode!);
+      return ApiResponse(OrderCancel.fromJson(jsonDecode(response.data!)),
+          response.statusCode!);
     } on DioError catch (e) {
       return Future.error(
           _ref.read(_apiUtilsProvider).buildApiException('_newOrder', e));

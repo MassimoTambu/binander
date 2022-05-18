@@ -1,14 +1,13 @@
 import 'package:bottino_fortino/modules/bot/models/bot_phases.enum.dart';
 import 'package:bottino_fortino/modules/bot/models/interfaces/pipeline.interface.dart';
-import 'package:bottino_fortino/modules/bot/models/orders_pair.dart';
+import 'package:bottino_fortino/modules/bot/models/run_orders.dart';
 import 'package:bottino_fortino/modules/dashboard/models/orders_order.enum.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-final botTileProvider =
-    StateNotifierProvider<BotTileProvider, List<OrdersPair>>(
-        (ref) => throw UnimplementedError());
+final botTileProvider = StateNotifierProvider<BotTileProvider, List<RunOrders>>(
+    (ref) => throw UnimplementedError());
 
-class BotTileProvider extends StateNotifier<List<OrdersPair>> {
+class BotTileProvider extends StateNotifier<List<RunOrders>> {
   final Pipeline pipeline;
   final bool hasToStart;
   final bool isStartButtonDisabled;
@@ -48,23 +47,17 @@ class BotTileProvider extends StateNotifier<List<OrdersPair>> {
     state = [...state];
   }
 
-  static int _sortByDate(OrdersPair a, OrdersPair b, {bool newest = true}) {
-    var aTime = a.sellOrder
-        ?.map(data: (o) => o.updateTime, newLimit: (o) => o.transactTime);
+  static int _sortByDate(RunOrders a, RunOrders b, {bool newest = true}) {
+    final aTime =
+        a.sellOrder != null ? a.sellOrder!.updateTime : a.buyOrder.updateTime;
 
-    aTime ??= a.buyOrder
-        .map(data: (o) => o.updateTime, newLimit: (o) => o.transactTime);
-
-    var bTime = b.sellOrder
-        ?.map(data: (o) => o.updateTime, newLimit: (o) => o.transactTime);
-
-    bTime ??= b.buyOrder
-        .map(data: (o) => o.updateTime, newLimit: (o) => o.transactTime);
+    final bTime =
+        b.sellOrder != null ? b.sellOrder!.updateTime : b.buyOrder.updateTime;
 
     if (newest) {
-      return bTime!.compareTo(aTime!);
+      return bTime.compareTo(aTime);
     }
 
-    return aTime!.compareTo(bTime!);
+    return aTime.compareTo(bTime);
   }
 }

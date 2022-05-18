@@ -5,7 +5,7 @@ import 'package:bottino_fortino/utils/datetime.utils.dart';
 import 'package:flutter/material.dart';
 
 class OrderDetailPage extends StatelessWidget {
-  final Order _order;
+  final OrderData _order;
 
   const OrderDetailPage(this._order, {Key? key}) : super(key: key);
 
@@ -20,31 +20,8 @@ class OrderDetailPage extends StatelessWidget {
       'Side: ${_order.side.name}',
       'Status: ${_order.status.name}',
       'Type: ${_order.type.name}',
-      ..._order.map(
-        data: (o) => [
-          'Time: ${DateTimeUtils.toHmsddMMy(o.time)}',
-          'Updated time: ${DateTimeUtils.toHmsddMMy(o.updateTime)}',
-        ],
-        newLimit: (o) {
-          final texts = [
-            'Transact time: ${DateTimeUtils.toHmsddMMy(o.transactTime)}'
-          ];
-          if (o.fills.isNotEmpty) {
-            texts.add('Fills:');
-            for (final fill in o.fills) {
-              texts.addAll([
-                '- TradeId: ${fill.tradeId}',
-                '  Commission: ${fill.commission}',
-                '  CommissionAsset: ${fill.commissionAsset}',
-                '  Price: ${fill.price}',
-                '  Qty: ${fill.qty}',
-              ]);
-            }
-          }
-
-          return texts;
-        },
-      ),
+      'Time: ${DateTimeUtils.toHmsddMMy(_order.time)}',
+      'Updated time: ${DateTimeUtils.toHmsddMMy(_order.updateTime)}',
     ];
 
     return Scaffold(
