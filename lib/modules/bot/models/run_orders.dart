@@ -20,7 +20,8 @@ class RunOrders with _$RunOrders {
     return buyOrders.first;
   }
 
-  /// Returns the last sell order found. Could exists more than one sell order like cancelled sell orders
+  /// Returns the last sell order found.
+  /// Could exists more than one sell order like cancelled sell orders
   OrderData? get sellOrder {
     // Should always be one
     final sellOrders = orders.where((o) => o.side == OrderSides.SELL);

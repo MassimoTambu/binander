@@ -38,7 +38,7 @@ class TotalGainsChip extends StatelessWidget {
                                   color: Colors.green),
           const SizedBox(width: 5),
           Text(
-            '${totalGains.abs()} ${_orderPairs.isEmpty ? '-' : _orderPairs.first.buyOrder.symbol}',
+            '${totalGains.abs()} ${_orderPairs.isEmpty ? '-' : _orderPairs.first.buyOrder!.symbol}',
             style: Theme.of(context)
                 .textTheme
                 .labelLarge!

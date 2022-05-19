@@ -21,7 +21,7 @@ class BotTileOrdersPair extends ConsumerWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            OrderContainer(ordersPair.buyOrder),
+            OrderContainer(ordersPair.buyOrder!),
             if (ordersPair.sellOrder != null)
               OrderContainer(ordersPair.sellOrder!)
           ],

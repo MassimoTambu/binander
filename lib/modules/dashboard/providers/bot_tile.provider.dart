@@ -24,7 +24,7 @@ class BotTileProvider extends StateNotifier<List<RunOrders>> {
             pipeline.bot.pipelineData.status.phase == BotPhases.stopping ||
                 pipeline.bot.pipelineData.status.phase == BotPhases.offline,
         selectedOrder = OrdersOrder.dateNewest,
-        super([...pipeline.bot.pipelineData.ordersHistory.allOrders]
+        super([...pipeline.bot.pipelineData.ordersHistory.runOrders]
           ..sort((a, b) => _sortByDate(a, b)));
 
   void orderBy(OrdersOrder orderFactor) {
@@ -49,10 +49,10 @@ class BotTileProvider extends StateNotifier<List<RunOrders>> {
 
   static int _sortByDate(RunOrders a, RunOrders b, {bool newest = true}) {
     final aTime =
-        a.sellOrder != null ? a.sellOrder!.updateTime : a.buyOrder.updateTime;
+        a.sellOrder != null ? a.sellOrder!.updateTime : a.buyOrder!.updateTime;
 
     final bTime =
-        b.sellOrder != null ? b.sellOrder!.updateTime : b.buyOrder.updateTime;
+        b.sellOrder != null ? b.sellOrder!.updateTime : b.buyOrder!.updateTime;
 
     if (newest) {
       return bTime.compareTo(aTime);

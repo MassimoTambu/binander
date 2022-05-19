@@ -8,7 +8,7 @@ part 'orders_history.g.dart';
 @unfreezed
 class OrdersHistory with _$OrdersHistory {
   const OrdersHistory._();
-  const factory OrdersHistory(
+  factory OrdersHistory(
     List<RunOrders> runOrders,
   ) = _OrdersHistory;
 
@@ -23,6 +23,11 @@ class OrdersHistory with _$OrdersHistory {
 
   Iterable<OrderData> get allOrders =>
       runOrders.map((ro) => ro.orders).reduce((acc, ro) => acc + ro);
+
+  Iterable<OrderData> get cancelledOrders => runOrders
+      .map((ro) => ro.orders)
+      .reduce((acc, ro) => acc + ro)
+      .where((o) => o.status == OrderStatus.CANCELED);
 
   void upsertOrderInNotEndedRunOrder(OrderData order) {
     if (lastNotEndedRunOrders == null) {

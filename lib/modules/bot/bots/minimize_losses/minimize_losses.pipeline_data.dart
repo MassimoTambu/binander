@@ -14,7 +14,7 @@ part 'minimize_losses.pipeline_data.g.dart';
 class MinimizeLossesPipeLineData
     with _$MinimizeLossesPipeLineData
     implements PipelineData {
-  const factory MinimizeLossesPipeLineData({
+  factory MinimizeLossesPipeLineData({
     @Default(OrdersHistory([])) @override final OrdersHistory ordersHistory,
     @override @Default(0) int pipelineCounter,
     @override @JsonKey(ignore: true) Timer? timer,
