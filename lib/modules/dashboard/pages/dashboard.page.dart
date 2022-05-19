@@ -1,3 +1,4 @@
+import 'package:bottino_fortino/api/api.dart';
 import 'package:bottino_fortino/modules/dashboard/providers/bot_tile.provider.dart';
 import 'package:bottino_fortino/modules/dashboard/widgets/bot_tile/bot_tile.dart';
 import 'package:bottino_fortino/modules/dashboard/widgets/crypto_info_container/crypto_info_container.dart';
@@ -12,6 +13,18 @@ class DashboardPage extends ConsumerWidget {
 
   void _navigateToAddBotPage(BuildContext context) {
     context.router.push(CreateBotRoute());
+  }
+
+  void _connect(WidgetRef ref) {
+    ref.read(webSocketProvider).connect();
+  }
+
+  void _send(WidgetRef ref) {
+    ref.read(webSocketProvider).send();
+  }
+
+  void _close(WidgetRef ref) {
+    ref.read(webSocketProvider).close();
   }
 
   @override
@@ -54,6 +67,21 @@ class DashboardPage extends ConsumerWidget {
               childCount: pipelines.length,
             ),
           ),
+          SliverToBoxAdapter(
+              child: TextButton(
+            child: const Text('connect'),
+            onPressed: () => _connect(ref),
+          )),
+          SliverToBoxAdapter(
+              child: TextButton(
+            child: const Text('send'),
+            onPressed: () => _send(ref),
+          )),
+          SliverToBoxAdapter(
+              child: TextButton(
+            child: const Text('close'),
+            onPressed: () => _close(ref),
+          )),
         ],
       ),
       floatingActionButton: FloatingActionButton(

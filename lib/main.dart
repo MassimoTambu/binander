@@ -34,7 +34,7 @@ class BottinoFortino extends ConsumerWidget {
                   (prevPipelines, newPipelines) {
                 ref
                     .watch(fileStorageProvider)
-                    .upsertBots(newPipelines.map((e) => e.bot).toList());
+                    .upsertBots(newPipelines.map((e) => e.bot));
               });
               return MaterialApp.router(
                 scaffoldMessengerKey: snackbarKey,

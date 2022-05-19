@@ -8,6 +8,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'dart:convert';
 import 'package:crypto/crypto.dart';
+import 'package:web_socket_channel/io.dart';
+import 'package:web_socket_channel/status.dart' as status;
 
 part 'api.exception.dart';
 part 'api_security_level.enum.dart';
@@ -40,6 +42,7 @@ part 'api.freezed.dart';
 
 part 'api.provider.dart';
 part 'dio.provider.dart';
+part 'websocket.provider.dart';
 part 'spot/spot.provider.dart';
 part 'spot/market/market.provider.dart';
 part 'spot/trade/trade.provider.dart';
