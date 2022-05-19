@@ -12,8 +12,8 @@ class BotTile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final bot =
-        ref.watch(botTileProvider.notifier.select((p) => p.pipeline.bot));
+    final pipeline =
+        ref.watch(botTileProvider.notifier.select((p) => p.pipeline));
     return ExpansionTile(
       title: Wrap(
         spacing: 8,
@@ -25,11 +25,11 @@ class BotTile extends ConsumerWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                bot.name,
+                pipeline.bot.name,
                 style: Theme.of(context).textTheme.headline6,
               ),
               const SizedBox(width: 20),
-              TotalGainsChip(bot.pipelineData.ordersHistory.runOrders),
+              TotalGainsChip(pipeline.ordersHistory.runOrders),
               const SizedBox(width: 8),
               Chip(
                 label: Row(
@@ -38,9 +38,9 @@ class BotTile extends ConsumerWidget {
                     const Icon(Icons.attach_money_rounded, color: Colors.green),
                     const SizedBox(width: 5),
                     Text(
-                      bot.pipelineData.lastAveragePrice == null
+                      pipeline.lastAveragePrice == null
                           ? 'No data'
-                          : '${bot.pipelineData.lastAveragePrice!.price.floorToDoubleWithDecimals(2)}',
+                          : '${pipeline.lastAveragePrice!.price.floorToDoubleWithDecimals(2)}',
                       style: Theme.of(context)
                           .textTheme
                           .labelLarge!
@@ -68,8 +68,8 @@ class _BotTileRightChips extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final botStatus = ref.watch(botTileProvider.notifier
-        .select((p) => p.pipeline.bot.pipelineData.status));
+    final botStatus =
+        ref.watch(botTileProvider.notifier.select((p) => p.pipeline.status));
     final testNet = ref
         .watch(botTileProvider.notifier.select((p) => p.pipeline.bot.testNet));
 

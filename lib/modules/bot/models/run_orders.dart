@@ -1,4 +1,5 @@
 import 'package:bottino_fortino/api/api.dart';
+import 'package:bottino_fortino/modules/bot/models/roi.enum.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'run_orders.freezed.dart';
@@ -31,11 +32,19 @@ class RunOrders with _$RunOrders {
   }
 
   /// Check whether is a profit or a loss orders pair
-  bool get isProfit {
-    if (buyOrder == null || sellOrder == null) return false;
+  ROI get roi {
+    if ((buyOrder == null && sellOrder == null) ||
+        buyOrder == null ||
+        sellOrder == null) {
+      return ROI.stable;
+    }
 
-    return sellOrder!.executedQty * sellOrder!.price >
-        buyOrder!.executedQty * buyOrder!.price;
+    if (sellOrder!.executedQty * sellOrder!.price >
+        buyOrder!.executedQty * buyOrder!.price) {
+      return ROI.profit;
+    }
+
+    return ROI.loss;
   }
 
   /// Returns the difference between sell order and buy order floor approximated starting from 2nd decimal number.

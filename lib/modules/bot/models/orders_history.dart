@@ -1,4 +1,5 @@
 import 'package:bottino_fortino/api/api.dart';
+import 'package:bottino_fortino/modules/bot/models/roi.enum.dart';
 import 'package:bottino_fortino/modules/bot/models/run_orders.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
@@ -18,8 +19,10 @@ class OrdersHistory with _$OrdersHistory {
     return runOrder.last;
   }
 
-  Iterable<RunOrders> get profitsOnly => runOrders.where((ro) => ro.isProfit);
-  Iterable<RunOrders> get lossesOnly => runOrders.where((ro) => !ro.isProfit);
+  Iterable<RunOrders> get profitsOnly =>
+      runOrders.where((ro) => ro.roi == ROI.profit);
+  Iterable<RunOrders> get lossesOnly =>
+      runOrders.where((ro) => ro.roi == ROI.loss);
 
   Iterable<OrderData> get allOrders =>
       runOrders.map((ro) => ro.orders).reduce((acc, ro) => acc + ro);

@@ -1,11 +1,11 @@
 import 'package:bottino_fortino/models/crypto_symbol.dart';
 import 'package:bottino_fortino/modules/bot/bots/minimize_losses/minimize_losses.config.dart';
 import 'package:bottino_fortino/modules/bot/bots/minimize_losses/minimize_losses.pipeline.dart';
-import 'package:bottino_fortino/modules/bot/bots/minimize_losses/minimize_losses.pipeline_data.dart';
 import 'package:bottino_fortino/modules/bot/models/bot.dart';
 import 'package:bottino_fortino/modules/bot/models/bot_status.dart';
 import 'package:bottino_fortino/modules/bot/models/bot_types.enum.dart';
 import 'package:bottino_fortino/modules/bot/models/interfaces/pipeline.interface.dart';
+import 'package:bottino_fortino/modules/bot/models/orders_history.dart';
 import 'package:bottino_fortino/providers/file_storage.provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
@@ -30,8 +30,7 @@ class PipelineProvider extends StateNotifier<List<Pipeline>> {
   }
 
   void updateBotStatus(String uuid, BotStatus status) {
-    state.firstWhere((p) => p.bot.uuid == uuid).bot.pipelineData.status =
-        status;
+    state.firstWhere((p) => p.bot.uuid == uuid).status = status;
     state = [...state];
   }
 
@@ -111,7 +110,6 @@ class PipelineProvider extends StateNotifier<List<Pipeline>> {
   }) {
     final bot = MinimizeLossesBot(
       const Uuid().v4(),
-      MinimizeLossesPipeLineData(),
       name: name,
       testNet: testNet,
       config: MinimizeLossesConfig.create(
@@ -123,7 +121,8 @@ class PipelineProvider extends StateNotifier<List<Pipeline>> {
       ),
     );
 
-    final pipeline = MinimizeLossesPipeline(_ref, bot);
+    final pipeline =
+        MinimizeLossesPipeline(_ref, bot, ordersHistory: OrdersHistory([]));
 
     state = [...state, pipeline];
 
@@ -147,8 +146,9 @@ class PipelineProvider extends StateNotifier<List<Pipeline>> {
 
   Pipeline _createBotPipeline(Bot bot) {
     return bot.map(
-      minimizeLosses: (minimizeLosses) =>
-          MinimizeLossesPipeline(_ref, minimizeLosses),
+      minimizeLosses: (minimizeLosses) => MinimizeLossesPipeline(
+          _ref, minimizeLosses,
+          ordersHistory: OrdersHistory([])),
     );
   }
 

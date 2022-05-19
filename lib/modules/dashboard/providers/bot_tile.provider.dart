@@ -15,16 +15,13 @@ class BotTileProvider extends StateNotifier<List<RunOrders>> {
   OrdersOrder selectedOrder;
 
   BotTileProvider(this.pipeline)
-      : hasToStart =
-            pipeline.bot.pipelineData.status.phase == BotPhases.offline ||
-                pipeline.bot.pipelineData.status.phase == BotPhases.error,
-        isStartButtonDisabled =
-            pipeline.bot.pipelineData.status.phase == BotPhases.stopping,
-        isPauseButtonDisabled =
-            pipeline.bot.pipelineData.status.phase == BotPhases.stopping ||
-                pipeline.bot.pipelineData.status.phase == BotPhases.offline,
+      : hasToStart = pipeline.status.phase == BotPhases.offline ||
+            pipeline.status.phase == BotPhases.error,
+        isStartButtonDisabled = pipeline.status.phase == BotPhases.stopping,
+        isPauseButtonDisabled = pipeline.status.phase == BotPhases.stopping ||
+            pipeline.status.phase == BotPhases.offline,
         selectedOrder = OrdersOrder.dateNewest,
-        super([...pipeline.bot.pipelineData.ordersHistory.runOrders]
+        super([...pipeline.ordersHistory.runOrders]
           ..sort((a, b) => _sortByDate(a, b)));
 
   void orderBy(OrdersOrder orderFactor) {

@@ -132,8 +132,8 @@ class TestOrderBook {
     final currentPrice = getPriceStrategy();
     switch (o.type) {
       case OrderTypes.LIMIT:
-        return (o.side == OrderSides.BUY && currentPrice <= o.price) ||
-            (o.side == OrderSides.SELL && currentPrice >= o.price);
+        return (o.side == OrderSides.BUY && currentPrice < o.price) ||
+            (o.side == OrderSides.SELL && currentPrice > o.price);
       case OrderTypes.STOP_LOSS_LIMIT:
         return (o.side == OrderSides.BUY && currentPrice >= o.stopPrice!) ||
             (o.side == OrderSides.SELL && currentPrice <= o.stopPrice!);
@@ -143,11 +143,11 @@ class TestOrderBook {
     }
   }
 
-  OrderCancel removeOrder(TestWallet wallet, int orderId) {
-    final orderIndex = orders.indexWhere((o) => o.orderId == orderId);
-    final order = orders.removeAt(orderIndex);
+  OrderCancel cancelOrder(TestWallet wallet, int orderId) {
+    final index = orders.indexWhere((o) => o.orderId == orderId);
+    orders[index] = orders[index].copyWith(status: OrderStatus.CANCELED);
 
-    final orderCancel = TestUtils.createOrderCancel(order);
+    final orderCancel = TestUtils.createOrderCancel(orders[index]);
 
     wallet.balances = wallet.balances.map((b) {
       // Check whether balance has been used in this order and if so update the account wallet
