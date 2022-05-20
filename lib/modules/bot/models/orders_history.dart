@@ -24,13 +24,14 @@ class OrdersHistory with _$OrdersHistory {
   Iterable<RunOrders> get lossesOnly =>
       runOrders.where((ro) => ro.roi == ROI.loss);
 
-  Iterable<OrderData> get allOrders =>
-      runOrders.map((ro) => ro.orders).reduce((acc, ro) => acc + ro);
+  Iterable<OrderData> get allOrders => runOrders
+      .map((ro) => ro.orders)
+      .fold<List<OrderData>>([], (acc, ro) => acc + ro);
 
   Iterable<OrderData> get cancelledOrders => runOrders
       .map((ro) => ro.orders)
-      .reduce((acc, ro) => acc + ro)
-      .where((o) => o.status == OrderStatus.CANCELED);
+      .fold<List<OrderData>>([], (acc, ro) => acc + ro).where(
+          (o) => o.status == OrderStatus.CANCELED);
 
   void upsertOrderInNotEndedRunOrder(OrderData order) {
     if (lastNotEndedRunOrders == null) {
@@ -64,7 +65,7 @@ class OrdersHistory with _$OrdersHistory {
 
   /// Return the sum of all the orders pair. It could return a negative number
   double getTotalGains() =>
-      runOrders.map((ro) => ro.gains).reduce((acc, ro) => acc + ro);
+      runOrders.map((ro) => ro.gains).fold<double>(0, (acc, g) => acc + g);
 
   factory OrdersHistory.fromJson(Map<String, dynamic> json) =>
       _$OrdersHistoryFromJson(json);

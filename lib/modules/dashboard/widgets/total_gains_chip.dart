@@ -13,7 +13,7 @@ class TotalGainsChip extends StatelessWidget {
     }
 
     final totalGains =
-        _orderPairs.map((op) => op.gains).reduce((acc, g) => acc + g);
+        _orderPairs.map((op) => op.gains).fold<double>(0, (acc, g) => acc + g);
 
     return Chip(
       label: Row(
