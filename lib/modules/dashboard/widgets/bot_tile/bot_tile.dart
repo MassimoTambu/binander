@@ -29,7 +29,7 @@ class BotTile extends ConsumerWidget {
                 style: Theme.of(context).textTheme.headline6,
               ),
               const SizedBox(width: 20),
-              TotalGainsChip(pipeline.ordersHistory.runOrders),
+              TotalGainsChip(pipeline.bot.data.ordersHistory.runOrders),
               const SizedBox(width: 8),
               Chip(
                 label: Row(
@@ -38,9 +38,9 @@ class BotTile extends ConsumerWidget {
                     const Icon(Icons.attach_money_rounded, color: Colors.green),
                     const SizedBox(width: 5),
                     Text(
-                      pipeline.lastAveragePrice == null
+                      pipeline.bot.data.lastAveragePrice == null
                           ? 'No data'
-                          : '${pipeline.lastAveragePrice!.price.floorToDoubleWithDecimals(2)}',
+                          : '${pipeline.bot.data.lastAveragePrice!.price.floorToDoubleWithDecimals(2)}',
                       style: Theme.of(context)
                           .textTheme
                           .labelLarge!
@@ -68,8 +68,8 @@ class _BotTileRightChips extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final botStatus =
-        ref.watch(botTileProvider.notifier.select((p) => p.pipeline.status));
+    final botStatus = ref.watch(
+        botTileProvider.notifier.select((p) => p.pipeline.bot.data.status));
     final testNet = ref
         .watch(botTileProvider.notifier.select((p) => p.pipeline.bot.testNet));
 

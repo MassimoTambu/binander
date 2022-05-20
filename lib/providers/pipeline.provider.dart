@@ -1,6 +1,7 @@
 import 'package:bottino_fortino/models/crypto_symbol.dart';
 import 'package:bottino_fortino/modules/bot/bots/minimize_losses/minimize_losses.config.dart';
 import 'package:bottino_fortino/modules/bot/bots/minimize_losses/minimize_losses.pipeline.dart';
+import 'package:bottino_fortino/modules/bot/bots/minimize_losses/minimize_losses.pipeline_data.dart';
 import 'package:bottino_fortino/modules/bot/models/bot.dart';
 import 'package:bottino_fortino/modules/bot/models/bot_status.dart';
 import 'package:bottino_fortino/modules/bot/models/bot_types.enum.dart';
@@ -30,7 +31,7 @@ class PipelineProvider extends StateNotifier<List<Pipeline>> {
   }
 
   void updateBotStatus(String uuid, BotStatus status) {
-    state.firstWhere((p) => p.bot.uuid == uuid).status = status;
+    state.firstWhere((p) => p.bot.uuid == uuid).bot.data.status = status;
     state = [...state];
   }
 
@@ -110,6 +111,7 @@ class PipelineProvider extends StateNotifier<List<Pipeline>> {
   }) {
     final bot = MinimizeLossesBot(
       const Uuid().v4(),
+      MinimizeLossesPipelineData(ordersHistory: OrdersHistory([])),
       name: name,
       testNet: testNet,
       config: MinimizeLossesConfig.create(
@@ -121,8 +123,7 @@ class PipelineProvider extends StateNotifier<List<Pipeline>> {
       ),
     );
 
-    final pipeline =
-        MinimizeLossesPipeline(_ref, bot, ordersHistory: OrdersHistory([]));
+    final pipeline = MinimizeLossesPipeline(_ref, bot);
 
     state = [...state, pipeline];
 
@@ -146,9 +147,8 @@ class PipelineProvider extends StateNotifier<List<Pipeline>> {
 
   Pipeline _createBotPipeline(Bot bot) {
     return bot.map(
-      minimizeLosses: (minimizeLosses) => MinimizeLossesPipeline(
-          _ref, minimizeLosses,
-          ordersHistory: OrdersHistory([])),
+      minimizeLosses: (minimizeLosses) =>
+          MinimizeLossesPipeline(_ref, minimizeLosses),
     );
   }
 

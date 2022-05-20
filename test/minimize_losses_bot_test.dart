@@ -120,11 +120,11 @@ void main() {
 
   void ensureIsACleanStart(MinimizeLossesPipeline pipeline) {
     expect(pipeline.bot.testNet, isTrue);
-    expect(pipeline.timer, isNull);
-    expect(pipeline.lastAveragePrice, isNull);
-    expect(pipeline.ordersHistory.lastNotEndedRunOrders, isNull);
-    expect(pipeline.ordersHistory.runOrders.length, isZero);
-    expect(pipeline.pipelineCounter, isZero);
+    expect(pipeline.bot.data.timer, isNull);
+    expect(pipeline.bot.data.lastAveragePrice, isNull);
+    expect(pipeline.bot.data.ordersHistory.lastNotEndedRunOrders, isNull);
+    expect(pipeline.bot.data.ordersHistory.runOrders.length, isZero);
+    expect(pipeline.bot.data.counter, isZero);
   }
 
   double getAllLockedAssetFromWallet() {
@@ -140,27 +140,32 @@ void main() {
           // The second one it will fill the buy order.
           // Third lap will submit a sell order.
           // Fourth lap is for trigger sell order.
-          if (pipeline.pipelineCounter == 1) {
+          if (pipeline.bot.data.counter == 1) {
             return startPrice;
           }
-          if (pipeline.pipelineCounter == 2) {
-            expect(pipeline.ordersHistory.lastNotEndedRunOrders?.buyOrder,
+          if (pipeline.bot.data.counter == 2) {
+            expect(
+                pipeline.bot.data.ordersHistory.lastNotEndedRunOrders?.buyOrder,
                 isNotNull);
             return startPrice;
           }
-          if (pipeline.pipelineCounter == 3) {
-            expect(pipeline.ordersHistory.lastNotEndedRunOrders?.buyOrder,
+          if (pipeline.bot.data.counter == 3) {
+            expect(
+                pipeline.bot.data.ordersHistory.lastNotEndedRunOrders?.buyOrder,
                 isNotNull);
             expect(
-                pipeline.ordersHistory.lastNotEndedRunOrders?.buyOrder?.status,
+                pipeline.bot.data.ordersHistory.lastNotEndedRunOrders?.buyOrder
+                    ?.status,
                 OrderStatus.FILLED);
             return 125;
           }
 
-          expect(pipeline.ordersHistory.lastNotEndedRunOrders?.sellOrder,
+          expect(
+              pipeline.bot.data.ordersHistory.lastNotEndedRunOrders?.sellOrder,
               isNotNull);
           expect(
-              pipeline.ordersHistory.lastNotEndedRunOrders?.sellOrder?.status,
+              pipeline.bot.data.ordersHistory.lastNotEndedRunOrders?.sellOrder
+                  ?.status,
               OrderStatus.NEW);
           return 120;
         });
@@ -182,15 +187,15 @@ void main() {
       async.elapse(const Duration(seconds: 30));
 
       // Should be offline
-      expect(pipeline.status.phase, BotPhases.offline);
-      expect(pipeline.pipelineCounter, 4);
-      expect(pipeline.ordersHistory.cancelledOrders.length, 0);
-      expect(pipeline.ordersHistory.runOrders.length, 1);
+      expect(pipeline.bot.data.status.phase, BotPhases.offline);
+      expect(pipeline.bot.data.counter, 4);
+      expect(pipeline.bot.data.ordersHistory.cancelledOrders.length, 0);
+      expect(pipeline.bot.data.ordersHistory.runOrders.length, 1);
       // Is a profit
-      expect(pipeline.ordersHistory.profitsOnly.length, 1);
+      expect(pipeline.bot.data.ordersHistory.profitsOnly.length, 1);
       // No losses
-      expect(pipeline.ordersHistory.lossesOnly.length, 0);
-      expect(pipeline.ordersHistory.getTotalGains(), 42);
+      expect(pipeline.bot.data.ordersHistory.lossesOnly.length, 0);
+      expect(pipeline.bot.data.ordersHistory.getTotalGains(), 42);
       final testAsset = wallet.findBalanceByAsset('USDT');
       expect(TestUtils.approxPriceToFloor(testAsset.free), 1042);
       expect(testAsset.locked, 0);
@@ -208,10 +213,11 @@ void main() {
           // The second one it will fill the buy order.
           // Third lap the price will be lower to submitting sell order.
           // Fourth lap is for trigger sell order.
-          if (pipeline.pipelineCounter == 1 || pipeline.pipelineCounter == 2) {
+          if (pipeline.bot.data.counter == 1 ||
+              pipeline.bot.data.counter == 2) {
             return startPrice;
           }
-          if (pipeline.pipelineCounter == 3) return 90;
+          if (pipeline.bot.data.counter == 3) return 90;
           return 80;
         });
 
@@ -232,15 +238,15 @@ void main() {
       async.elapse(const Duration(seconds: 30));
 
       // Should be offline
-      expect(pipeline.status.phase, BotPhases.offline);
-      expect(pipeline.pipelineCounter, 4);
-      expect(pipeline.ordersHistory.cancelledOrders.length, 0);
-      expect(pipeline.ordersHistory.runOrders.length, 1);
+      expect(pipeline.bot.data.status.phase, BotPhases.offline);
+      expect(pipeline.bot.data.counter, 4);
+      expect(pipeline.bot.data.ordersHistory.cancelledOrders.length, 0);
+      expect(pipeline.bot.data.ordersHistory.runOrders.length, 1);
       // Is a loss
-      expect(pipeline.ordersHistory.lossesOnly.length, 1);
+      expect(pipeline.bot.data.ordersHistory.lossesOnly.length, 1);
       // No profits
-      expect(pipeline.ordersHistory.profitsOnly.length, 0);
-      expect(pipeline.ordersHistory.getTotalGains(), -14);
+      expect(pipeline.bot.data.ordersHistory.profitsOnly.length, 0);
+      expect(pipeline.bot.data.ordersHistory.getTotalGains(), -14);
       final testAsset = wallet.findBalanceByAsset('USDT');
       expect(TestUtils.approxPriceToFloor(testAsset.free), 986);
       expect(testAsset.locked, 0);
@@ -263,10 +269,10 @@ void main() {
           // Twelfth lap will move sell order higher than before and
           // will move the sell order.
           // From thirteenth lap the price will be lower to trigger sell price (in profit).
-          if (pipeline.pipelineCounter == 1) return startPrice;
-          if (pipeline.pipelineCounter <= 9) return 110;
-          if (pipeline.pipelineCounter <= 10) return 109;
-          if (pipeline.pipelineCounter == 12) return 125;
+          if (pipeline.bot.data.counter == 1) return startPrice;
+          if (pipeline.bot.data.counter <= 9) return 110;
+          if (pipeline.bot.data.counter <= 10) return 109;
+          if (pipeline.bot.data.counter == 12) return 125;
           return 90;
         });
 
@@ -289,15 +295,15 @@ void main() {
       async.elapse(const Duration(seconds: 112));
 
       // Should be offline
-      expect(pipeline.status.phase, BotPhases.offline);
-      expect(pipeline.pipelineCounter, 13);
-      expect(pipeline.ordersHistory.cancelledOrders.length, 2);
-      expect(pipeline.ordersHistory.runOrders.length, 2);
+      expect(pipeline.bot.data.status.phase, BotPhases.offline);
+      expect(pipeline.bot.data.counter, 13);
+      expect(pipeline.bot.data.ordersHistory.cancelledOrders.length, 2);
+      expect(pipeline.bot.data.ordersHistory.runOrders.length, 2);
       // Is a profit
-      expect(pipeline.ordersHistory.profitsOnly.length, 1);
+      expect(pipeline.bot.data.ordersHistory.profitsOnly.length, 1);
       // No losses
-      expect(pipeline.ordersHistory.lossesOnly.length, 0);
-      expect(pipeline.ordersHistory.getTotalGains(), 9.53);
+      expect(pipeline.bot.data.ordersHistory.lossesOnly.length, 0);
+      expect(pipeline.bot.data.ordersHistory.getTotalGains(), 9.53);
       final testAsset = wallet.findBalanceByAsset('USDT');
       // Approximation
       expect(TestUtils.approxPriceToFloor(testAsset.free), 1009.54);
@@ -317,10 +323,11 @@ void main() {
           // The second one it will fill the buy order.
           // Third lap the price will be lower to submitting sell order.
           // Fourth lap is for trigger sell order.
-          if (pipeline.pipelineCounter == 1 || pipeline.pipelineCounter == 2) {
+          if (pipeline.bot.data.counter == 1 ||
+              pipeline.bot.data.counter == 2) {
             return startPrice;
           }
-          if (pipeline.pipelineCounter == 3) return 90;
+          if (pipeline.bot.data.counter == 3) return 90;
           return 80;
         });
 
@@ -341,15 +348,15 @@ void main() {
       async.elapse(const Duration(seconds: 30));
 
       // Should be offline
-      expect(pipeline.status.phase, BotPhases.offline);
-      expect(pipeline.pipelineCounter, 4);
-      expect(pipeline.ordersHistory.cancelledOrders.length, 0);
-      expect(pipeline.ordersHistory.runOrders.length, 1);
+      expect(pipeline.bot.data.status.phase, BotPhases.offline);
+      expect(pipeline.bot.data.counter, 4);
+      expect(pipeline.bot.data.ordersHistory.cancelledOrders.length, 0);
+      expect(pipeline.bot.data.ordersHistory.runOrders.length, 1);
       // Is a loss
-      expect(pipeline.ordersHistory.lossesOnly.length, 1);
+      expect(pipeline.bot.data.ordersHistory.lossesOnly.length, 1);
       // No profits
-      expect(pipeline.ordersHistory.profitsOnly.length, 0);
-      expect(pipeline.ordersHistory.getTotalGains(), -14);
+      expect(pipeline.bot.data.ordersHistory.profitsOnly.length, 0);
+      expect(pipeline.bot.data.ordersHistory.getTotalGains(), -14);
       final testAsset = wallet.findBalanceByAsset('USDT');
       expect(TestUtils.approxPriceToFloor(testAsset.free), 986);
       expect(testAsset.locked, 0);
@@ -369,8 +376,9 @@ void main() {
 
       async.elapse(const Duration(seconds: 5));
 
-      expect(pipeline.status.phase, BotPhases.error);
-      expect(pipeline.status.reason, contains('Daily sell loss limit reached'));
+      expect(pipeline.bot.data.status.phase, BotPhases.error);
+      expect(pipeline.bot.data.status.reason,
+          contains('Daily sell loss limit reached'));
     });
   });
 
@@ -384,26 +392,29 @@ void main() {
           // The second one it will fill the buy order.
           // Third lap will submit a sell order.
           // Fourth lap is for trigger sell order.
-          if (pipeline.pipelineCounter == 1 || pipeline.pipelineCounter == 2) {
+          if (pipeline.bot.data.counter == 1 ||
+              pipeline.bot.data.counter == 2) {
             return startPrice;
           }
-          if (pipeline.pipelineCounter == 3) {
+          if (pipeline.bot.data.counter == 3) {
             return 125;
           }
-          if (pipeline.pipelineCounter == 4) {
+          if (pipeline.bot.data.counter == 4) {
             return 120;
           }
           // These are the laps for the 2nd bot start
-          if (pipeline.pipelineCounter == 5 || pipeline.pipelineCounter == 6) {
+          if (pipeline.bot.data.counter == 5 ||
+              pipeline.bot.data.counter == 6) {
             return startPrice;
           }
-          if (pipeline.pipelineCounter == 7) return 90;
-          if (pipeline.pipelineCounter == 8) return 80;
+          if (pipeline.bot.data.counter == 7) return 90;
+          if (pipeline.bot.data.counter == 8) return 80;
           // 3nd bot start
-          if (pipeline.pipelineCounter == 9 || pipeline.pipelineCounter == 10) {
+          if (pipeline.bot.data.counter == 9 ||
+              pipeline.bot.data.counter == 10) {
             return startPrice;
           }
-          if (pipeline.pipelineCounter == 11) {
+          if (pipeline.bot.data.counter == 11) {
             return 125;
           }
 
@@ -427,49 +438,49 @@ void main() {
       async.elapse(const Duration(seconds: 30));
 
       // Should be offline
-      expect(pipeline.status.phase, BotPhases.offline);
-      expect(pipeline.pipelineCounter, 4);
-      expect(pipeline.ordersHistory.cancelledOrders.length, 0);
-      expect(pipeline.ordersHistory.runOrders.length, 1);
+      expect(pipeline.bot.data.status.phase, BotPhases.offline);
+      expect(pipeline.bot.data.counter, 4);
+      expect(pipeline.bot.data.ordersHistory.cancelledOrders.length, 0);
+      expect(pipeline.bot.data.ordersHistory.runOrders.length, 1);
       // Is a profit
-      expect(pipeline.ordersHistory.profitsOnly.length, 1);
+      expect(pipeline.bot.data.ordersHistory.profitsOnly.length, 1);
       // No losses
-      expect(pipeline.ordersHistory.lossesOnly.length, 0);
-      expect(pipeline.ordersHistory.getTotalGains(), 21);
+      expect(pipeline.bot.data.ordersHistory.lossesOnly.length, 0);
+      expect(pipeline.bot.data.ordersHistory.getTotalGains(), 21);
 
-      expect(pipeline.timer, isNull);
-      expect(pipeline.ordersHistory.lastNotEndedRunOrders, isNull);
+      expect(pipeline.bot.data.timer, isNull);
+      expect(pipeline.bot.data.ordersHistory.lastNotEndedRunOrders, isNull);
 
       pipeline.start();
 
       async.elapse(const Duration(seconds: 30));
 
       // Should be offline
-      expect(pipeline.status.phase, BotPhases.offline);
-      expect(pipeline.ordersHistory.runOrders.length, 2);
-      expect(pipeline.pipelineCounter, 8);
+      expect(pipeline.bot.data.status.phase, BotPhases.offline);
+      expect(pipeline.bot.data.ordersHistory.runOrders.length, 2);
+      expect(pipeline.bot.data.counter, 8);
       // Is a profit
-      expect(pipeline.ordersHistory.profitsOnly.length, 1);
+      expect(pipeline.bot.data.ordersHistory.profitsOnly.length, 1);
       // No losses
-      expect(pipeline.ordersHistory.lossesOnly.length, 1);
-      expect(pipeline.ordersHistory.getTotalGains(), 7);
+      expect(pipeline.bot.data.ordersHistory.lossesOnly.length, 1);
+      expect(pipeline.bot.data.ordersHistory.getTotalGains(), 7);
 
-      expect(pipeline.timer, isNull);
-      expect(pipeline.ordersHistory.lastNotEndedRunOrders, isNull);
+      expect(pipeline.bot.data.timer, isNull);
+      expect(pipeline.bot.data.ordersHistory.lastNotEndedRunOrders, isNull);
 
       pipeline.start();
 
       async.elapse(const Duration(seconds: 30));
 
       // Should be offline
-      expect(pipeline.status.phase, BotPhases.offline);
-      expect(pipeline.ordersHistory.runOrders.length, 3);
-      expect(pipeline.pipelineCounter, 12);
+      expect(pipeline.bot.data.status.phase, BotPhases.offline);
+      expect(pipeline.bot.data.ordersHistory.runOrders.length, 3);
+      expect(pipeline.bot.data.counter, 12);
       // Is a profit
-      expect(pipeline.ordersHistory.profitsOnly.length, 2);
+      expect(pipeline.bot.data.ordersHistory.profitsOnly.length, 2);
       // No losses
-      expect(pipeline.ordersHistory.lossesOnly.length, 1);
-      expect(pipeline.ordersHistory.getTotalGains(), 28);
+      expect(pipeline.bot.data.ordersHistory.lossesOnly.length, 1);
+      expect(pipeline.bot.data.ordersHistory.getTotalGains(), 28);
       final testAsset = wallet.findBalanceByAsset('USDT');
       expect(TestUtils.approxPriceToFloor(testAsset.free), 1028);
       expect(testAsset.locked, 0);
@@ -484,13 +495,14 @@ void main() {
     orderBook = TestOrderBook.create(
         orders: [],
         getPriceStrategy: () {
-          if (pipeline.pipelineCounter <= 6) {
+          if (pipeline.bot.data.counter <= 6) {
             return startPrice;
           }
-          if (pipeline.pipelineCounter == 7 || pipeline.pipelineCounter == 8) {
+          if (pipeline.bot.data.counter == 7 ||
+              pipeline.bot.data.counter == 8) {
             return 125;
           }
-          if (pipeline.pipelineCounter <= 12) {
+          if (pipeline.bot.data.counter <= 12) {
             return 150;
           }
 
@@ -514,15 +526,15 @@ void main() {
       async.elapse(const Duration(seconds: 120));
 
       // Should be offline
-      expect(pipeline.status.phase, BotPhases.offline);
-      expect(pipeline.pipelineCounter, 13);
-      expect(pipeline.ordersHistory.cancelledOrders.length, 2);
-      expect(pipeline.ordersHistory.runOrders.length, 1);
+      expect(pipeline.bot.data.status.phase, BotPhases.offline);
+      expect(pipeline.bot.data.counter, 13);
+      expect(pipeline.bot.data.ordersHistory.cancelledOrders.length, 2);
+      expect(pipeline.bot.data.ordersHistory.runOrders.length, 1);
       // Is a profit
-      expect(pipeline.ordersHistory.profitsOnly.length, 1);
+      expect(pipeline.bot.data.ordersHistory.profitsOnly.length, 1);
       // No losses
-      expect(pipeline.ordersHistory.lossesOnly.length, 0);
-      expect(pipeline.ordersHistory.getTotalGains(), 46);
+      expect(pipeline.bot.data.ordersHistory.lossesOnly.length, 0);
+      expect(pipeline.bot.data.ordersHistory.getTotalGains(), 46);
       final testAsset = wallet.findBalanceByAsset('USDT');
       expect(TestUtils.approxPriceToFloor(testAsset.free), 1046);
       expect(testAsset.locked, 0);
@@ -556,16 +568,16 @@ void main() {
       async.elapse(const Duration(seconds: 20));
 
       // Should be offline
-      expect(pipeline.status.phase, BotPhases.error);
-      expect(pipeline.pipelineCounter, 1);
-      expect(pipeline.ordersHistory.cancelledOrders.length, 0);
-      expect(pipeline.ordersHistory.runOrders.length, 0);
+      expect(pipeline.bot.data.status.phase, BotPhases.error);
+      expect(pipeline.bot.data.counter, 1);
+      expect(pipeline.bot.data.ordersHistory.cancelledOrders.length, 0);
+      expect(pipeline.bot.data.ordersHistory.runOrders.length, 0);
       // There should not be any locked asset
       expect(getAllLockedAssetFromWallet(), 0);
       verify(mockTradeProvider.getAccountInformation(any)).called(1);
       verifyNoMoreInteractions(mockMarketProvider);
       verifyNoMoreInteractions(mockTradeProvider);
-      expect(pipeline.status.reason,
+      expect(pipeline.bot.data.status.reason,
           contains('asset not found on wallet account'));
     });
   });
@@ -580,21 +592,24 @@ void main() {
           // The second one it will fill the buy order.
           // Third lap will submit a sell order.
           // Fourth lap is for trigger sell order.
-          if (pipeline.pipelineCounter == 1) {
+          if (pipeline.bot.data.counter == 1) {
             return startPrice;
           }
-          if (pipeline.pipelineCounter == 2) {
-            expect(pipeline.ordersHistory.lastNotEndedRunOrders, isNotNull);
+          if (pipeline.bot.data.counter == 2) {
+            expect(pipeline.bot.data.ordersHistory.lastNotEndedRunOrders,
+                isNotNull);
             return startPrice;
           }
-          if (pipeline.pipelineCounter == 3) {
-            expect(pipeline.ordersHistory.lastNotEndedRunOrders, isNotNull);
+          if (pipeline.bot.data.counter == 3) {
+            expect(pipeline.bot.data.ordersHistory.lastNotEndedRunOrders,
+                isNotNull);
             expect(
-                pipeline.ordersHistory.lastNotEndedRunOrders?.buyOrder?.status,
+                pipeline.bot.data.ordersHistory.lastNotEndedRunOrders?.buyOrder
+                    ?.status,
                 OrderStatus.FILLED);
             return 125;
           }
-          if (pipeline.pipelineCounter == 4) {
+          if (pipeline.bot.data.counter == 4) {
             return 120;
           }
 
@@ -617,19 +632,22 @@ void main() {
 
       async.elapse(const Duration(seconds: 10));
 
-      expect(pipeline.status.phase, BotPhases.online);
-      expect(pipeline.pipelineCounter, 2);
+      expect(pipeline.bot.data.status.phase, BotPhases.online);
+      expect(pipeline.bot.data.counter, 2);
 
       pipeline.pause();
-      expect(pipeline.status.phase, BotPhases.offline);
-      expect(pipeline.status.reason, contains('Paused by user'));
-      expect(pipeline.pipelineCounter, 2);
-      expect(pipeline.ordersHistory.lastNotEndedRunOrders?.sellOrder, isNull);
-      expect(pipeline.ordersHistory.lastNotEndedRunOrders?.buyOrder?.status,
+      expect(pipeline.bot.data.status.phase, BotPhases.offline);
+      expect(pipeline.bot.data.status.reason, contains('Paused by user'));
+      expect(pipeline.bot.data.counter, 2);
+      expect(pipeline.bot.data.ordersHistory.lastNotEndedRunOrders?.sellOrder,
+          isNull);
+      expect(
+          pipeline
+              .bot.data.ordersHistory.lastNotEndedRunOrders?.buyOrder?.status,
           OrderStatus.FILLED);
-      expect(pipeline.ordersHistory.runOrders.length, 1);
+      expect(pipeline.bot.data.ordersHistory.runOrders.length, 1);
       //TODO Remove
-      expect(pipeline.ordersHistory.runOrders.first.sellOrder, isNull);
+      expect(pipeline.bot.data.ordersHistory.runOrders.first.sellOrder, isNull);
 
       async.elapse(const Duration(seconds: 20));
 
@@ -638,15 +656,15 @@ void main() {
       async.elapse(const Duration(seconds: 20));
 
       // Should be offline
-      expect(pipeline.status.phase, BotPhases.offline);
-      expect(pipeline.pipelineCounter, 5);
-      expect(pipeline.ordersHistory.cancelledOrders.length, 0);
-      expect(pipeline.ordersHistory.runOrders.length, 1);
+      expect(pipeline.bot.data.status.phase, BotPhases.offline);
+      expect(pipeline.bot.data.counter, 5);
+      expect(pipeline.bot.data.ordersHistory.cancelledOrders.length, 0);
+      expect(pipeline.bot.data.ordersHistory.runOrders.length, 1);
       // Is a profit
-      expect(pipeline.ordersHistory.profitsOnly.length, 1);
+      expect(pipeline.bot.data.ordersHistory.profitsOnly.length, 1);
       // No losses
-      expect(pipeline.ordersHistory.lossesOnly.length, 0);
-      expect(pipeline.ordersHistory.getTotalGains(), 32);
+      expect(pipeline.bot.data.ordersHistory.lossesOnly.length, 0);
+      expect(pipeline.bot.data.ordersHistory.getTotalGains(), 32);
       final testAsset = wallet.findBalanceByAsset('USDT');
       expect(TestUtils.approxPriceToFloor(testAsset.free), 1032);
       expect(testAsset.locked, 0);

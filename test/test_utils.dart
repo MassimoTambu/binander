@@ -1,7 +1,9 @@
 import 'package:bottino_fortino/api/api.dart';
 import 'package:bottino_fortino/models/crypto_symbol.dart';
 import 'package:bottino_fortino/modules/bot/bots/minimize_losses/minimize_losses.config.dart';
+import 'package:bottino_fortino/modules/bot/bots/minimize_losses/minimize_losses.pipeline_data.dart';
 import 'package:bottino_fortino/modules/bot/models/bot.dart';
+import 'package:bottino_fortino/modules/bot/models/orders_history.dart';
 import 'package:clock/clock.dart';
 import 'package:uuid/uuid.dart';
 
@@ -26,6 +28,7 @@ class TestUtils {
   }) =>
       MinimizeLossesBot(
         const Uuid().v4(),
+        MinimizeLossesPipelineData(ordersHistory: OrdersHistory([])),
         name: name,
         testNet: true,
         config: MinimizeLossesConfig(
