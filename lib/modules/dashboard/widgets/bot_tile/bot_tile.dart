@@ -1,3 +1,4 @@
+import 'package:bottino_fortino/modules/bot/bots/minimize_losses/minimize_losses.pipeline.dart';
 import 'package:bottino_fortino/modules/dashboard/providers/bot_tile.provider.dart';
 import 'package:bottino_fortino/modules/dashboard/widgets/bot_tile/bot_tile_buttons.dart';
 import 'package:bottino_fortino/modules/dashboard/widgets/bot_tile_orders/bot_tile_orders.dart';
@@ -49,15 +50,55 @@ class BotTile extends ConsumerWidget {
                   ],
                 ),
               ),
+              if (pipeline.bot.data.ordersHistory.lastNotEndedRunOrders
+                      ?.sellOrder !=
+                  null)
+                Padding(
+                  padding: const EdgeInsets.only(left: 8),
+                  child: Chip(
+                    label: Text(
+                      'Stop: ${pipeline.bot.data.ordersHistory.lastNotEndedRunOrders?.sellOrder?.stopPrice?.floorToDoubleWithDecimals(2)}',
+                      style: Theme.of(context)
+                          .textTheme
+                          .labelLarge!
+                          .copyWith(fontWeight: FontWeight.w600),
+                    ),
+                  ),
+                ),
+              if (pipeline.bot.data.ordersHistory.lastNotEndedRunOrders
+                          ?.sellOrder !=
+                      null &&
+                  pipeline is MinimizeLossesPipeline)
+                Padding(
+                  padding: const EdgeInsets.only(left: 8),
+                  child: Chip(
+                    label: Text(
+                      'Σ: ${pipeline.calculateNewOrderStopPrice().floorToDoubleWithDecimals(2)}',
+                      style: Theme.of(context)
+                          .textTheme
+                          .labelLarge!
+                          .copyWith(fontWeight: FontWeight.w600),
+                    ),
+                  ),
+                ),
             ],
           ),
           const _BotTileRightChips(),
         ],
       ),
       childrenPadding: const EdgeInsets.all(18),
-      children: const [
-        BotTileButtons(),
-        BotTileOrders(),
+      expandedCrossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(bottom: 16),
+          child: Text(
+            'Status: ${pipeline.bot.data.status.reason}',
+            style:
+                Theme.of(context).textTheme.bodyMedium?.copyWith(fontSize: 15),
+          ),
+        ),
+        const BotTileButtons(),
+        const BotTileOrders(),
       ],
     );
   }

@@ -373,8 +373,7 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
 
   Future<OrderNewStopLimit> _submitStopSellOrder() async {
     final price = _calculateNewOrderPrice().floorToDoubleWithDecimals(2);
-    final stopPrice =
-        _calculateNewOrderStopPrice().floorToDoubleWithDecimals(2);
+    final stopPrice = calculateNewOrderStopPrice().floorToDoubleWithDecimals(2);
 
     final res = await ref.read(apiProvider).spot.trade.newStopLimitOrder(
         _getApiConnection(),
@@ -427,10 +426,10 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
 
   bool _hasToMoveOrder() {
     final sellOrder = bot.data.ordersHistory.lastNotEndedRunOrders!.sellOrder!;
-    print("calcNewStopPrice ${_calculateNewOrderStopPrice()}");
+    print("calcNewStopPrice ${calculateNewOrderStopPrice()}");
     print("lastAvgPrice: ${bot.data.lastAveragePrice!.price}");
     print("stopPrice: ${sellOrder.stopPrice!}");
-    return _calculateNewOrderStopPrice() > sellOrder.stopPrice!;
+    return calculateNewOrderStopPrice() > sellOrder.stopPrice!;
   }
 
   double _calculateNewOrderPrice() {
@@ -440,11 +439,21 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
         (lastBuyOrder * (bot.config.percentageSellOrder! + 1) / 100);
   }
 
-  double _calculateNewOrderStopPrice() {
-    final lastBuyOrder =
-        bot.data.ordersHistory.lastNotEndedRunOrders!.buyOrder!.price;
-    return bot.data.lastAveragePrice!.price -
-        (lastBuyOrder * bot.config.percentageSellOrder! / 100);
+  /// Calculate the new sell order stop price.
+  /// It could return 0 if atleast one of last buy order, last average price or
+  /// percentage sell order were null
+  double calculateNewOrderStopPrice() {
+    final lastBuyOrderPrice =
+        bot.data.ordersHistory.lastNotEndedRunOrders?.buyOrder?.price;
+    final lastAvgPrice = bot.data.lastAveragePrice?.price;
+    final percentageSellOrder = bot.config.percentageSellOrder;
+    if (lastBuyOrderPrice == null ||
+        lastAvgPrice == null ||
+        percentageSellOrder == null) {
+      return 0;
+    }
+
+    return lastAvgPrice - (lastBuyOrderPrice * percentageSellOrder / 100);
   }
 
   bool _hasReachDailySellLossLimit() {
