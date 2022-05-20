@@ -7,16 +7,14 @@ class BotTileButtons extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final _botTileProvider = ref.watch(botTileProvider.notifier);
-    final isStartDisabled = _botTileProvider.isStartButtonDisabled;
-    final isPauseDisabled = _botTileProvider.isPauseButtonDisabled;
-    final isStarted = !_botTileProvider.hasToStart;
+    final botTile = ref.watch(botTileProvider.notifier);
+    final isStartDisabled = botTile.isStartButtonDisabled;
+    final isPauseDisabled = botTile.isPauseButtonDisabled;
+    final isStarted = !botTile.hasToStart;
 
     return Row(
       children: [
         ElevatedButton(
-          child: Text(isStarted ? 'Stop' : 'Start',
-              style: const TextStyle(fontWeight: FontWeight.bold)),
           style: ButtonStyle(
             backgroundColor: MaterialStateProperty.all<Color>(
               isStarted ? Colors.red : Theme.of(context).colorScheme.primary,
@@ -26,15 +24,15 @@ class BotTileButtons extends ConsumerWidget {
               ? null
               : () {
                   if (!isStarted) {
-                    _botTileProvider.pipeline.start();
+                    botTile.pipeline.start();
                   } else {
-                    _botTileProvider.pipeline.shutdown();
+                    botTile.pipeline.shutdown();
                   }
                 },
+          child: Text(isStarted ? 'Stop' : 'Start',
+              style: const TextStyle(fontWeight: FontWeight.bold)),
         ),
         ElevatedButton(
-          child: const Text('Pause',
-              style: TextStyle(fontWeight: FontWeight.bold)),
           style: ButtonStyle(
             backgroundColor: MaterialStateProperty.all<Color>(
               isStarted
@@ -46,9 +44,11 @@ class BotTileButtons extends ConsumerWidget {
               ? null
               : () {
                   if (isStarted) {
-                    _botTileProvider.pipeline.pause();
+                    botTile.pipeline.pause();
                   }
                 },
+          child: const Text('Pause',
+              style: TextStyle(fontWeight: FontWeight.bold)),
         ),
       ],
     );

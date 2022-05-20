@@ -126,7 +126,7 @@ class BotConfigContainer extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            ref.watch(createBotProvider).name + ' options',
+            '${ref.watch(createBotProvider).name} options',
             style: TextStyle(
                 fontSize: Theme.of(context).textTheme.subtitle1?.fontSize),
           ),

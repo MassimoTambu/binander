@@ -72,7 +72,7 @@ class ApiUtils {
       }
     });
 
-    queryString += 'timestamp=' + queryParams['timestamp']!;
+    queryString += 'timestamp=${queryParams['timestamp']!}';
 
     final encodedQuery = utf8.encode(queryString);
     final encodedSecret = utf8.encode(apiSecret);

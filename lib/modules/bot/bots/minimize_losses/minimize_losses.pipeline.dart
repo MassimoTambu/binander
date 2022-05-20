@@ -114,7 +114,7 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
       reason = ': $reason';
     }
 
-    changeStatusTo(BotPhases.stopping, 'stopping' + reason);
+    changeStatusTo(BotPhases.stopping, 'stopping$reason');
 
     // We should leave a clean environment before stopping the bot.
     // If for some reason the bot has going to stop we should cancel the opened orders
@@ -132,7 +132,7 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
     bot.data.lastAveragePrice = null;
     bot.data.ordersHistory.closeRunOrder();
 
-    final closingMessage = 'Turned off' + reason;
+    final closingMessage = 'Turned off$reason';
 
     changeStatusTo(phase, closingMessage);
 
@@ -311,7 +311,7 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
                   _getApiConnection(), bot.config.symbol!, newBuyOrder.orderId))
           .body;
       bot.data.ordersHistory.upsertOrderInNotEndedRunOrder(buyOrderData);
-    } on ApiException catch (_, __) {
+    } on ApiException {
       const message = 'Failed to submit buy order. Retry in 10s';
 
       changeStatusTo(BotPhases.starting, message);
@@ -362,7 +362,7 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
                   stopLimitOrder.orderId))
           .body;
       bot.data.ordersHistory.upsertOrderInNotEndedRunOrder(sellOrderData);
-    } on ApiException catch (_, __) {
+    } on ApiException {
       final message = '${bot.name} - Failed to submit sell order';
 
       changeStatusTo(BotPhases.error, message);
@@ -406,7 +406,7 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
               _getApiConnection(), bot.config.symbol!, orderCancel.orderId))
           .body;
       bot.data.ordersHistory.lastNotEndedRunOrders?.orders.add(orderData);
-    } on ApiException catch (_, __) {
+    } on ApiException {
       const message = 'Failed to submit cancel order';
 
       changeStatusTo(BotPhases.error, message);

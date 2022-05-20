@@ -34,11 +34,11 @@ class BinanceStatusIndicator<T> extends ConsumerWidget {
             },
             loading: () {
               return const SizedBox(
+                width: 24,
+                height: 24,
                 child: CircularProgressIndicator(
                   strokeWidth: 3,
                 ),
-                width: 24,
-                height: 24,
               );
             },
             error: (error, stackTrace) {

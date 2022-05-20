@@ -17,7 +17,7 @@ class FileStorageProvider {
   static const encoder = JsonEncoder.withIndent('  ');
 
   static final String defaultApplicationPath = Directory.current.absolute.path;
-  static final String defaultFileName = defaultApplicationPath + '/data.json';
+  static final String defaultFileName = '$defaultApplicationPath/data.json';
 
   Future<bool> init() async {
     if (kDebugMode) {
@@ -32,8 +32,8 @@ class FileStorageProvider {
     final file = File.fromUri(Uri.file(defaultFileName));
 
     if (await file.exists()) {
-      final _data = await file.readAsString();
-      data = jsonDecode(_data);
+      final dataFromFile = await file.readAsString();
+      data = jsonDecode(dataFromFile);
 
       // sink = file.openWrite();
     } else {

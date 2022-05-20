@@ -58,9 +58,9 @@ class DashboardPage extends ConsumerWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _navigateToAddBotPage(context),
-        child: const Icon(Icons.add),
         backgroundColor: Theme.of(context).colorScheme.primary,
         foregroundColor: Theme.of(context).colorScheme.onPrimary,
+        child: const Icon(Icons.add),
       ),
       persistentFooterButtons: const [Text("v 0.6.9 - Dio 🐷")],
     );
