@@ -1,5 +1,3 @@
-// ignore_for_file: prefer_initializing_formals
-
 import 'package:bottino_fortino/models/config_field.dart';
 import 'package:bottino_fortino/models/constants/symbols.dart';
 import 'package:bottino_fortino/models/crypto_symbol.dart';
@@ -28,17 +26,12 @@ class MinimizeLossesConfig implements Config {
   });
 
   MinimizeLossesConfig.create({
-    required int dailyLossSellOrders,
-    required double maxInvestmentPerOrder,
-    required double percentageSellOrder,
-    required CryptoSymbol symbol,
-    required Duration timerBuyOrder,
+    required this.dailyLossSellOrders,
+    required this.maxInvestmentPerOrder,
+    required this.percentageSellOrder,
+    required this.symbol,
+    required this.timerBuyOrder,
   }) {
-    this.dailyLossSellOrders = dailyLossSellOrders;
-    this.maxInvestmentPerOrder = maxInvestmentPerOrder;
-    this.percentageSellOrder = percentageSellOrder;
-    this.symbol = symbol;
-    this.timerBuyOrder = timerBuyOrder;
     configFields[dailyLossSellOrdersName]!.value =
         dailyLossSellOrders.toString();
     configFields[maxInvestmentPerOrderName]!.value =
@@ -46,7 +39,8 @@ class MinimizeLossesConfig implements Config {
     configFields[percentageSellOrderName]!.value =
         percentageSellOrder.toString();
     configFields[symbolName]!.value = symbol.toString();
-    configFields[timerBuyOrderName]!.value = timerBuyOrder.inMinutes.toString();
+    configFields[timerBuyOrderName]!.value =
+        timerBuyOrder!.inMinutes.toString();
   }
 
   @override
