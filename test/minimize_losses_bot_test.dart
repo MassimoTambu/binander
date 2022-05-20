@@ -128,7 +128,9 @@ void main() {
   }
 
   double getAllLockedAssetFromWallet() {
-    return wallet.balances.map((b) => b.locked).reduce((acc, b) => acc + b);
+    return wallet.balances
+        .map((b) => b.locked)
+        .fold<double>(0, (acc, g) => acc + g);
   }
 
   test('Submit buy order and sell order, then close sell order in profit',
@@ -147,7 +149,7 @@ void main() {
             expect(
                 pipeline.bot.data.ordersHistory.lastNotEndedRunOrders?.buyOrder,
                 isNotNull);
-            return startPrice;
+            return 99;
           }
           if (pipeline.bot.data.counter == 3) {
             expect(
@@ -213,10 +215,10 @@ void main() {
           // The second one it will fill the buy order.
           // Third lap the price will be lower to submitting sell order.
           // Fourth lap is for trigger sell order.
-          if (pipeline.bot.data.counter == 1 ||
-              pipeline.bot.data.counter == 2) {
-            return startPrice;
-          }
+          if (pipeline.bot.data.counter == 1) return startPrice;
+
+          if (pipeline.bot.data.counter == 2) return 99;
+
           if (pipeline.bot.data.counter == 3) return 90;
           return 80;
         });
@@ -323,10 +325,10 @@ void main() {
           // The second one it will fill the buy order.
           // Third lap the price will be lower to submitting sell order.
           // Fourth lap is for trigger sell order.
-          if (pipeline.bot.data.counter == 1 ||
-              pipeline.bot.data.counter == 2) {
-            return startPrice;
-          }
+          if (pipeline.bot.data.counter == 1) return startPrice;
+
+          if (pipeline.bot.data.counter == 2) return 99;
+
           if (pipeline.bot.data.counter == 3) return 90;
           return 80;
         });
@@ -392,31 +394,19 @@ void main() {
           // The second one it will fill the buy order.
           // Third lap will submit a sell order.
           // Fourth lap is for trigger sell order.
-          if (pipeline.bot.data.counter == 1 ||
-              pipeline.bot.data.counter == 2) {
-            return startPrice;
-          }
-          if (pipeline.bot.data.counter == 3) {
-            return 125;
-          }
-          if (pipeline.bot.data.counter == 4) {
-            return 120;
-          }
+          if (pipeline.bot.data.counter == 1) return startPrice;
+          if (pipeline.bot.data.counter == 2) return 99;
+          if (pipeline.bot.data.counter == 3) return 125;
+          if (pipeline.bot.data.counter == 4) return 120;
           // These are the laps for the 2nd bot start
-          if (pipeline.bot.data.counter == 5 ||
-              pipeline.bot.data.counter == 6) {
-            return startPrice;
-          }
+          if (pipeline.bot.data.counter == 5) return startPrice;
+          if (pipeline.bot.data.counter == 6) return 99;
           if (pipeline.bot.data.counter == 7) return 90;
           if (pipeline.bot.data.counter == 8) return 80;
           // 3nd bot start
-          if (pipeline.bot.data.counter == 9 ||
-              pipeline.bot.data.counter == 10) {
-            return startPrice;
-          }
-          if (pipeline.bot.data.counter == 11) {
-            return 125;
-          }
+          if (pipeline.bot.data.counter == 9) return startPrice;
+          if (pipeline.bot.data.counter == 10) return 99;
+          if (pipeline.bot.data.counter == 11) return 125;
 
           return 120;
         });
@@ -436,7 +426,6 @@ void main() {
       pipeline.start();
 
       async.elapse(const Duration(seconds: 30));
-
       // Should be offline
       expect(pipeline.bot.data.status.phase, BotPhases.offline);
       expect(pipeline.bot.data.counter, 4);
@@ -495,16 +484,14 @@ void main() {
     orderBook = TestOrderBook.create(
         orders: [],
         getPriceStrategy: () {
-          if (pipeline.bot.data.counter <= 6) {
-            return startPrice;
-          }
+          if (pipeline.bot.data.counter == 1) return startPrice;
+          if (pipeline.bot.data.counter == 2) return 99;
+          if (pipeline.bot.data.counter <= 6) return startPrice;
           if (pipeline.bot.data.counter == 7 ||
               pipeline.bot.data.counter == 8) {
             return 125;
           }
-          if (pipeline.bot.data.counter <= 12) {
-            return 150;
-          }
+          if (pipeline.bot.data.counter <= 12) return 150;
 
           return 120;
         });
@@ -592,13 +579,12 @@ void main() {
           // The second one it will fill the buy order.
           // Third lap will submit a sell order.
           // Fourth lap is for trigger sell order.
-          if (pipeline.bot.data.counter == 1) {
-            return startPrice;
-          }
+          if (pipeline.bot.data.counter == 1) return startPrice;
+
           if (pipeline.bot.data.counter == 2) {
             expect(pipeline.bot.data.ordersHistory.lastNotEndedRunOrders,
                 isNotNull);
-            return startPrice;
+            return 99;
           }
           if (pipeline.bot.data.counter == 3) {
             expect(pipeline.bot.data.ordersHistory.lastNotEndedRunOrders,
@@ -609,9 +595,7 @@ void main() {
                 OrderStatus.FILLED);
             return 125;
           }
-          if (pipeline.bot.data.counter == 4) {
-            return 120;
-          }
+          if (pipeline.bot.data.counter == 4) return 120;
 
           return 110;
         });

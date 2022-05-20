@@ -6,7 +6,6 @@ import 'package:bottino_fortino/modules/bot/models/bot_limit.dart';
 import 'package:bottino_fortino/modules/bot/models/bot_phases.enum.dart';
 import 'package:bottino_fortino/modules/bot/models/bot_status.dart';
 import 'package:bottino_fortino/modules/bot/models/interfaces/pipeline.interface.dart';
-import 'package:bottino_fortino/modules/bot/models/orders_history.dart';
 import 'package:bottino_fortino/modules/bot/models/roi.enum.dart';
 import 'package:bottino_fortino/modules/settings/models/api_connection.dart';
 import 'package:bottino_fortino/modules/settings/providers/settings.provider.dart';
@@ -96,6 +95,7 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
   @override
   void pause() {
     bot.data.timer?.cancel();
+    bot.data.timer = null;
 
     const message = 'Paused by user';
 
@@ -108,6 +108,7 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
   void shutdown(
       {BotPhases phase = BotPhases.offline, String reason = ''}) async {
     bot.data.timer?.cancel();
+    bot.data.timer = null;
 
     if (reason.isNotEmpty) {
       reason = ': $reason';
@@ -181,7 +182,8 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
       bot.data.buyOrderStartedAt = null;
       timer.cancel();
 
-      timer = Timer.periodic(const Duration(seconds: 2), (_) => start());
+      bot.data.timer =
+          Timer.periodic(const Duration(seconds: 2), (_) => start());
       return;
     }
 
