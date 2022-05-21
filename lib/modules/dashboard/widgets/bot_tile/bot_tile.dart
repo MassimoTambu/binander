@@ -1,3 +1,4 @@
+import 'package:bottino_fortino/modules/bot/bots/minimize_losses/minimize_losses.config.dart';
 import 'package:bottino_fortino/modules/bot/bots/minimize_losses/minimize_losses.pipeline.dart';
 import 'package:bottino_fortino/modules/dashboard/providers/bot_tile.provider.dart';
 import 'package:bottino_fortino/modules/dashboard/widgets/bot_tile/bot_tile_buttons.dart';
@@ -29,6 +30,46 @@ class BotTile extends ConsumerWidget {
               Text(
                 bot.name,
                 style: Theme.of(context).textTheme.headline6,
+              ),
+              const SizedBox(width: 4),
+              IconButton(
+                icon: Icon(Icons.info,
+                    color: Theme.of(context).colorScheme.onSecondary),
+                splashRadius: 20,
+                onPressed: () => showDialog<void>(
+                    context: context,
+                    builder: (context) {
+                      return AlertDialog(
+                        title: Text('Bot ${bot.name} info'),
+                        content: SizedBox(
+                          width: MediaQuery.of(context).size.width / 3,
+                          height: MediaQuery.of(context).size.height / 3,
+                          child: Column(children: [
+                            const SizedBox(height: 20),
+                            Expanded(
+                              child: Text(
+                                  '${MinimizeLossesConfig.dailyLossSellOrdersPublicName}: ${bot.config.dailyLossSellOrders}'),
+                            ),
+                            Expanded(
+                              child: Text(
+                                  '${MinimizeLossesConfig.maxInvestmentPerOrderPublicName}: ${bot.config.maxInvestmentPerOrder}'),
+                            ),
+                            Expanded(
+                              child: Text(
+                                  '${MinimizeLossesConfig.percentageSellOrderPublicName}: ${bot.config.percentageSellOrder}'),
+                            ),
+                            Expanded(
+                              child: Text(
+                                  '${MinimizeLossesConfig.symbolPublicName}: ${bot.config.symbol}'),
+                            ),
+                            Expanded(
+                              child: Text(
+                                  '${MinimizeLossesConfig.timerBuyOrderPublicName}: ${bot.config.timerBuyOrder?.inMinutes} minutes'),
+                            ),
+                          ]),
+                        ),
+                      );
+                    }),
               ),
               const SizedBox(width: 20),
               TotalGainsChip(bot.data.ordersHistory.runOrders),
