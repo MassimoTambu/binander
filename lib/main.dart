@@ -7,16 +7,12 @@ import 'package:bottino_fortino/providers/file_storage.provider.dart';
 import 'package:bottino_fortino/providers/init.provider.dart';
 import 'package:bottino_fortino/providers/pipeline.provider.dart';
 import 'package:bottino_fortino/router/app_router.dart';
-import 'package:bottino_fortino/utils/provider_logger.utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:form_builder_validators/localization/l10n.dart';
 
 Future<void> main() async {
-  runApp(ProviderScope(
-    observers: [ProviderLoggerUtils()],
-    child: BottinoFortino(),
-  ));
+  runApp(ProviderScope(child: BottinoFortino()));
 }
 
 class BottinoFortino extends ConsumerWidget {
