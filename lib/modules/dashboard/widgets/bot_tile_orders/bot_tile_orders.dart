@@ -10,7 +10,7 @@ class BotTileOrders extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final allOrders = ref.watch(botTileProvider);
+    final allOrders = ref.watch(botTileProvider.notifier).allOrders;
     const items = [
       {'Date (newer)': OrdersOrder.dateNewest},
       {'Date (oldest)': OrdersOrder.dateOldest},

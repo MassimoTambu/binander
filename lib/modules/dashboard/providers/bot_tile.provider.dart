@@ -26,6 +26,8 @@ class BotTileProvider extends StateNotifier<List<RunOrders>> {
         super([...pipeline.bot.data.ordersHistory.runOrders]
           ..sort((a, b) => _sortByDate(a, b)));
 
+  List<RunOrders> get allOrders => state;
+
   void orderBy(OrdersOrder orderFactor) {
     switch (orderFactor) {
       case OrdersOrder.dateNewest:

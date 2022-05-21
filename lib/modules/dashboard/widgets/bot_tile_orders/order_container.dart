@@ -25,6 +25,7 @@ class OrderContainer extends StatelessWidget {
             children: [
               OrderStatusIndicator(_order.status),
               const SizedBox(width: 5),
+              //TODO change text based on OrderStatus too
               Text(
                   '${_order.side == OrderSides.BUY ? 'Bought at' : 'Sold at'}: $formattedDate'),
             ],

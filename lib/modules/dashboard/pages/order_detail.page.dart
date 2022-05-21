@@ -16,6 +16,7 @@ class OrderDetailPage extends StatelessWidget {
       'OrigQty: ${_order.origQty}',
       'ExecutedQty: ${_order.executedQty}',
       'Price: ${_order.price}',
+      if (_order.stopPrice != null) 'Stop price: ${_order.stopPrice}',
       'Symbol: ${_order.symbol}',
       'Side: ${_order.side.name}',
       'Status: ${_order.status.name}',

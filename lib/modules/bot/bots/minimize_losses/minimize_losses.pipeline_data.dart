@@ -14,6 +14,8 @@ part 'minimize_losses.pipeline_data.g.dart';
 class MinimizeLossesPipelineData
     with _$MinimizeLossesPipelineData
     implements PipelineData {
+  static const tolerance = 0.4;
+
   factory MinimizeLossesPipelineData({
     @override required final OrdersHistory ordersHistory,
     @override @Default(0) int counter,

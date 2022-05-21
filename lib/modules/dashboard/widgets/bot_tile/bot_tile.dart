@@ -13,8 +13,9 @@ class BotTile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final pipeline =
-        ref.watch(botTileProvider.notifier.select((p) => p.pipeline));
+    final botTile = ref.watch(botTileProvider.notifier);
+    final pipeline = botTile.pipeline;
+    final bot = botTile.pipeline.bot;
     return ExpansionTile(
       title: Wrap(
         spacing: 8,
@@ -26,11 +27,11 @@ class BotTile extends ConsumerWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                pipeline.bot.name,
+                bot.name,
                 style: Theme.of(context).textTheme.headline6,
               ),
               const SizedBox(width: 20),
-              TotalGainsChip(pipeline.bot.data.ordersHistory.runOrders),
+              TotalGainsChip(bot.data.ordersHistory.runOrders),
               const SizedBox(width: 8),
               Chip(
                 label: Row(
@@ -39,9 +40,9 @@ class BotTile extends ConsumerWidget {
                     const Icon(Icons.attach_money_rounded, color: Colors.green),
                     const SizedBox(width: 5),
                     Text(
-                      pipeline.bot.data.lastAveragePrice == null
+                      bot.data.lastAveragePrice == null
                           ? 'No data'
-                          : '${pipeline.bot.data.lastAveragePrice!.price.floorToDoubleWithDecimals(2)}',
+                          : '${bot.data.lastAveragePrice!.price.floorToDoubleWithDecimals(2)}',
                       style: Theme.of(context)
                           .textTheme
                           .labelLarge!
@@ -50,14 +51,13 @@ class BotTile extends ConsumerWidget {
                   ],
                 ),
               ),
-              if (pipeline.bot.data.ordersHistory.lastNotEndedRunOrders
-                      ?.sellOrder !=
+              if (bot.data.ordersHistory.lastNotEndedRunOrders?.sellOrder !=
                   null)
                 Padding(
                   padding: const EdgeInsets.only(left: 8),
                   child: Chip(
                     label: Text(
-                      'Stop: ${pipeline.bot.data.ordersHistory.lastNotEndedRunOrders?.sellOrder?.stopPrice?.floorToDoubleWithDecimals(2)}',
+                      'Stop: ${bot.data.ordersHistory.lastNotEndedRunOrders?.sellOrder?.stopPrice?.floorToDoubleWithDecimals(2)}',
                       style: Theme.of(context)
                           .textTheme
                           .labelLarge!
@@ -65,15 +65,29 @@ class BotTile extends ConsumerWidget {
                     ),
                   ),
                 ),
-              if (pipeline.bot.data.ordersHistory.lastNotEndedRunOrders
-                          ?.sellOrder !=
+              if (bot.data.ordersHistory.lastNotEndedRunOrders?.sellOrder !=
                       null &&
                   pipeline is MinimizeLossesPipeline)
                 Padding(
                   padding: const EdgeInsets.only(left: 8),
                   child: Chip(
                     label: Text(
-                      'Σ: ${pipeline.calculateNewOrderStopPrice().floorToDoubleWithDecimals(2)}',
+                      'New Stop: ${pipeline.calculateNewOrderStopPrice().floorToDoubleWithDecimals(2)}',
+                      style: Theme.of(context)
+                          .textTheme
+                          .labelLarge!
+                          .copyWith(fontWeight: FontWeight.w600),
+                    ),
+                  ),
+                ),
+              if (bot.data.ordersHistory.lastNotEndedRunOrders?.sellOrder !=
+                      null &&
+                  pipeline is MinimizeLossesPipeline)
+                Padding(
+                  padding: const EdgeInsets.only(left: 8),
+                  child: Chip(
+                    label: Text(
+                      'Σ: ${pipeline.calculatePercentageOfDifference().floorToDoubleWithDecimals(2)}',
                       style: Theme.of(context)
                           .textTheme
                           .labelLarge!
@@ -92,7 +106,7 @@ class BotTile extends ConsumerWidget {
         Padding(
           padding: const EdgeInsets.only(bottom: 16),
           child: Text(
-            'Status: ${pipeline.bot.data.status.reason}',
+            'Status: ${bot.data.status.reason}',
             style:
                 Theme.of(context).textTheme.bodyMedium?.copyWith(fontSize: 15),
           ),

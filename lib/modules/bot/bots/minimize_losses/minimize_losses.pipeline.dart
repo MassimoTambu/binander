@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:bottino_fortino/api/api.dart';
+import 'package:bottino_fortino/modules/bot/bots/minimize_losses/minimize_losses.pipeline_data.dart';
 import 'package:bottino_fortino/modules/bot/models/bot.dart';
 import 'package:bottino_fortino/modules/bot/models/bot_limit.dart';
 import 'package:bottino_fortino/modules/bot/models/bot_phases.enum.dart';
@@ -228,9 +229,9 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
       if (_hasToMoveOrder()) {
         await _moveOrder(sellOrder.orderId);
         changeStatusTo(BotPhases.online,
-            'Moved sell order to ${sellOrder.price} ${bot.config.symbol!.rightPair}');
+            'Moved sell order to ${sellOrder.price} ${bot.config.symbol!.rightPair} with stop at ${sellOrder.stopPrice} ${bot.config.symbol!.rightPair}');
         _showSnackBar(
-            'Moved sell order to ${sellOrder.price} ${bot.config.symbol!.rightPair}');
+            'Moved sell order to ${sellOrder.stopPrice} ${bot.config.symbol!.rightPair} with stop at ${sellOrder.stopPrice} ${bot.config.symbol!.rightPair}');
       }
 
       return;
@@ -425,11 +426,8 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
   }
 
   bool _hasToMoveOrder() {
-    final sellOrder = bot.data.ordersHistory.lastNotEndedRunOrders!.sellOrder!;
-    print("calcNewStopPrice ${calculateNewOrderStopPrice()}");
-    print("lastAvgPrice: ${bot.data.lastAveragePrice!.price}");
-    print("stopPrice: ${sellOrder.stopPrice!}");
-    return calculateNewOrderStopPrice() > sellOrder.stopPrice!;
+    final diffPerc = calculatePercentageOfDifference();
+    return diffPerc >= MinimizeLossesPipelineData.tolerance;
   }
 
   double _calculateNewOrderPrice() {
@@ -454,6 +452,15 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
     }
 
     return lastAvgPrice - (lastBuyOrderPrice * percentageSellOrder / 100);
+  }
+
+  double calculatePercentageOfDifference() {
+    final newStopOrderPrice = calculateNewOrderStopPrice();
+    if (newStopOrderPrice == 0) return 0;
+
+    final sellOrder = bot.data.ordersHistory.lastNotEndedRunOrders!.sellOrder!;
+
+    return (newStopOrderPrice * 100 / sellOrder.stopPrice!) - 100;
   }
 
   bool _hasReachDailySellLossLimit() {
