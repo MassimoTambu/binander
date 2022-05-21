@@ -20,14 +20,16 @@ class BotTileRunOrders extends ConsumerWidget {
             padding: const EdgeInsets.only(bottom: 8),
             child: TotalGainsChip([runOrders]),
           ),
+        const SizedBox(height: 16),
         Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             OrderContainer(runOrders.buyOrder!),
             if (runOrders.sellOrder != null)
               OrderContainer(runOrders.sellOrder!)
           ],
         ),
+        const SizedBox(height: 12),
         Card(
           child: InkWell(
             borderRadius: BorderRadius.circular(5),
