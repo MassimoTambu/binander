@@ -630,8 +630,6 @@ void main() {
               .bot.data.ordersHistory.lastNotEndedRunOrders?.buyOrder?.status,
           OrderStatus.FILLED);
       expect(pipeline.bot.data.ordersHistory.runOrders.length, 1);
-      //TODO Remove
-      expect(pipeline.bot.data.ordersHistory.runOrders.first.sellOrder, isNull);
 
       async.elapse(const Duration(seconds: 20));
 

@@ -10,9 +10,22 @@ class OrderContainer extends StatelessWidget {
 
   const OrderContainer(this._order, {Key? key}) : super(key: key);
 
+  String writeTextPhrase() {
+    if (_order.side == OrderSides.BUY && _order.status == OrderStatus.FILLED) {
+      return 'Bought at';
+    }
+
+    if (_order.side == OrderSides.SELL && _order.status == OrderStatus.FILLED) {
+      return 'Sold at';
+    }
+
+    return 'Filled at';
+  }
+
   @override
   Widget build(BuildContext context) {
     final String formattedDate = DateTimeUtils.toHmsddMMy(_order.updateTime);
+    final textPhrase = writeTextPhrase();
 
     return Card(
       child: InkWell(
@@ -25,9 +38,7 @@ class OrderContainer extends StatelessWidget {
             children: [
               OrderStatusIndicator(_order.status),
               const SizedBox(width: 5),
-              //TODO change text based on OrderStatus too
-              Text(
-                  '${_order.side == OrderSides.BUY ? 'Bought at' : 'Sold at'}: $formattedDate'),
+              Text('$textPhrase: $formattedDate'),
             ],
           ),
         ),

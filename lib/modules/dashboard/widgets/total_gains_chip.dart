@@ -1,19 +1,22 @@
+import 'package:bottino_fortino/api/api.dart';
 import 'package:bottino_fortino/modules/bot/models/run_orders.dart';
 import 'package:flutter/material.dart';
 
 class TotalGainsChip extends StatelessWidget {
-  final Iterable<RunOrders> _orderPairs;
+  final Iterable<RunOrders> _runOrders;
 
-  const TotalGainsChip(this._orderPairs, {Key? key}) : super(key: key);
+  const TotalGainsChip(this._runOrders, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    if (_orderPairs.isEmpty) {
+    if (_runOrders.isEmpty) {
       return Container();
     }
 
-    final totalGains =
-        _orderPairs.map((op) => op.gains).fold<double>(0, (acc, g) => acc + g);
+    final totalGains = _runOrders
+        .where((ro) => ro.sellOrder?.status == OrderStatus.FILLED)
+        .map((op) => op.gains)
+        .fold<double>(0, (acc, g) => acc + g);
 
     return Chip(
       label: Row(
@@ -34,11 +37,14 @@ class TotalGainsChip extends StatelessWidget {
                               ? const Icon(
                                   Icons.keyboard_double_arrow_up_rounded,
                                   color: Colors.green)
-                              : const Icon(Icons.keyboard_arrow_up_rounded,
-                                  color: Colors.green),
+                              : totalGains == 0
+                                  ? const Icon(Icons.drag_handle,
+                                      color: Colors.yellow)
+                                  : const Icon(Icons.keyboard_arrow_up_rounded,
+                                      color: Colors.green),
           const SizedBox(width: 5),
           Text(
-            '${totalGains.abs()} ${_orderPairs.isEmpty ? '-' : _orderPairs.first.buyOrder!.symbol}',
+            '${totalGains.abs()} ${_runOrders.isEmpty ? '-' : _runOrders.first.buyOrder!.symbol}',
             style: Theme.of(context)
                 .textTheme
                 .labelLarge!

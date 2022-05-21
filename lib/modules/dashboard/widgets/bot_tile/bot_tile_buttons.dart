@@ -32,6 +32,7 @@ class BotTileButtons extends ConsumerWidget {
           child: Text(isStarted ? 'Stop' : 'Start',
               style: const TextStyle(fontWeight: FontWeight.bold)),
         ),
+        const SizedBox(width: 8),
         ElevatedButton(
           style: ButtonStyle(
             backgroundColor: MaterialStateProperty.all<Color>(

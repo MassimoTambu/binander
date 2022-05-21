@@ -11,8 +11,6 @@ final fileStorageProvider = Provider<FileStorageProvider>((ref) {
 
 class FileStorageProvider {
   Map<String, dynamic> data = {};
-  // TODO use stream to write repeatedly to file
-  // late IOSink sink;
 
   static const encoder = JsonEncoder.withIndent('  ');
 
@@ -78,9 +76,5 @@ class FileStorageProvider {
   Future<void> _saveFile() async {
     await File.fromUri(Uri.file(defaultFileName))
         .writeAsString(encoder.convert(data));
-
-    // final file = File.fromUri(Uri.file(defaultFileName));
-    // sink.
-    // await file.writeAsString(encoder.convert(data));
   }
 }

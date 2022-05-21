@@ -10,7 +10,7 @@ class BotTileOrders extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final allOrders = ref.watch(botTileProvider.notifier).allOrders;
+    final allOrders = ref.watch(botTileProvider);
     const items = [
       {'Date (newer)': OrdersOrder.dateNewest},
       {'Date (oldest)': OrdersOrder.dateOldest},
@@ -47,9 +47,9 @@ class BotTileOrders extends ConsumerWidget {
           itemCount: allOrders.length,
           itemBuilder: (context, index) => ProviderScope(
             overrides: [
-              currentOrdersPairTile.overrideWithValue(allOrders[index]),
+              currentRunOrdersTile.overrideWithValue(allOrders[index]),
             ],
-            child: const BotTileOrdersPair(),
+            child: const BotTileRunOrders(),
           ),
           separatorBuilder: (context, index) => const Divider(),
         ),

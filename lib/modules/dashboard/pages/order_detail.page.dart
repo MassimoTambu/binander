@@ -40,7 +40,7 @@ class OrderDetailPage extends StatelessWidget {
         child: ListView.separated(
           padding: const EdgeInsets.all(18),
           itemCount: orderInfos.length,
-          itemBuilder: (context, i) => Text(
+          itemBuilder: (context, i) => SelectableText(
             orderInfos[i],
             style: TextStyle(
               fontSize: Theme.of(context).textTheme.headline6!.fontSize,
