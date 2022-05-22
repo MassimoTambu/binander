@@ -55,6 +55,8 @@ class PipelineProvider extends StateNotifier<List<Pipeline>> {
             minutes: int.parse(
                 fields[MinimizeLossesConfig.timerBuyOrderName]!.value),
           ),
+          autoRestart:
+              fields[MinimizeLossesConfig.autoRestartName]!.value == 'true',
         );
         break;
       default:
@@ -72,6 +74,8 @@ class PipelineProvider extends StateNotifier<List<Pipeline>> {
             minutes: int.parse(
                 fields[MinimizeLossesConfig.timerBuyOrderName]!.value),
           ),
+          autoRestart:
+              fields[MinimizeLossesConfig.autoRestartName]!.value == 'true',
         );
         break;
     }
@@ -108,6 +112,7 @@ class PipelineProvider extends StateNotifier<List<Pipeline>> {
     required double maxInvestmentPerOrder,
     required double percentageSellOrder,
     required Duration timerBuyOrder,
+    required bool autoRestart,
   }) {
     final bot = MinimizeLossesBot(
       const Uuid().v4(),
@@ -120,6 +125,7 @@ class PipelineProvider extends StateNotifier<List<Pipeline>> {
         percentageSellOrder: percentageSellOrder,
         symbol: symbol,
         timerBuyOrder: timerBuyOrder,
+        autoRestart: autoRestart,
       ),
     );
 

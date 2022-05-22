@@ -654,4 +654,93 @@ void main() {
       expect(getAllLockedAssetFromWallet(), 0);
     });
   });
+
+  test(
+      'With autoRestart set, submit buy order and sell order, close in profit and start another run that will finish in loss. Bot will be stopped by dailyLossSellOrders parameter',
+      () async {
+    orderBook = TestOrderBook.create(
+        orders: [],
+        getPriceStrategy: () {
+          // First lap is for buy order submission without filling it.
+          // The second one will fill the buy order.
+          // Third lap will submit a sell order.
+          // Fourth lap is for trigger sell order.
+          // Fifth lap is for second buy order submission without filling it.
+          // Sixth lap will fill the buy order.
+          // Seventh lap will submit the second sell order.
+          // Eighth lap is for trigger sell order.
+          if (pipeline.bot.data.counter == 1) return startPrice;
+
+          if (pipeline.bot.data.counter == 2) {
+            expect(pipeline.bot.data.ordersHistory.lastNotEndedRunOrders,
+                isNotNull);
+            return 99;
+          }
+          if (pipeline.bot.data.counter == 3) {
+            expect(pipeline.bot.data.ordersHistory.lastNotEndedRunOrders,
+                isNotNull);
+            expect(
+                pipeline.bot.data.ordersHistory.lastNotEndedRunOrders?.buyOrder
+                    ?.status,
+                OrderStatus.FILLED);
+            return 125;
+          }
+          if (pipeline.bot.data.counter == 4) return 120;
+          if (pipeline.bot.data.counter == 5) return startPrice;
+
+          if (pipeline.bot.data.counter == 6) {
+            expect(pipeline.bot.data.ordersHistory.lastNotEndedRunOrders,
+                isNotNull);
+            return 99;
+          }
+          if (pipeline.bot.data.counter == 7) {
+            expect(pipeline.bot.data.ordersHistory.lastNotEndedRunOrders,
+                isNotNull);
+            expect(
+                pipeline.bot.data.ordersHistory.lastNotEndedRunOrders?.buyOrder
+                    ?.status,
+                OrderStatus.FILLED);
+            return 90;
+          }
+
+          return 80;
+        });
+
+    wallet.balances = TestUtils.fillWalletWithAccountBalances();
+    final bot = TestUtils.createMinimizeLossesBot(
+        dailyLossSellOrders: 1, autoRestart: true);
+    container.read(pipelineProvider.notifier).addBots([bot]);
+
+    pipeline = container
+        .read(pipelineProvider)
+        .whereType<MinimizeLossesPipeline>()
+        .first;
+
+    ensureIsACleanStart(pipeline);
+
+    fakeAsync((async) {
+      pipeline.start();
+
+      async.elapse(const Duration(seconds: 80));
+      expect(pipeline.bot.data.status.phase, BotPhases.error);
+      expect(pipeline.bot.data.counter, 9);
+
+      expect(pipeline.bot.data.status.reason,
+          contains('Daily sell loss limit reached'));
+      expect(pipeline.bot.data.ordersHistory.lastNotEndedRunOrders, isNull);
+
+      expect(pipeline.bot.data.ordersHistory.cancelledOrders.length, 0);
+      expect(pipeline.bot.data.ordersHistory.runOrders.length, 2);
+      // Is a profit
+      expect(pipeline.bot.data.ordersHistory.profitsOnly.length, 1);
+      // No losses
+      expect(pipeline.bot.data.ordersHistory.lossesOnly.length, 1);
+      expect(pipeline.bot.data.ordersHistory.getTotalGains(), 7);
+      final testAsset = wallet.findBalanceByAsset('USDT');
+      expect(TestUtils.approxPriceToFloor(testAsset.free), 1007);
+      expect(testAsset.locked, 0);
+      // There should not be any locked asset
+      expect(getAllLockedAssetFromWallet(), 0);
+    });
+  });
 }

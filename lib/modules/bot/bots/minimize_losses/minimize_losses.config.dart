@@ -16,6 +16,7 @@ class MinimizeLossesConfig implements Config {
   double? percentageSellOrder;
   CryptoSymbol? symbol;
   Duration? timerBuyOrder;
+  bool? autoRestart;
 
   MinimizeLossesConfig({
     this.dailyLossSellOrders,
@@ -23,6 +24,7 @@ class MinimizeLossesConfig implements Config {
     this.percentageSellOrder,
     this.symbol,
     this.timerBuyOrder,
+    this.autoRestart,
   });
 
   MinimizeLossesConfig.create({
@@ -31,6 +33,7 @@ class MinimizeLossesConfig implements Config {
     required this.percentageSellOrder,
     required this.symbol,
     required this.timerBuyOrder,
+    required this.autoRestart,
   }) {
     configFields[dailyLossSellOrdersName]!.value =
         dailyLossSellOrders.toString();
@@ -41,6 +44,7 @@ class MinimizeLossesConfig implements Config {
     configFields[symbolName]!.value = symbol.toString();
     configFields[timerBuyOrderName]!.value =
         timerBuyOrder!.inMinutes.toString();
+    configFields[autoRestartName]!.value = autoRestart!.toString();
   }
 
   @override
@@ -105,6 +109,16 @@ class MinimizeLossesConfig implements Config {
         ConfigFieldValidatorsTypes.positiveNumbers,
       ],
     ),
+    autoRestartName: ConfigField(
+      name: autoRestartName,
+      publicName: autoRestartPublicName,
+      description: autoRestartDescription,
+      value: null,
+      configFieldTypes: ConfigFieldTypes.selectField,
+      validators: [
+        ConfigFieldValidatorsTypes.required,
+      ],
+    ),
   };
 
   // Data
@@ -129,6 +143,10 @@ class MinimizeLossesConfig implements Config {
   static const String timerBuyOrderPublicName = 'Buy order timer';
   static const String timerBuyOrderDescription =
       'Time limit in minutes that the bot will try to submit a buy order';
+  static const String autoRestartName = 'auto_restart_name';
+  static const String autoRestartPublicName = 'Auto restart';
+  static const String autoRestartDescription =
+      'Auto restart bot when close a sell order';
 
   factory MinimizeLossesConfig.fromJson(Map<String, dynamic> json) =>
       _$MinimizeLossesConfigFromJson(json);
