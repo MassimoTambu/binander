@@ -25,18 +25,20 @@ class TestUtils {
     double maxInvestmentPerOrder = 100,
     double percentageSellOrder = 3,
     Duration timerBuyOrder = const Duration(minutes: 30),
+    bool autoRestart = false,
   }) =>
       MinimizeLossesBot(
         const Uuid().v4(),
         MinimizeLossesPipelineData(ordersHistory: OrdersHistory([])),
         name: name,
         testNet: true,
-        config: MinimizeLossesConfig(
+        config: MinimizeLossesConfig.create(
           symbol: CryptoSymbol(symbol),
           dailyLossSellOrders: dailyLossSellOrders,
           maxInvestmentPerOrder: maxInvestmentPerOrder,
           percentageSellOrder: percentageSellOrder,
           timerBuyOrder: timerBuyOrder,
+          autoRestart: autoRestart,
         ),
       );
 

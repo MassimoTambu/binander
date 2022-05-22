@@ -238,8 +238,6 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
     }
     // If order status is closed
     else if (sellOrder.status == OrderStatus.FILLED) {
-      // TODO resume a buy order
-
       var reason = 'Sell order executed';
 
       // Check if is a loss
@@ -251,6 +249,18 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
       }
 
       timer.cancel();
+
+      if (bot.config.autoRestart!) {
+        bot.data.timer?.cancel();
+        bot.data.timer = null;
+        bot.data.buyOrderStartedAt = null;
+        bot.data.lastAveragePrice = null;
+        bot.data.ordersHistory.closeRunOrder();
+
+        bot.data.timer =
+            Timer.periodic(const Duration(seconds: 2), (_) => start());
+        return;
+      }
 
       return shutdown(reason: reason);
     } else {
