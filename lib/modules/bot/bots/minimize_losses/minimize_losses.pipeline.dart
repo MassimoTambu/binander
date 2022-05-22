@@ -322,7 +322,7 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
                   _getApiConnection(), bot.config.symbol!, newBuyOrder.orderId))
           .body;
       bot.data.ordersHistory.upsertOrderInNotEndedRunOrder(buyOrderData);
-    } on ApiException {
+    } on ApiException catch (e, ee) {
       const message = 'Failed to submit buy order. Retry in 10s';
 
       changeStatusTo(BotPhases.starting, message);
@@ -350,7 +350,7 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
 
   double _calculateBuyOrderQuantity(double rightPairQty, double currentPrice) {
     final qty = rightPairQty / currentPrice;
-    return (qty * 100).floorToDouble() / 100;
+    return qty.floorToDoubleWithDecimals(5);
   }
 
   Future<OrderData> _getBuyOrder() async {
