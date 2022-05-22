@@ -109,11 +109,12 @@ class MinimizeLossesConfig implements Config {
         ConfigFieldValidatorsTypes.positiveNumbers,
       ],
     ),
-    autoRestartName: ConfigField(
+    autoRestartName: SelectField(
       name: autoRestartName,
       publicName: autoRestartPublicName,
       description: autoRestartDescription,
       value: null,
+      items: ['true', 'false'],
       configFieldTypes: ConfigFieldTypes.selectField,
       validators: [
         ConfigFieldValidatorsTypes.required,
