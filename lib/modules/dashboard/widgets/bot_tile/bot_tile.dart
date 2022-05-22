@@ -66,6 +66,10 @@ class BotTile extends ConsumerWidget {
                               child: Text(
                                   '${MinimizeLossesConfig.timerBuyOrderPublicName}: ${bot.config.timerBuyOrder?.inMinutes} minutes'),
                             ),
+                            Expanded(
+                              child: Text(
+                                  '${MinimizeLossesConfig.autoRestartPublicName}: ${bot.config.autoRestart}'),
+                            ),
                           ]),
                         ),
                       );
