@@ -55,8 +55,7 @@ class PipelineProvider extends StateNotifier<List<Pipeline>> {
             minutes: int.parse(
                 fields[MinimizeLossesConfig.timerBuyOrderName]!.value),
           ),
-          autoRestart:
-              fields[MinimizeLossesConfig.autoRestartName]!.value == 'true',
+          autoRestart: fields[MinimizeLossesConfig.autoRestartName]!.value,
         );
         break;
       default:
@@ -74,8 +73,7 @@ class PipelineProvider extends StateNotifier<List<Pipeline>> {
             minutes: int.parse(
                 fields[MinimizeLossesConfig.timerBuyOrderName]!.value),
           ),
-          autoRestart:
-              fields[MinimizeLossesConfig.autoRestartName]!.value == 'true',
+          autoRestart: fields[MinimizeLossesConfig.autoRestartName]!.value,
         );
         break;
     }

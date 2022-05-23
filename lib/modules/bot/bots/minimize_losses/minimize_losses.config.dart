@@ -1,10 +1,7 @@
 import 'package:bottino_fortino/models/config_field.dart';
 import 'package:bottino_fortino/models/constants/symbols.dart';
 import 'package:bottino_fortino/models/crypto_symbol.dart';
-import 'package:bottino_fortino/models/enums/config_field_types.enum.dart';
-import 'package:bottino_fortino/models/enums/config_field_validators_types.enum.dart';
 import 'package:bottino_fortino/models/interfaces/config.interface.dart';
-import 'package:bottino_fortino/models/select_field.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'minimize_losses.config.g.dart';
@@ -53,72 +50,32 @@ class MinimizeLossesConfig implements Config {
       name: dailyLossSellOrdersName,
       publicName: dailyLossSellOrdersPublicName,
       description: dailyLossSellOrdersDescription,
-      value: null,
-      configFieldTypes: ConfigFieldTypes.textField,
-      validators: [
-        ConfigFieldValidatorsTypes.required,
-        ConfigFieldValidatorsTypes.int,
-        ConfigFieldValidatorsTypes.positiveNumbers,
-      ],
     ),
     maxInvestmentPerOrderName: ConfigField(
       name: maxInvestmentPerOrderName,
       publicName: maxInvestmentPerOrderPublicName,
       description: maxInvestmentPerOrderDescription,
-      value: null,
-      configFieldTypes: ConfigFieldTypes.textField,
-      validators: [
-        ConfigFieldValidatorsTypes.required,
-        ConfigFieldValidatorsTypes.double,
-        ConfigFieldValidatorsTypes.positiveNumbers,
-      ],
     ),
     percentageSellOrderName: ConfigField(
       name: percentageSellOrderName,
       publicName: percentageSellOrderPublicName,
       description: percentageSellOrderDescription,
-      value: null,
-      configFieldTypes: ConfigFieldTypes.textField,
-      validators: [
-        ConfigFieldValidatorsTypes.required,
-        ConfigFieldValidatorsTypes.double,
-        ConfigFieldValidatorsTypes.positiveNumbers,
-        ConfigFieldValidatorsTypes.min1,
-      ],
     ),
-    symbolName: SelectField(
+    symbolName: ConfigField(
       name: symbolName,
       publicName: symbolPublicName,
       description: symbolDescription,
-      value: null,
       items: symbols,
-      configFieldTypes: ConfigFieldTypes.selectField,
-      validators: [
-        ConfigFieldValidatorsTypes.required,
-      ],
     ),
     timerBuyOrderName: ConfigField(
       name: timerBuyOrderName,
       publicName: timerBuyOrderPublicName,
       description: timerBuyOrderDescription,
-      value: null,
-      configFieldTypes: ConfigFieldTypes.textField,
-      validators: [
-        ConfigFieldValidatorsTypes.required,
-        ConfigFieldValidatorsTypes.int,
-        ConfigFieldValidatorsTypes.positiveNumbers,
-      ],
     ),
-    autoRestartName: SelectField(
+    autoRestartName: ConfigField(
       name: autoRestartName,
       publicName: autoRestartPublicName,
       description: autoRestartDescription,
-      value: null,
-      items: ['true', 'false'],
-      configFieldTypes: ConfigFieldTypes.selectField,
-      validators: [
-        ConfigFieldValidatorsTypes.required,
-      ],
     ),
   };
 

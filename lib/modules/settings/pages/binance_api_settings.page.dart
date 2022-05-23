@@ -1,10 +1,7 @@
 import 'package:bottino_fortino/models/config_field.dart';
-import 'package:bottino_fortino/models/select_field.dart';
 import 'package:bottino_fortino/modules/settings/models/settings.config.dart';
 import 'package:bottino_fortino/modules/settings/providers/settings.provider.dart';
 import 'package:bottino_fortino/utils/media_query.utils.dart';
-import 'package:bottino_fortino/widgets/config_field_builder.dart';
-import 'package:bottino_fortino/widgets/select_field_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
@@ -114,13 +111,20 @@ class ConfigGroup extends StatelessWidget {
           style: Theme.of(context).textTheme.headline6,
         ),
         ...configFields.map((e) {
-          if (e.key == SettingsConfig.pubNetUrlName ||
-              e.key == SettingsConfig.testNetUrlName) {
-            return ConfigFieldBuilder(configField: e.value, enabled: false);
-          } else if (e.value is SelectField) {
-            return SelectFieldBuilder(configField: e.value as SelectField);
-          }
-          return ConfigFieldBuilder(configField: e.value);
+          final configField = e.value;
+          final isApiUrl = e.key == SettingsConfig.pubNetUrlName ||
+              e.key == SettingsConfig.testNetUrlName;
+
+          return FormBuilderTextField(
+            name: configField.name,
+            decoration: InputDecoration(
+                label: Text(configField.publicName),
+                helperText: configField.description,
+                filled: isApiUrl),
+            initialValue:
+                configField.value ?? configField.defaultValue?.toString(),
+            enabled: !isApiUrl,
+          );
         }),
       ],
     );

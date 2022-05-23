@@ -1,7 +1,4 @@
-// ignore_for_file: prefer_initializing_formals
-
 import 'package:bottino_fortino/models/config_field.dart';
-import 'package:bottino_fortino/models/enums/config_field_types.enum.dart';
 import 'package:bottino_fortino/models/interfaces/config.interface.dart';
 import 'package:bottino_fortino/modules/settings/models/api_connection.dart';
 
@@ -30,50 +27,32 @@ class SettingsConfig implements Config {
       name: pubNetApiKeyName,
       publicName: apiKeyPublicName,
       description: apiKeyDescription,
-      value: null,
-      configFieldTypes: ConfigFieldTypes.textField,
-      validators: [],
     ),
     pubNetApiSecretName: ConfigField(
       name: pubNetApiSecretName,
       publicName: apiSecretPublicName,
       description: apiSecretDescription,
-      value: null,
-      configFieldTypes: ConfigFieldTypes.textField,
-      validators: [],
     ),
     pubNetUrlName: ConfigField(
       name: pubNetUrlName,
       publicName: apiUrlPublicName,
       description: apiUrlDescription,
-      value: null,
-      configFieldTypes: ConfigFieldTypes.textField,
-      validators: [],
     ),
     // TestNet
     testNetApiKeyName: ConfigField(
       name: testNetApiKeyName,
       publicName: apiKeyPublicName,
       description: apiKeyDescription,
-      value: null,
-      configFieldTypes: ConfigFieldTypes.textField,
-      validators: [],
     ),
     testNetApiSecretName: ConfigField(
       name: testNetApiSecretName,
       publicName: apiSecretPublicName,
       description: apiSecretDescription,
-      value: null,
-      configFieldTypes: ConfigFieldTypes.textField,
-      validators: [],
     ),
     testNetUrlName: ConfigField(
       name: testNetUrlName,
       publicName: apiUrlPublicName,
       description: apiUrlDescription,
-      value: null,
-      configFieldTypes: ConfigFieldTypes.textField,
-      validators: [],
     ),
   };
 

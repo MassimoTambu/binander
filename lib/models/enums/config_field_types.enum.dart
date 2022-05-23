@@ -1,4 +1,0 @@
-enum ConfigFieldTypes {
-  textField,
-  selectField,
-}

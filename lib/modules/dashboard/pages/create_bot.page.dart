@@ -1,13 +1,9 @@
-import 'package:bottino_fortino/models/config_field.dart';
-import 'package:bottino_fortino/models/select_field.dart';
-import 'package:bottino_fortino/modules/bot/bots/minimize_losses/minimize_losses.config.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:bottino_fortino/modules/bot/models/bot.dart';
 import 'package:bottino_fortino/modules/bot/models/bot_types.enum.dart';
+import 'package:bottino_fortino/modules/bot/widgets/create_minimize_losses.dart';
 import 'package:bottino_fortino/modules/dashboard/providers/create_bot.provider.dart';
 import 'package:bottino_fortino/utils/media_query.utils.dart';
-import 'package:bottino_fortino/widgets/config_field_builder.dart';
-import 'package:bottino_fortino/widgets/select_field_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -111,13 +107,13 @@ class BotConfigContainer extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    late final Map<String, ConfigField> configFields;
+    late final Widget form;
     switch (ref.watch(createBotProvider)) {
       case BotTypes.minimizeLosses:
-        configFields = MinimizeLossesConfig().configFields;
+        form = const CreateMinimizeLosses();
         break;
       default:
-        configFields = MinimizeLossesConfig().configFields;
+        form = const CreateMinimizeLosses();
         break;
     }
     return Padding(
@@ -130,12 +126,7 @@ class BotConfigContainer extends ConsumerWidget {
             style: TextStyle(
                 fontSize: Theme.of(context).textTheme.subtitle1?.fontSize),
           ),
-          ...configFields.entries.map((e) {
-            if (e.value is SelectField) {
-              return SelectFieldBuilder(configField: e.value as SelectField);
-            }
-            return ConfigFieldBuilder(configField: e.value);
-          }),
+          form,
         ],
       ),
     );
