@@ -10,28 +10,28 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 
 class CreateBotPage extends ConsumerWidget {
-  CreateBotPage({Key? key}) : super(key: key);
-
-  final _formKey = GlobalKey<FormBuilderState>();
+  const CreateBotPage({Key? key}) : super(key: key);
 
   void onCreateBot(BuildContext context, WidgetRef ref) {
-    if (_formKey.currentState!.validate()) {
+    final formKey = ref.read(createBotProvider.notifier).formKey;
+    if (formKey.currentState!.validate()) {
       ref
           .read(createBotProvider.notifier)
-          .createBot(_formKey.currentState!.fields);
+          .createBot(formKey.currentState!.fields);
       context.router.navigateBack();
     }
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final formKey = ref.watch(createBotProvider.notifier).formKey;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Create bot'),
         centerTitle: true,
       ),
       body: FormBuilder(
-        key: _formKey,
+        key: formKey,
         autovalidateMode: AutovalidateMode.disabled,
         child: SingleChildScrollView(
           physics: const BouncingScrollPhysics(),

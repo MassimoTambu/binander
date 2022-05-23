@@ -66,6 +66,7 @@ class MinimizeLossesConfig implements Config {
       publicName: symbolPublicName,
       description: symbolDescription,
       items: symbols,
+      defaultValue: symbols.first,
     ),
     timerBuyOrderName: ConfigField(
       name: timerBuyOrderName,
