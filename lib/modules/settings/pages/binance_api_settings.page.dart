@@ -114,6 +114,8 @@ class ConfigGroup extends StatelessWidget {
           final configField = e.value;
           final isApiUrl = e.key == SettingsConfig.pubNetUrlName ||
               e.key == SettingsConfig.testNetUrlName;
+          final isApiSecret = e.key == SettingsConfig.pubNetApiSecretName ||
+              e.key == SettingsConfig.testNetApiSecretName;
 
           return FormBuilderTextField(
             name: configField.name,
@@ -124,6 +126,7 @@ class ConfigGroup extends StatelessWidget {
             initialValue:
                 configField.value ?? configField.defaultValue?.toString(),
             enabled: !isApiUrl,
+            obscureText: isApiSecret,
           );
         }),
       ],
