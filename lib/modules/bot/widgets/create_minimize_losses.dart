@@ -83,7 +83,7 @@ class CreateMinimizeLosses extends StatelessWidget {
               )
               .toList(),
           validator: FormBuilderValidators.compose([
-            FormBuilderValidators.required(),
+            FormBuilderValidators.required<String>(),
           ]),
         ),
         FormBuilderTextField(
