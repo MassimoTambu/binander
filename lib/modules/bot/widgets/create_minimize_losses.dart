@@ -1,11 +1,5 @@
-import 'package:bottino_fortino/api/api.dart';
-import 'package:bottino_fortino/models/crypto_symbol.dart';
 import 'package:bottino_fortino/modules/bot/bots/minimize_losses/minimize_losses.config.dart';
-import 'package:bottino_fortino/modules/bot/models/bot.dart';
-import 'package:bottino_fortino/modules/dashboard/providers/create_bot.provider.dart';
-import 'package:bottino_fortino/modules/settings/models/api_connection.dart';
-import 'package:bottino_fortino/modules/settings/providers/settings.provider.dart';
-import 'package:bottino_fortino/providers/binance_test_net_status.provider.dart';
+import 'package:bottino_fortino/modules/bot/providers/create_minimize_losses.provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -79,6 +73,7 @@ class CreateMinimizeLosses extends ConsumerWidget {
           validator: FormBuilderValidators.compose([
             FormBuilderValidators.required<String>(),
           ]),
+          onChanged: (_) => ref.refresh(createMinimizeLossesProvider),
         ),
         Padding(
           padding: const EdgeInsets.only(top: 24),
@@ -91,9 +86,14 @@ class CreateMinimizeLosses extends ConsumerWidget {
         Wrap(
           crossAxisAlignment: WrapCrossAlignment.center,
           children: [
-            Text(
-              'Given the current price of ${ref.watch(createBotProvider.notifier).currentPrice} ${symbolField.value} and the sell order percentage of ',
-            ),
+            ref.watch(createMinimizeLossesProvider).maybeWhen(
+                  data: (createMinimizeLosses) => Text(
+                    'Given the current price of ${createMinimizeLosses.currentPrice} ${createMinimizeLosses.symbol} and the sell order percentage of ',
+                  ),
+                  orElse: () => const Text(
+                    'Given the current price of -- and the sell order percentage of ',
+                  ),
+                ),
             SizedBox(
               width: 60,
               child: FormBuilderTextField(
@@ -113,40 +113,25 @@ class CreateMinimizeLosses extends ConsumerWidget {
                   fontWeight: FontWeight.w600,
                 ),
                 textAlign: TextAlign.end,
-                onChanged: (value) async {
-                  final fields = ref
-                      .read(createBotProvider.notifier)
-                      .formKey
-                      .currentState!
-                      .fields;
-                  final symbol = fields[symbolField.name]!.value as String?;
-                  final isTestNet = fields[Bot.testNetName]!.value as bool;
-                  if (value == null ||
-                      value.isEmpty ||
-                      symbol == null ||
-                      symbol.isEmpty) return;
-
-                  final ApiConnection apiConn = isTestNet
-                      ? ref.read(settingsProvider).testNetConnection
-                      : ref.read(settingsProvider).pubNetConnection;
-
-                  final res = await ref
-                      .read(apiProvider)
-                      .spot
-                      .market
-                      .getAveragePrice(apiConn, CryptoSymbol(symbol));
-
-                  ref.read(createBotProvider.notifier).currentPrice =
-                      res.body.price;
-                },
+                onChanged: (_) => ref.refresh(createMinimizeLossesProvider),
               ),
             ),
-            Text(', I will try to submit a Sell StopLossOrder at Y'),
+            ref.watch(createMinimizeLossesProvider).maybeWhen(
+                  data: (createMinimizeLosses) => Text(
+                    ' I will try to submit a Sell StopLossOrder at ${createMinimizeLosses.stopSellOrderPrice} ${createMinimizeLosses.symbol}',
+                  ),
+                  orElse: () => const Text(
+                    ' I will try to submit a Sell StopLossOrder at --',
+                  ),
+                ),
           ],
         ),
-        Text(
-          percentageSellOrderField.description,
-          style: Theme.of(context).textTheme.caption!,
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 20),
+          child: Text(
+            percentageSellOrderField.description,
+            style: Theme.of(context).textTheme.caption!,
+          ),
         ),
         FormBuilderTextField(
           name: timerBuyOrderField.name,

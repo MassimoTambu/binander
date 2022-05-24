@@ -13,7 +13,6 @@ final createBotProvider =
 class CreateBotProvider extends StateNotifier<BotTypes> {
   final Ref ref;
   final formKey = GlobalKey<FormBuilderState>();
-  double currentPrice = 0;
 
   CreateBotProvider(this.ref) : super(BotTypes.minimizeLosses);
 

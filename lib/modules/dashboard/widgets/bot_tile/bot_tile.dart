@@ -117,7 +117,7 @@ class BotTile extends ConsumerWidget {
                   padding: const EdgeInsets.only(left: 8),
                   child: Chip(
                     label: Text(
-                      'New Stop: ${pipeline.calculateNewOrderStopPrice().floorToDoubleWithDecimals(2)}',
+                      'New Stop: ${pipeline.calculateNewOrderStopPriceWithProperties().floorToDoubleWithDecimals(2)}',
                       style: Theme.of(context)
                           .textTheme
                           .labelLarge!

@@ -10,7 +10,8 @@ class CryptoSymbol with _$CryptoSymbol {
   const factory CryptoSymbol(String symbol) = _CryptoSymbol;
 
   String get leftPair {
-    return symbol.substring(0, symbol.indexOf('-'));
+    final end = symbol.indexOf('-');
+    return symbol.substring(0, end == -1 ? null : end);
   }
 
   String get rightPair {
