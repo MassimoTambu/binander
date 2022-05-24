@@ -13,10 +13,10 @@ class WalletProvider {
     try {
       final response = await _ref
           .read(_dioProvider)
-          .get<String>('${conn.url}/sapi/v1/system/status');
+          .get<Map<String, dynamic>>('${conn.url}/sapi/v1/system/status');
 
       return ApiResponse(
-        SystemStatus.fromJson(jsonDecode(response.data!)),
+        SystemStatus.fromJson(response.data!),
         response.statusCode!,
       );
     } on DioError catch (e) {
@@ -41,13 +41,13 @@ class WalletProvider {
         conn.apiSecret, {}, API_SECURITY_TYPE.userData);
 
     try {
-      final response = await _ref.read(_dioProvider).get<String>(
+      final response = await _ref.read(_dioProvider).get<Map<String, dynamic>>(
           '${conn.url}/sapi/v1/account/apiRestrictions',
           options: options,
           queryParameters: secureQuery);
 
       return ApiResponse(
-        ApiKeyPermission.fromJson(jsonDecode(response.data!)),
+        ApiKeyPermission.fromJson(response.data!),
         response.statusCode!,
       );
     } on DioError catch (e) {
