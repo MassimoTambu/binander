@@ -66,7 +66,7 @@ class TestUtils {
         TimeInForce.GTC,
         OrderTypes.LIMIT,
         orderSides,
-        [Fill(price, origQty, 0, cryptoSymbol.rightPair, orderId)]);
+        [Fill(price, origQty, 0, cryptoSymbol.quoteAsset, orderId)]);
   }
 
   static OrderNewStopLimit createOrderNewStopLimit({

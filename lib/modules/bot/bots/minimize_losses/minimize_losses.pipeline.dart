@@ -59,7 +59,7 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
 
       final accInfo = await _getAccountInformation();
       final accBalances = accInfo.balances.where(
-        (b) => b.asset == bot.config.symbol!.rightPair,
+        (b) => b.asset == bot.config.symbol!.quoteAsset,
       );
       // Asset not found in account
       if (accBalances.isEmpty) {
@@ -229,9 +229,9 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
       if (_hasToMoveOrder()) {
         await _moveOrder(sellOrder.orderId);
         changeStatusTo(BotPhases.online,
-            'Moved sell order to ${sellOrder.price} ${bot.config.symbol!.rightPair} with stop at ${sellOrder.stopPrice} ${bot.config.symbol!.rightPair}');
+            'Moved sell order to ${sellOrder.price} ${bot.config.symbol!.quoteAsset} with stop at ${sellOrder.stopPrice} ${bot.config.symbol!.quoteAsset}');
         _showSnackBar(
-            'Moved sell order to ${sellOrder.stopPrice} ${bot.config.symbol!.rightPair} with stop at ${sellOrder.stopPrice} ${bot.config.symbol!.rightPair}');
+            'Moved sell order to ${sellOrder.stopPrice} ${bot.config.symbol!.quoteAsset} with stop at ${sellOrder.stopPrice} ${bot.config.symbol!.quoteAsset}');
       }
 
       return;

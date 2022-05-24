@@ -1,5 +1,8 @@
 import 'package:bottino_fortino/modules/bot/bots/minimize_losses/minimize_losses.config.dart';
+import 'package:bottino_fortino/modules/bot/models/bot.dart';
 import 'package:bottino_fortino/modules/bot/providers/create_minimize_losses.provider.dart';
+import 'package:bottino_fortino/modules/dashboard/providers/create_bot.provider.dart';
+import 'package:bottino_fortino/providers/exchange_info.provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -22,6 +25,16 @@ class CreateMinimizeLosses extends ConsumerWidget {
         configFields[MinimizeLossesConfig.timerBuyOrderName]!;
     final autoRestartField =
         configFields[MinimizeLossesConfig.autoRestartName]!;
+    final isTestNet = ref
+        .watch(createBotProvider.notifier)
+        .formKey
+        .currentState!
+        .fields[Bot.testNetName]!
+        .value as bool;
+    final symbols = ref
+            .watch(exchangeInfoProvider)
+            ?.getCompatibleSymbolsWithMinimizeLosses(isTestNet: isTestNet) ??
+        [];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -62,11 +75,11 @@ class CreateMinimizeLosses extends ConsumerWidget {
           ),
           initialValue:
               symbolField.value ?? symbolField.defaultValue?.toString(),
-          items: symbolField.items!
+          items: symbols
               .map(
                 (c) => DropdownMenuItem<String>(
-                  value: c,
-                  child: Text(c),
+                  value: c.symbol,
+                  child: Text(c.symbol),
                 ),
               )
               .toList(),

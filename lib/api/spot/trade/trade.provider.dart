@@ -23,14 +23,13 @@ class TradeProvider {
         conn.apiSecret, {}, API_SECURITY_TYPE.userData);
 
     try {
-      final response = await _ref.read(_dioProvider).get<String>(
+      final response = await _ref.read(_dioProvider).get<Map<String, dynamic>>(
           '${conn.url}/api/v3/account',
           options: options,
           queryParameters: secureQuery);
 
       return ApiResponse(
-          AccountInformation.fromJson(jsonDecode(response.data!)),
-          response.statusCode!);
+          AccountInformation.fromJson(response.data!), response.statusCode!);
     } on DioError catch (e) {
       return Future.error(_ref
           .read(_apiUtilsProvider)

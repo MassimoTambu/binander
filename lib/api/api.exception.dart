@@ -7,7 +7,7 @@ class ApiException with _$ApiException implements Exception {
     String method,
     int? statusCode,
     String? statusMessage,
-    String? data,
+    Map<String, dynamic>? data,
   ) = _ApiException;
 
   @override
