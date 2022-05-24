@@ -13,7 +13,8 @@ class CreateMinimizeLosses extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final configFields = MinimizeLossesConfig().configFields;
+    final configFields = ref.watch(createBotProvider).configFields;
+    final createBotNotifier = ref.watch(createBotProvider.notifier);
     final dailyLossField =
         configFields[MinimizeLossesConfig.dailyLossSellOrdersName]!;
     final maxInvestmentField =
@@ -25,12 +26,7 @@ class CreateMinimizeLosses extends ConsumerWidget {
         configFields[MinimizeLossesConfig.timerBuyOrderName]!;
     final autoRestartField =
         configFields[MinimizeLossesConfig.autoRestartName]!;
-    final isTestNet = ref
-        .watch(createBotProvider.notifier)
-        .formKey
-        .currentState!
-        .fields[Bot.testNetName]!
-        .value as bool;
+    final isTestNet = configFields[Bot.testNetName]!.value as bool;
     final symbols = ref
             .watch(exchangeInfoProvider)
             ?.getCompatibleSymbolsWithMinimizeLosses(isTestNet: isTestNet) ??
@@ -52,6 +48,8 @@ class CreateMinimizeLosses extends ConsumerWidget {
             FormBuilderValidators.integer(),
             FormBuilderValidators.min(0),
           ]),
+          onChanged: (value) =>
+              createBotNotifier.updateConfigField(dailyLossField.name, value),
         ),
         FormBuilderTextField(
           name: maxInvestmentField.name,
@@ -66,6 +64,8 @@ class CreateMinimizeLosses extends ConsumerWidget {
             FormBuilderValidators.integer(),
             FormBuilderValidators.min(0),
           ]),
+          onChanged: (value) => createBotNotifier.updateConfigField(
+              maxInvestmentField.name, value),
         ),
         FormBuilderDropdown(
           name: symbolField.name,
@@ -86,7 +86,10 @@ class CreateMinimizeLosses extends ConsumerWidget {
           validator: FormBuilderValidators.compose([
             FormBuilderValidators.required<String>(),
           ]),
-          onChanged: (_) => ref.refresh(createMinimizeLossesProvider),
+          onChanged: (value) {
+            createBotNotifier.updateConfigField(symbolField.name, value);
+            ref.refresh(createMinimizeLossesProvider);
+          },
         ),
         Padding(
           padding: const EdgeInsets.only(top: 24),
@@ -126,7 +129,11 @@ class CreateMinimizeLosses extends ConsumerWidget {
                   fontWeight: FontWeight.w600,
                 ),
                 textAlign: TextAlign.end,
-                onChanged: (_) => ref.refresh(createMinimizeLossesProvider),
+                onChanged: (value) {
+                  createBotNotifier.updateConfigField(
+                      percentageSellOrderField.name, value);
+                  ref.refresh(createMinimizeLossesProvider);
+                },
               ),
             ),
             ref.watch(createMinimizeLossesProvider).maybeWhen(
@@ -159,6 +166,8 @@ class CreateMinimizeLosses extends ConsumerWidget {
             FormBuilderValidators.integer(),
             FormBuilderValidators.min(0),
           ]),
+          onChanged: (value) => createBotNotifier.updateConfigField(
+              timerBuyOrderField.name, value),
         ),
         FormBuilderSwitch(
           name: autoRestartField.name,
@@ -170,6 +179,8 @@ class CreateMinimizeLosses extends ConsumerWidget {
             FormBuilderValidators.required(),
           ]),
           title: Text(autoRestartField.publicName),
+          onChanged: (value) =>
+              createBotNotifier.updateConfigField(autoRestartField.name, value),
         ),
       ],
     );

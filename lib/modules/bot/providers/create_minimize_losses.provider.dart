@@ -12,15 +12,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final createMinimizeLossesProvider =
     FutureProvider.autoDispose<CreateMinimizeLosses>((ref) async {
-  final fields =
-      ref.watch(createBotProvider.notifier).formKey.currentState!.fields;
+  final fields = ref.watch(createBotProvider).configFields;
   final isTestNet = fields[Bot.testNetName]!.value as bool;
   final ApiConnection apiConn = isTestNet
       ? ref.read(settingsProvider).testNetConnection
       : ref.read(settingsProvider).pubNetConnection;
   final percentageSellOrder = double.tryParse(
-      fields[MinimizeLossesConfig.percentageSellOrderName]!.value);
-  final symbol = fields[MinimizeLossesConfig.symbolName]!.value as String?;
+      fields[MinimizeLossesConfig.percentageSellOrderName]!.value!);
+  final symbol = fields[MinimizeLossesConfig.symbolName]!.value;
 
   if (percentageSellOrder == null || symbol == null || symbol.isEmpty) {
     return Future.error('Invalid params');

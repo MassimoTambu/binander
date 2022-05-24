@@ -10,10 +10,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 
 class CreateBotPage extends ConsumerWidget {
-  const CreateBotPage({Key? key}) : super(key: key);
+  final formKey = GlobalKey<FormBuilderState>();
+
+  CreateBotPage({Key? key}) : super(key: key);
 
   void onCreateBot(BuildContext context, WidgetRef ref) {
-    final formKey = ref.read(createBotProvider.notifier).formKey;
     if (formKey.currentState!.validate()) {
       ref
           .read(createBotProvider.notifier)
@@ -24,7 +25,6 @@ class CreateBotPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final formKey = ref.watch(createBotProvider.notifier).formKey;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Create bot'),
@@ -87,7 +87,7 @@ class SelectBotField extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return FormBuilderDropdown(
       name: 'bot_type',
-      initialValue: ref.read(createBotProvider),
+      initialValue: ref.read(createBotProvider).botTypes,
       items: BotTypes.values.map((BotTypes botType) {
         return DropdownMenuItem<BotTypes>(
           value: botType,
@@ -96,7 +96,7 @@ class SelectBotField extends ConsumerWidget {
       }).toList(),
       onChanged: (BotTypes? newBotType) {
         newBotType ??= BotTypes.minimizeLosses;
-        ref.read(createBotProvider.notifier).setBotType(newBotType);
+        ref.read(createBotProvider.notifier).update(botTypes: newBotType);
       },
     );
   }
@@ -108,7 +108,7 @@ class BotConfigContainer extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     late final Widget form;
-    switch (ref.watch(createBotProvider)) {
+    switch (ref.watch(createBotProvider).botTypes) {
       case BotTypes.minimizeLosses:
         form = const CreateMinimizeLosses();
         break;
@@ -122,7 +122,7 @@ class BotConfigContainer extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            '${ref.watch(createBotProvider).name} options',
+            '${ref.watch(createBotProvider).botTypes.name} options',
             style: TextStyle(
                 fontSize: Theme.of(context).textTheme.subtitle1?.fontSize),
           ),

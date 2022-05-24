@@ -11,7 +11,7 @@ class DashboardPage extends ConsumerWidget {
   const DashboardPage({Key? key}) : super(key: key);
 
   void _navigateToAddBotPage(BuildContext context) {
-    context.router.push(const CreateBotRoute());
+    context.router.push(CreateBotRoute());
   }
 
   @override
