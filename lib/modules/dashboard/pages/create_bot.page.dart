@@ -1,8 +1,6 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:bottino_fortino/modules/bot/bots/minimize_losses/minimize_losses.config.dart';
 import 'package:bottino_fortino/modules/bot/models/bot.dart';
 import 'package:bottino_fortino/modules/bot/models/bot_types.enum.dart';
-import 'package:bottino_fortino/modules/bot/providers/create_minimize_losses.provider.dart';
 import 'package:bottino_fortino/modules/bot/widgets/create_minimize_losses.dart';
 import 'package:bottino_fortino/modules/dashboard/providers/create_bot.provider.dart';
 import 'package:bottino_fortino/utils/media_query.utils.dart';
@@ -12,15 +10,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 
 class CreateBotPage extends ConsumerWidget {
-  final formKey = GlobalKey<FormBuilderState>();
+  final _formKey = GlobalKey<FormBuilderState>();
 
   CreateBotPage({Key? key}) : super(key: key);
 
   void onCreateBot(BuildContext context, WidgetRef ref) {
-    if (formKey.currentState!.validate()) {
+    if (_formKey.currentState!.validate()) {
       ref
           .read(createBotProvider.notifier)
-          .createBot(formKey.currentState!.fields);
+          .createBot(_formKey.currentState!.fields);
       context.router.navigateBack();
     }
   }
@@ -35,7 +33,7 @@ class CreateBotPage extends ConsumerWidget {
         centerTitle: true,
       ),
       body: FormBuilder(
-        key: formKey,
+        key: _formKey,
         autovalidateMode: AutovalidateMode.disabled,
         child: SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
@@ -73,11 +71,16 @@ class CreateBotPage extends ConsumerWidget {
                       if (botType == BotTypes.minimizeLosses) {
                         final configFields =
                             ref.read(createBotProvider).configFields;
-                        configFields.update(MinimizeLossesConfig.symbolName,
-                            (field) => field..value = null);
 
-                        createBotNotifier.update(
-                            isTestNet: value, configFields: configFields);
+                        // if (value !=
+                        //     configFields.values.elementAt(4).value as bool?) {
+                        //   _formKey.currentState?.fields.values
+                        //       .elementAt(4)
+                        //       .formState
+                        //       ?.reset();
+                        // }
+
+                        createBotNotifier.update(isTestNet: value);
                         return;
                       }
 

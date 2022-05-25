@@ -73,8 +73,6 @@ class CreateMinimizeLosses extends ConsumerWidget {
             label: Text(symbolField.publicName),
             helperText: symbolField.description,
           ),
-          initialValue:
-              symbolField.value ?? symbolField.defaultValue?.toString(),
           items: symbols
               .map(
                 (c) => DropdownMenuItem<String>(

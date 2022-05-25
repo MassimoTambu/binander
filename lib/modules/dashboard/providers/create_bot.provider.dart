@@ -79,7 +79,7 @@ class CreateBotNotifier {
   }) {
     if (kvp != null) {
       kvp.forEach((key, value) {
-        configFields.update(key, (field) => field..value = value);
+        configFields.update(key, (field) => field..value = value.toString());
       });
     }
 
