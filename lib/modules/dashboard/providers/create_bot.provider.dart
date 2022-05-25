@@ -16,7 +16,11 @@ class CreateBotProvider extends StateNotifier<CreateBotNotifier> {
 
   CreateBotProvider(this.ref)
       : super(CreateBotNotifier(
-            BotTypes.minimizeLosses, MinimizeLossesConfig().configFields));
+          '',
+          true,
+          BotTypes.minimizeLosses,
+          MinimizeLossesConfig().configFields,
+        ));
 
   void createBot(
       Map<String, FormBuilderFieldState<FormBuilderField<dynamic>, dynamic>>
@@ -26,30 +30,64 @@ class CreateBotProvider extends StateNotifier<CreateBotNotifier> {
     ref.read(snackBarProvider).show('Bot ${bot.name} created!');
   }
 
-  void update({BotTypes? botTypes, Map<String, ConfigField>? configFields}) {
-    state = state.copyWith(botTypes, configFields);
+  void update({
+    String? name,
+    bool? isTestNet,
+    BotTypes? botTypes,
+    Map<String, ConfigField>? configFields,
+  }) {
+    state = state.copyWith(
+        name: name,
+        isTestNet: isTestNet,
+        botTypes: botTypes,
+        configFields: configFields);
   }
 
   void updateConfigField(String key, dynamic value) {
-    state = state.copyWith(null, {key: value});
+    state = state.copyWithKVP(kvp: {key: value});
   }
 }
 
 class CreateBotNotifier {
+  final String name;
+  final bool isTestNet;
   final BotTypes botTypes;
   final Map<String, ConfigField> configFields;
 
-  const CreateBotNotifier(this.botTypes, this.configFields);
+  const CreateBotNotifier(
+      this.name, this.isTestNet, this.botTypes, this.configFields);
 
-  CreateBotNotifier copyWith(
-      BotTypes? botTypes, Map<String, ConfigField>? configFields) {
-    if (configFields != null) {
-      this.configFields.forEach((key, value) {
-        configFields.putIfAbsent(key, () => value);
+  CreateBotNotifier copyWith({
+    String? name,
+    bool? isTestNet,
+    BotTypes? botTypes,
+    Map<String, ConfigField>? configFields,
+  }) {
+    return CreateBotNotifier(
+      name ?? this.name,
+      isTestNet ?? this.isTestNet,
+      botTypes ?? this.botTypes,
+      configFields ?? this.configFields,
+    );
+  }
+
+  CreateBotNotifier copyWithKVP({
+    String? name,
+    bool? isTestNet,
+    BotTypes? botTypes,
+    Map<String, dynamic>? kvp,
+  }) {
+    if (kvp != null) {
+      kvp.forEach((key, value) {
+        configFields.update(key, (field) => field..value = value);
       });
     }
 
     return CreateBotNotifier(
-        botTypes ?? this.botTypes, configFields ?? this.configFields);
+      name ?? this.name,
+      isTestNet ?? this.isTestNet,
+      botTypes ?? this.botTypes,
+      configFields,
+    );
   }
 }

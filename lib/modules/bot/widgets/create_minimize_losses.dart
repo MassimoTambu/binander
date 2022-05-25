@@ -14,6 +14,7 @@ class CreateMinimizeLosses extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final configFields = ref.watch(createBotProvider).configFields;
+    final isTestNet = ref.watch(createBotProvider).isTestNet;
     final createBotNotifier = ref.watch(createBotProvider.notifier);
     final dailyLossField =
         configFields[MinimizeLossesConfig.dailyLossSellOrdersName]!;
@@ -26,7 +27,6 @@ class CreateMinimizeLosses extends ConsumerWidget {
         configFields[MinimizeLossesConfig.timerBuyOrderName]!;
     final autoRestartField =
         configFields[MinimizeLossesConfig.autoRestartName]!;
-    final isTestNet = configFields[Bot.testNetName]!.value as bool;
     final symbols = ref
             .watch(exchangeInfoProvider)
             ?.getCompatibleSymbolsWithMinimizeLosses(isTestNet: isTestNet) ??
