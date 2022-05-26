@@ -15,22 +15,31 @@ class ExchangeInfoProvider {
 
   const ExchangeInfoProvider(this.ref, this.exchangeInfoNetworks);
 
-  Iterable<Symbol> getCompatibleSymbolsWithMinimizeLosses(
-      {bool isTestNet = true}) {
-    late final List<Symbol> symbols;
-    if (isTestNet) {
-      symbols = exchangeInfoNetworks.testNet.symbols;
-    } else {
-      symbols = exchangeInfoNetworks.pubNet.symbols;
-    }
-
+  List<Symbol> getCompatibleSymbolsWithMinimizeLosses({bool isTestNet = true}) {
     // Get enabled symbols sorted alphabetically
-    return symbols
+    return getNetworkSymbols(isTestNet)
         .where((s) =>
             s.isSpotTradingAllowed &&
             s.orderTypes.any((o) => o == OrderTypes.STOP_LOSS_LIMIT) &&
             s.orderTypes.any((o) => o == OrderTypes.LIMIT))
         .toList()
       ..sort((a, b) => a.symbol.compareTo(b.symbol));
+  }
+
+  int getSymbolPrecision(String symbol, {bool isTestNet = true}) {
+    final symbolPrecisions = getNetworkSymbols(isTestNet)
+        .where((s) => s.symbol == symbol)
+        .map((s) => s.quotePrecision);
+    // Returns precision default value
+    if (symbolPrecisions.isEmpty) return 8;
+
+    return symbolPrecisions.first;
+  }
+
+  List<Symbol> getNetworkSymbols(bool isTestNet) {
+    if (isTestNet) {
+      return exchangeInfoNetworks.testNet.symbols;
+    }
+    return exchangeInfoNetworks.pubNet.symbols;
   }
 }

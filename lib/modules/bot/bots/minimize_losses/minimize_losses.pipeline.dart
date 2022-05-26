@@ -336,8 +336,8 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
 
   /// Submit a new Buy Order with the last average price approximated
   Future<OrderNewLimit> _submitBuyOrder(double rightPairQty) async {
-    final currentApproxPrice =
-        bot.data.lastAveragePrice!.price.floorToDoubleWithDecimals(2);
+    final currentApproxPrice = bot.data.lastAveragePrice!.price
+        .floorToDoubleWithDecimals(bot.data.symbolPrecision);
     final res = await ref.read(apiProvider).spot.trade.newLimitOrder(
         _getApiConnection(),
         bot.config.symbol!,
@@ -350,7 +350,7 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
 
   double _calculateBuyOrderQuantity(double rightPairQty, double currentPrice) {
     final qty = rightPairQty / currentPrice;
-    return qty.floorToDoubleWithDecimals(5);
+    return qty.floorToDoubleWithDecimals(bot.data.symbolPrecision);
   }
 
   Future<OrderData> _getBuyOrder() async {
@@ -383,9 +383,10 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
   }
 
   Future<OrderNewStopLimit> _submitStopSellOrder() async {
-    final price = _calculateNewOrderPrice().floorToDoubleWithDecimals(2);
-    final stopPrice =
-        calculateNewOrderStopPriceWithProperties().floorToDoubleWithDecimals(2);
+    final price = _calculateNewOrderPrice()
+        .floorToDoubleWithDecimals(bot.data.symbolPrecision);
+    final stopPrice = calculateNewOrderStopPriceWithProperties()
+        .floorToDoubleWithDecimals(bot.data.symbolPrecision);
 
     final res = await ref.read(apiProvider).spot.trade.newStopLimitOrder(
         _getApiConnection(),

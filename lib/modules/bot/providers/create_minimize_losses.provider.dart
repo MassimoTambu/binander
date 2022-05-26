@@ -33,9 +33,9 @@ final createMinimizeLossesProvider = FutureProvider.autoDispose
     lastAvgPrice,
     CryptoSymbol(symbol),
     MinimizeLossesPipeline.calculateNewOrderStopPrice(
-            lastAvgPrice: lastAvgPrice.floorToDoubleWithDecimals(7),
+            lastAvgPrice: lastAvgPrice.floorToDoubleWithDecimals(8),
             lastBuyOrderPrice: lastAvgPrice,
             percentageSellOrder: percentageSellOrder)
-        .floorToDoubleWithDecimals(7),
+        .floorToDoubleWithDecimals(8),
   );
 });

@@ -29,7 +29,10 @@ class TestUtils {
   }) =>
       MinimizeLossesBot(
         const Uuid().v4(),
-        MinimizeLossesPipelineData(ordersHistory: OrdersHistory([])),
+        MinimizeLossesPipelineData(
+          ordersHistory: OrdersHistory([]),
+          symbolPrecision: 8,
+        ),
         name: name,
         testNet: true,
         config: MinimizeLossesConfig.create(

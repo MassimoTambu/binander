@@ -18,6 +18,7 @@ class MinimizeLossesPipelineData
 
   factory MinimizeLossesPipelineData({
     @override required final OrdersHistory ordersHistory,
+    @override required final int symbolPrecision,
     @override @Default(0) int counter,
     @override @JsonKey(ignore: true) Timer? timer,
     @override @JsonKey(ignore: true) AveragePrice? lastAveragePrice,

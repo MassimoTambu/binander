@@ -7,6 +7,7 @@ import 'package:bottino_fortino/modules/bot/models/bot_status.dart';
 import 'package:bottino_fortino/modules/bot/models/bot_types.enum.dart';
 import 'package:bottino_fortino/modules/bot/models/interfaces/pipeline.interface.dart';
 import 'package:bottino_fortino/modules/bot/models/orders_history.dart';
+import 'package:bottino_fortino/providers/exchange_info.provider.dart';
 import 'package:bottino_fortino/providers/file_storage.provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
@@ -112,9 +113,16 @@ class PipelineProvider extends StateNotifier<List<Pipeline>> {
     required Duration timerBuyOrder,
     required bool autoRestart,
   }) {
+    final precision = _ref
+        .read(exchangeInfoProvider)!
+        .getSymbolPrecision(symbol.toString(), isTestNet: testNet);
+
     final bot = MinimizeLossesBot(
       const Uuid().v4(),
-      MinimizeLossesPipelineData(ordersHistory: OrdersHistory([])),
+      MinimizeLossesPipelineData(
+        ordersHistory: OrdersHistory([]),
+        symbolPrecision: precision,
+      ),
       name: name,
       testNet: testNet,
       config: MinimizeLossesConfig.create(
