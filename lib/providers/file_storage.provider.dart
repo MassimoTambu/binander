@@ -84,10 +84,14 @@ class FileStorageProvider {
     final file = File.fromUri(Uri.file(defaultFileName));
     final raf = file.openSync(mode: FileMode.write);
     try {
-      raf.lockSync(FileLock.blockingExclusive);
+      // We must require lock to prevent concurrent writes.
+      // Also we have to perform a async lock, otherwise app could freeze if we don't release lock quickly
+      await raf.lock(FileLock.blockingExclusive);
       await raf.writeString(encoder.convert(data));
     } catch (e) {
-      ref.read(snackBarProvider).show('Error while saving file: $e');
+      ref
+          .read(snackBarProvider)
+          .show('Error while saving file: $e', seconds: 5);
     } finally {
       raf.closeSync();
     }
