@@ -31,6 +31,11 @@ class BottinoFortino extends ConsumerWidget {
                 final oldBots = prevPipelines?.map((e) => e.bot).toList() ?? [];
                 final newBots = newPipelines.map((e) => e.bot).toList();
 
+                // Upsert bots
+                ref
+                    .watch(fileStorageProvider)
+                    .upsertBots(newPipelines.map((e) => e.bot).toList());
+
                 // Find bots to remove
                 final botsToRemove = oldBots
                     .where((b1) => newBots.every((b2) => b2.uuid != b1.uuid));
