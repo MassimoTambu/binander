@@ -14,9 +14,8 @@ class BotTile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final botTile = ref.watch(botTileProvider.notifier);
-    final pipeline = botTile.pipeline;
-    final bot = botTile.pipeline.bot;
+    final pipeline = ref.watch(botTileProvider.select((p) => p.pipeline));
+    final bot = pipeline.bot;
     return ExpansionTile(
       title: Wrap(
         spacing: 8,
@@ -169,10 +168,10 @@ class _BotTileRightChips extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final botStatus = ref.watch(
-        botTileProvider.notifier.select((p) => p.pipeline.bot.data.status));
-    final testNet = ref
-        .watch(botTileProvider.notifier.select((p) => p.pipeline.bot.testNet));
+    final botStatus =
+        ref.watch(botTileProvider.select((p) => p.pipeline.bot.data.status));
+    final testNet =
+        ref.watch(botTileProvider.select((p) => p.pipeline.bot.testNet));
 
     return Wrap(
       spacing: 8,

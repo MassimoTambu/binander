@@ -10,7 +10,8 @@ class BotTileOrders extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final allOrders = ref.watch(botTileProvider);
+    final allOrders = ref.watch(botTileProvider
+        .select((p) => p.pipeline.bot.data.ordersHistory.runOrders));
     const items = [
       {'Date (newer)': OrdersOrder.dateNewest},
       {'Date (oldest)': OrdersOrder.dateOldest},
@@ -31,7 +32,7 @@ class BotTileOrders extends ConsumerWidget {
                   child: Text(kv.keys.first),
                 );
               }).toList(),
-              value: ref.watch(botTileProvider.notifier).selectedOrder,
+              value: ref.watch(botTileProvider).selectedOrder,
               hint: const Text('Sort by'),
               icon: const Icon(Icons.sort),
               onChanged: (OrdersOrder? ordersOrder) {

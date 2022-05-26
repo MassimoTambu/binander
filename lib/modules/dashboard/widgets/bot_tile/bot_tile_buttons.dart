@@ -9,7 +9,7 @@ class BotTileButtons extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final botTile = ref.watch(botTileProvider.notifier);
+    final botTile = ref.watch(botTileProvider);
     final isStartDisabled = botTile.isStartButtonDisabled;
     final isPauseDisabled = botTile.isPauseButtonDisabled;
     final isStarted = !botTile.hasToStart;

@@ -80,7 +80,7 @@ class CreateMinimizeLosses extends ConsumerWidget {
           items: symbols
               .map(
                 (c) => DropdownMenuItem<String>(
-                  value: c.symbol,
+                  value: "${c.baseAsset}-${c.quoteAsset}",
                   child: Text(c.symbol),
                 ),
               )
