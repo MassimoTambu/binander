@@ -10,22 +10,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 
 class CreateBotPage extends ConsumerWidget {
-  final _formKey = GlobalKey<FormBuilderState>();
-
-  CreateBotPage({Key? key}) : super(key: key);
-
-  void onCreateBot(BuildContext context, WidgetRef ref) {
-    if (_formKey.currentState!.validate()) {
-      ref
-          .read(createBotProvider.notifier)
-          .createBot(_formKey.currentState!.fields);
-      context.router.navigateBack();
-    }
-  }
+  const CreateBotPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final botType = ref.watch(createBotProvider.select((p) => p.botTypes));
     final createBotNotifier = ref.watch(createBotProvider.notifier);
     return Scaffold(
       appBar: AppBar(
@@ -33,7 +21,7 @@ class CreateBotPage extends ConsumerWidget {
         centerTitle: true,
       ),
       body: FormBuilder(
-        key: _formKey,
+        key: createBotNotifier.formKey,
         autovalidateMode: AutovalidateMode.disabled,
         child: SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
@@ -68,28 +56,17 @@ class CreateBotPage extends ConsumerWidget {
                         'Binance removes orders every start of month'),
                     initialValue: true,
                     onChanged: (value) {
-                      if (botType == BotTypes.minimizeLosses) {
-                        final configFields =
-                            ref.read(createBotProvider).configFields;
-
-                        // if (value !=
-                        //     configFields.values.elementAt(4).value as bool?) {
-                        //   _formKey.currentState?.fields.values
-                        //       .elementAt(4)
-                        //       .formState
-                        //       ?.reset();
-                        // }
-
-                        createBotNotifier.update(isTestNet: value);
-                        return;
-                      }
-
                       createBotNotifier.update(isTestNet: value);
                     },
                   ),
                   const BotConfigContainer(),
                   TextButton(
-                    onPressed: () => onCreateBot(context, ref),
+                    onPressed: () {
+                      if (createBotNotifier.formKey.currentState!.validate()) {
+                        ref.read(createBotProvider.notifier).createBot();
+                        context.router.navigateBack();
+                      }
+                    },
                     child: const Text('Create'),
                   ),
                 ],

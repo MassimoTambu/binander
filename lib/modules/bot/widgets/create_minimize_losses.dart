@@ -1,5 +1,5 @@
 import 'package:bottino_fortino/modules/bot/bots/minimize_losses/minimize_losses.config.dart';
-import 'package:bottino_fortino/modules/bot/models/bot.dart';
+import 'package:bottino_fortino/modules/bot/models/create_minimize_losses_params.dart';
 import 'package:bottino_fortino/modules/bot/providers/create_minimize_losses.provider.dart';
 import 'package:bottino_fortino/modules/dashboard/providers/create_bot.provider.dart';
 import 'package:bottino_fortino/providers/exchange_info.provider.dart';
@@ -31,6 +31,10 @@ class CreateMinimizeLosses extends ConsumerWidget {
             .watch(exchangeInfoProvider)
             ?.getCompatibleSymbolsWithMinimizeLosses(isTestNet: isTestNet) ??
         [];
+
+    final createMinimizeLosses = ref.watch(createMinimizeLossesProvider(
+        CreateMinimizeLossesParams(
+            isTestNet, percentageSellOrderField.value, symbolField.value)));
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -86,7 +90,6 @@ class CreateMinimizeLosses extends ConsumerWidget {
           ]),
           onChanged: (value) {
             createBotNotifier.updateConfigField(symbolField.name, value);
-            ref.refresh(createMinimizeLossesProvider);
           },
         ),
         Padding(
@@ -100,14 +103,14 @@ class CreateMinimizeLosses extends ConsumerWidget {
         Wrap(
           crossAxisAlignment: WrapCrossAlignment.center,
           children: [
-            ref.watch(createMinimizeLossesProvider).maybeWhen(
-                  data: (createMinimizeLosses) => Text(
-                    'Given the current price of ${createMinimizeLosses.currentPrice} ${createMinimizeLosses.symbol} and the sell order percentage of ',
-                  ),
-                  orElse: () => const Text(
-                    'Given the current price of -- and the sell order percentage of ',
-                  ),
-                ),
+            createMinimizeLosses.maybeWhen(
+              data: (createMinimizeLosses) => Text(
+                'Given the current price of ${createMinimizeLosses.currentPrice} ${createMinimizeLosses.symbol} and the sell order percentage of ',
+              ),
+              orElse: () => const Text(
+                'Given the current price of -- and the sell order percentage of ',
+              ),
+            ),
             SizedBox(
               width: 60,
               child: FormBuilderTextField(
@@ -130,18 +133,17 @@ class CreateMinimizeLosses extends ConsumerWidget {
                 onChanged: (value) {
                   createBotNotifier.updateConfigField(
                       percentageSellOrderField.name, value);
-                  ref.refresh(createMinimizeLossesProvider);
                 },
               ),
             ),
-            ref.watch(createMinimizeLossesProvider).maybeWhen(
-                  data: (createMinimizeLosses) => Text(
-                    ' I will try to submit a Sell StopLossOrder at ${createMinimizeLosses.stopSellOrderPrice} ${createMinimizeLosses.symbol}',
-                  ),
-                  orElse: () => const Text(
-                    ' I will try to submit a Sell StopLossOrder at --',
-                  ),
-                ),
+            createMinimizeLosses.maybeWhen(
+              data: (createMinimizeLosses) => Text(
+                ' I will try to submit a Sell StopLossOrder at ${createMinimizeLosses.stopSellOrderPrice} ${createMinimizeLosses.symbol}',
+              ),
+              orElse: () => const Text(
+                ' I will try to submit a Sell StopLossOrder at --',
+              ),
+            ),
           ],
         ),
         Padding(
