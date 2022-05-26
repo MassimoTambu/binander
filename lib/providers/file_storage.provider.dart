@@ -2,15 +2,19 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:bottino_fortino/modules/bot/models/bot.dart';
+import 'package:bottino_fortino/providers/snackbar.provider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final fileStorageProvider = Provider<FileStorageProvider>((ref) {
-  return FileStorageProvider();
+  return FileStorageProvider(ref);
 });
 
 class FileStorageProvider {
+  final Ref ref;
   Map<String, dynamic> data = {};
+
+  FileStorageProvider(this.ref);
 
   static const encoder = JsonEncoder.withIndent('  ');
 
@@ -32,22 +36,22 @@ class FileStorageProvider {
     if (await file.exists()) {
       final dataFromFile = await file.readAsString();
       data = jsonDecode(dataFromFile);
-
-      // sink = file.openWrite();
     } else {
-      // sink = file.openWrite();
-
       _loadSchema();
-      await _saveFile();
+      _saveFile();
     }
   }
 
-  void upsertBots(List<Bot> bots) {
+  void _loadSchema() {
+    data = {'bots': <Map<String, dynamic>>[]};
+  }
+
+  Future<void> upsertBots(List<Bot> bots) async {
     for (var bot in bots) {
       _upsertBot(bot);
     }
 
-    _saveFile();
+    await _saveFile();
   }
 
   void _upsertBot(Bot newBot) {
@@ -69,12 +73,23 @@ class FileStorageProvider {
     (data['bots'] as List).add(newBot.toJson());
   }
 
-  void _loadSchema() {
-    data = {'bots': <Map<String, dynamic>>[]};
+  Future<void> removeBots(List<Bot> bots) async {
+    (data['bots'] as List)
+        .removeWhere((b) => bots.any((b2) => b2.uuid == b['uuid']));
+
+    await _saveFile();
   }
 
   Future<void> _saveFile() async {
-    await File.fromUri(Uri.file(defaultFileName))
-        .writeAsString(encoder.convert(data));
+    final file = File.fromUri(Uri.file(defaultFileName));
+    final raf = file.openSync(mode: FileMode.write);
+    try {
+      raf.lockSync(FileLock.blockingExclusive);
+      await raf.writeString(encoder.convert(data));
+    } catch (e) {
+      ref.read(snackBarProvider).show('Error while saving file: $e');
+    } finally {
+      raf.closeSync();
+    }
   }
 }

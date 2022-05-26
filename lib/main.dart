@@ -28,9 +28,19 @@ class BottinoFortino extends ConsumerWidget {
               // Autosave bots to file when pipelineProvider changes
               ref.listen<List<Pipeline>>(pipelineProvider,
                   (prevPipelines, newPipelines) {
-                ref
-                    .watch(fileStorageProvider)
-                    .upsertBots(newPipelines.map((e) => e.bot).toList());
+                final oldBots = prevPipelines?.map((e) => e.bot).toList() ?? [];
+                final newBots = newPipelines.map((e) => e.bot).toList();
+
+                // Find bots to remove
+                final botsToRemove = oldBots
+                    .where((b1) => newBots.every((b2) => b2.uuid != b1.uuid));
+
+                if (botsToRemove.isNotEmpty) {
+                  // Remove bots from file
+                  ref
+                      .read(fileStorageProvider)
+                      .removeBots(botsToRemove.toList());
+                }
               });
               return MaterialApp.router(
                 scaffoldMessengerKey: snackbarKey,

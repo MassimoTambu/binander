@@ -79,8 +79,6 @@ class PipelineProvider extends StateNotifier<List<Pipeline>> {
         break;
     }
 
-    _saveBot(bot);
-
     return bot;
   }
 
@@ -142,8 +140,20 @@ class PipelineProvider extends StateNotifier<List<Pipeline>> {
     return bot;
   }
 
-  void removeBot() {
-    /// TODO implement remove
+  Future<void> removeBots(List<String> uuids) async {
+    final pipelines = state.where((p) => uuids.any((u) => p.bot.uuid == u));
+
+    // Exit if no pipelines are found
+    if (pipelines.isEmpty) return;
+
+    await Future.wait(
+        pipelines.map((p) => p.shutdown(reason: 'removing bot..')));
+
+    // Update state removing cancelled bots
+    state = [...state.where((p) => uuids.every((u) => p.bot.uuid != u))];
+    _ref
+        .read(fileStorageProvider)
+        .removeBots(pipelines.map((p) => p.bot).toList());
   }
 
   void _loadBotsFromFile(Map<String, dynamic> data) {
@@ -162,9 +172,5 @@ class PipelineProvider extends StateNotifier<List<Pipeline>> {
       minimizeLosses: (minimizeLosses) =>
           MinimizeLossesPipeline(_ref, minimizeLosses),
     );
-  }
-
-  void _saveBot(Bot bot) {
-    _ref.read(fileStorageProvider).upsertBots([bot]);
   }
 }
