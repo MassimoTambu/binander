@@ -7,9 +7,9 @@ final snackBarProvider = Provider<SnackBarProvider>((ref) {
 });
 
 class SnackBarProvider {
-  void show(String message, {bool dismissable = false}) {
+  void show(String message, {bool dismissable = false, int seconds = 3}) {
     final snackBar = SnackBar(
-      duration: const Duration(seconds: 3),
+      duration: Duration(seconds: seconds),
       content: Text(message),
       action: SnackBarAction(
         label: 'Okay',
