@@ -7,7 +7,7 @@ abstract class Pipeline {
 
   Pipeline(this.ref, this.bot);
 
-  void start();
+  Future<void> start();
   void pause();
-  void shutdown({String reason = ''});
+  Future<void> shutdown({String reason = ''});
 }

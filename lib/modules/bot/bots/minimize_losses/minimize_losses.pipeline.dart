@@ -29,7 +29,7 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
       _MinimizeLossesPipeline;
 
   @override
-  void start() async {
+  Future<void> start() async {
     // We can't create a status variable because with freezed
     //  if the state changes (like below) we will have the old reference
     // final status = status;
@@ -106,7 +106,7 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
   }
 
   @override
-  void shutdown(
+  Future<void> shutdown(
       {BotPhases phase = BotPhases.offline, String reason = ''}) async {
     bot.data.timer?.cancel();
     bot.data.timer = null;
