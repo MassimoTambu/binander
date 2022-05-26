@@ -24,10 +24,13 @@ class ExchangeInfoProvider {
       symbols = exchangeInfoNetworks.pubNet.symbols;
     }
 
-    // Get enabled orders for
-    return symbols.where((s) =>
-        s.isSpotTradingAllowed &&
-        s.orderTypes.any((o) => o == OrderTypes.STOP_LOSS_LIMIT) &&
-        s.orderTypes.any((o) => o == OrderTypes.LIMIT));
+    // Get enabled symbols sorted alphabetically
+    return symbols
+        .where((s) =>
+            s.isSpotTradingAllowed &&
+            s.orderTypes.any((o) => o == OrderTypes.STOP_LOSS_LIMIT) &&
+            s.orderTypes.any((o) => o == OrderTypes.LIMIT))
+        .toList()
+      ..sort((a, b) => a.symbol.compareTo(b.symbol));
   }
 }
