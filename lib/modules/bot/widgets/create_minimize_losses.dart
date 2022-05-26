@@ -156,6 +156,8 @@ class CreateMinimizeLosses extends ConsumerWidget {
         FormBuilderTextField(
           name: timerBuyOrderField.name,
           decoration: InputDecoration(
+            prefixText: 'minutes: ',
+            prefixStyle: Theme.of(context).textTheme.bodyText1,
             label: Text(timerBuyOrderField.publicName),
             helperText: timerBuyOrderField.description,
           ),
