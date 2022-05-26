@@ -157,6 +157,7 @@ class BotTile extends ConsumerWidget {
           ),
         ),
         const BotTileButtons(),
+        const SizedBox(height: 16),
         const BotTileOrders(),
       ],
     );
