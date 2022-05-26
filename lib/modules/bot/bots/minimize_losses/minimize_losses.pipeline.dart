@@ -59,7 +59,7 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
 
       final accInfo = await _getAccountInformation();
       final accBalances = accInfo.balances.where(
-        (b) => b.asset == bot.config.symbol!.rightPair,
+        (b) => b.asset == bot.config.symbol!.quoteAsset,
       );
       // Asset not found in account
       if (accBalances.isEmpty) {
@@ -229,9 +229,9 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
       if (_hasToMoveOrder()) {
         await _moveOrder(sellOrder.orderId);
         changeStatusTo(BotPhases.online,
-            'Moved sell order to ${sellOrder.price} ${bot.config.symbol!.rightPair} with stop at ${sellOrder.stopPrice} ${bot.config.symbol!.rightPair}');
+            'Moved sell order to ${sellOrder.price} ${bot.config.symbol!.quoteAsset} with stop at ${sellOrder.stopPrice} ${bot.config.symbol!.quoteAsset}');
         _showSnackBar(
-            'Moved sell order to ${sellOrder.stopPrice} ${bot.config.symbol!.rightPair} with stop at ${sellOrder.stopPrice} ${bot.config.symbol!.rightPair}');
+            'Moved sell order to ${sellOrder.stopPrice} ${bot.config.symbol!.quoteAsset} with stop at ${sellOrder.stopPrice} ${bot.config.symbol!.quoteAsset}');
       }
 
       return;
@@ -322,8 +322,8 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
                   _getApiConnection(), bot.config.symbol!, newBuyOrder.orderId))
           .body;
       bot.data.ordersHistory.upsertOrderInNotEndedRunOrder(buyOrderData);
-    } on ApiException catch (e, ee) {
-      const message = 'Failed to submit buy order. Retry in 10s';
+    } on ApiException catch (e) {
+      final message = 'Failed to submit buy order. Retry in 10s | $e';
 
       changeStatusTo(BotPhases.starting, message);
 
@@ -384,7 +384,8 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
 
   Future<OrderNewStopLimit> _submitStopSellOrder() async {
     final price = _calculateNewOrderPrice().floorToDoubleWithDecimals(2);
-    final stopPrice = calculateNewOrderStopPrice().floorToDoubleWithDecimals(2);
+    final stopPrice =
+        calculateNewOrderStopPriceWithProperties().floorToDoubleWithDecimals(2);
 
     final res = await ref.read(apiProvider).spot.trade.newStopLimitOrder(
         _getApiConnection(),
@@ -450,11 +451,24 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
   /// Calculate the new sell order stop price.
   /// It could return 0 if atleast one of last buy order, last average price or
   /// percentage sell order were null
-  double calculateNewOrderStopPrice() {
+  double calculateNewOrderStopPriceWithProperties() {
     final lastBuyOrderPrice =
         bot.data.ordersHistory.lastNotEndedRunOrders?.buyOrder?.price;
     final lastAvgPrice = bot.data.lastAveragePrice?.price;
     final percentageSellOrder = bot.config.percentageSellOrder;
+
+    return calculateNewOrderStopPrice(
+      lastBuyOrderPrice: lastBuyOrderPrice,
+      lastAvgPrice: lastAvgPrice,
+      percentageSellOrder: percentageSellOrder,
+    );
+  }
+
+  static double calculateNewOrderStopPrice({
+    required double? lastAvgPrice,
+    required double? lastBuyOrderPrice,
+    required double? percentageSellOrder,
+  }) {
     if (lastBuyOrderPrice == null ||
         lastAvgPrice == null ||
         percentageSellOrder == null) {
@@ -465,7 +479,7 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
   }
 
   double calculatePercentageOfDifference() {
-    final newStopOrderPrice = calculateNewOrderStopPrice();
+    final newStopOrderPrice = calculateNewOrderStopPriceWithProperties();
     if (newStopOrderPrice == 0) return 0;
 
     final sellOrder = bot.data.ordersHistory.lastNotEndedRunOrders!.sellOrder!;

@@ -10,28 +10,18 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 
 class CreateBotPage extends ConsumerWidget {
-  CreateBotPage({Key? key}) : super(key: key);
-
-  final _formKey = GlobalKey<FormBuilderState>();
-
-  void onCreateBot(BuildContext context, WidgetRef ref) {
-    if (_formKey.currentState!.validate()) {
-      ref
-          .read(createBotProvider.notifier)
-          .createBot(_formKey.currentState!.fields);
-      context.router.navigateBack();
-    }
-  }
+  const CreateBotPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final createBotNotifier = ref.watch(createBotProvider.notifier);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Create bot'),
         centerTitle: true,
       ),
       body: FormBuilder(
-        key: _formKey,
+        key: createBotNotifier.formKey,
         autovalidateMode: AutovalidateMode.disabled,
         child: SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
@@ -54,6 +44,7 @@ class CreateBotPage extends ConsumerWidget {
                     validator: FormBuilderValidators.compose(
                       [FormBuilderValidators.required()],
                     ),
+                    onChanged: (value) => createBotNotifier.update(name: value),
                   ),
                   FormBuilderSwitch(
                     name: Bot.testNetName,
@@ -64,10 +55,18 @@ class CreateBotPage extends ConsumerWidget {
                     subtitle: const Text(
                         'Binance removes orders every start of month'),
                     initialValue: true,
+                    onChanged: (value) {
+                      createBotNotifier.update(isTestNet: value);
+                    },
                   ),
                   const BotConfigContainer(),
                   TextButton(
-                    onPressed: () => onCreateBot(context, ref),
+                    onPressed: () {
+                      if (createBotNotifier.formKey.currentState!.validate()) {
+                        ref.read(createBotProvider.notifier).createBot();
+                        context.router.navigateBack();
+                      }
+                    },
                     child: const Text('Create'),
                   ),
                 ],
@@ -87,7 +86,7 @@ class SelectBotField extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return FormBuilderDropdown(
       name: 'bot_type',
-      initialValue: ref.read(createBotProvider),
+      initialValue: ref.read(createBotProvider).botTypes,
       items: BotTypes.values.map((BotTypes botType) {
         return DropdownMenuItem<BotTypes>(
           value: botType,
@@ -96,7 +95,7 @@ class SelectBotField extends ConsumerWidget {
       }).toList(),
       onChanged: (BotTypes? newBotType) {
         newBotType ??= BotTypes.minimizeLosses;
-        ref.read(createBotProvider.notifier).setBotType(newBotType);
+        ref.read(createBotProvider.notifier).update(botTypes: newBotType);
       },
     );
   }
@@ -108,7 +107,7 @@ class BotConfigContainer extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     late final Widget form;
-    switch (ref.watch(createBotProvider)) {
+    switch (ref.watch(createBotProvider).botTypes) {
       case BotTypes.minimizeLosses:
         form = const CreateMinimizeLosses();
         break;
@@ -122,7 +121,7 @@ class BotConfigContainer extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            '${ref.watch(createBotProvider).name} options',
+            '${ref.watch(createBotProvider).botTypes.name} options',
             style: TextStyle(
                 fontSize: Theme.of(context).textTheme.subtitle1?.fontSize),
           ),

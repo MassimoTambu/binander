@@ -1,5 +1,4 @@
 import 'package:bottino_fortino/models/config_field.dart';
-import 'package:bottino_fortino/models/constants/symbols.dart';
 import 'package:bottino_fortino/models/crypto_symbol.dart';
 import 'package:bottino_fortino/models/interfaces/config.interface.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
@@ -65,7 +64,7 @@ class MinimizeLossesConfig implements Config {
       name: symbolName,
       publicName: symbolPublicName,
       description: symbolDescription,
-      items: symbols,
+      items: [],
     ),
     timerBuyOrderName: ConfigField(
       name: timerBuyOrderName,

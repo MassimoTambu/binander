@@ -1,14 +1,21 @@
 import 'package:bottino_fortino/modules/bot/bots/minimize_losses/minimize_losses.config.dart';
+import 'package:bottino_fortino/modules/bot/models/create_minimize_losses_params.dart';
+import 'package:bottino_fortino/modules/bot/providers/create_minimize_losses.provider.dart';
+import 'package:bottino_fortino/modules/dashboard/providers/create_bot.provider.dart';
+import 'package:bottino_fortino/providers/exchange_info.provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 
-class CreateMinimizeLosses extends StatelessWidget {
+class CreateMinimizeLosses extends ConsumerWidget {
   const CreateMinimizeLosses({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    final configFields = MinimizeLossesConfig().configFields;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final configFields = ref.watch(createBotProvider).configFields;
+    final isTestNet = ref.watch(createBotProvider).isTestNet;
+    final createBotNotifier = ref.watch(createBotProvider.notifier);
     final dailyLossField =
         configFields[MinimizeLossesConfig.dailyLossSellOrdersName]!;
     final maxInvestmentField =
@@ -20,6 +27,14 @@ class CreateMinimizeLosses extends StatelessWidget {
         configFields[MinimizeLossesConfig.timerBuyOrderName]!;
     final autoRestartField =
         configFields[MinimizeLossesConfig.autoRestartName]!;
+    final symbols = ref
+            .watch(exchangeInfoProvider)
+            ?.getCompatibleSymbolsWithMinimizeLosses(isTestNet: isTestNet) ??
+        [];
+
+    final createMinimizeLosses = ref.watch(createMinimizeLossesProvider(
+        CreateMinimizeLossesParams(
+            isTestNet, percentageSellOrderField.value, symbolField.value)));
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -37,6 +52,8 @@ class CreateMinimizeLosses extends StatelessWidget {
             FormBuilderValidators.integer(),
             FormBuilderValidators.min(0),
           ]),
+          onChanged: (value) =>
+              createBotNotifier.updateConfigField(dailyLossField.name, value),
         ),
         FormBuilderTextField(
           name: maxInvestmentField.name,
@@ -51,20 +68,8 @@ class CreateMinimizeLosses extends StatelessWidget {
             FormBuilderValidators.integer(),
             FormBuilderValidators.min(0),
           ]),
-        ),
-        FormBuilderTextField(
-          name: percentageSellOrderField.name,
-          decoration: InputDecoration(
-            label: Text(percentageSellOrderField.publicName),
-            helperText: percentageSellOrderField.description,
-          ),
-          initialValue: percentageSellOrderField.value ??
-              percentageSellOrderField.defaultValue?.toString(),
-          validator: FormBuilderValidators.compose([
-            FormBuilderValidators.required(),
-            FormBuilderValidators.numeric(),
-            FormBuilderValidators.min(1),
-          ]),
+          onChanged: (value) => createBotNotifier.updateConfigField(
+              maxInvestmentField.name, value),
         ),
         FormBuilderDropdown(
           name: symbolField.name,
@@ -72,19 +77,81 @@ class CreateMinimizeLosses extends StatelessWidget {
             label: Text(symbolField.publicName),
             helperText: symbolField.description,
           ),
-          initialValue:
-              symbolField.value ?? symbolField.defaultValue?.toString(),
-          items: symbolField.items!
+          items: symbols
               .map(
                 (c) => DropdownMenuItem<String>(
-                  value: c,
-                  child: Text(c),
+                  value: c.symbol,
+                  child: Text(c.symbol),
                 ),
               )
               .toList(),
           validator: FormBuilderValidators.compose([
             FormBuilderValidators.required<String>(),
           ]),
+          onChanged: (value) {
+            createBotNotifier.updateConfigField(symbolField.name, value);
+          },
+        ),
+        Padding(
+          padding: const EdgeInsets.only(top: 24),
+          child: Text(
+            percentageSellOrderField.publicName,
+            style: Theme.of(context).textTheme.caption!.copyWith(
+                fontSize: Theme.of(context).textTheme.subtitle1!.fontSize),
+          ),
+        ),
+        Wrap(
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: [
+            createMinimizeLosses.maybeWhen(
+              data: (createMinimizeLosses) => Text(
+                'Given the current price of ${createMinimizeLosses.currentPrice} ${createMinimizeLosses.symbol} and the sell order percentage of ',
+              ),
+              orElse: () => const Text(
+                'Given the current price of -- and the sell order percentage of ',
+              ),
+            ),
+            SizedBox(
+              width: 60,
+              child: FormBuilderTextField(
+                name: percentageSellOrderField.name,
+                initialValue: percentageSellOrderField.value ??
+                    percentageSellOrderField.defaultValue?.toString(),
+                decoration: InputDecoration(
+                    suffixText: '%',
+                    suffixStyle: Theme.of(context).textTheme.bodyText1),
+                validator: FormBuilderValidators.compose([
+                  FormBuilderValidators.required(errorText: 'Required'),
+                  FormBuilderValidators.numeric(errorText: 'Numbers only'),
+                  FormBuilderValidators.min(1, errorText: 'Min 1'),
+                  FormBuilderValidators.max(100, errorText: 'Max 100'),
+                ]),
+                style: const TextStyle(
+                  fontWeight: FontWeight.w600,
+                ),
+                textAlign: TextAlign.end,
+                onChanged: (value) {
+                  createBotNotifier.updateConfigField(
+                      percentageSellOrderField.name, value);
+                },
+              ),
+            ),
+            createMinimizeLosses.maybeWhen(
+              data: (createMinimizeLosses) => Text(
+                ' I will try to submit a Sell StopLossOrder at ${createMinimizeLosses.stopSellOrderPrice} ${createMinimizeLosses.symbol}',
+              ),
+              orElse: () => const Text(
+                ' I will try to submit a Sell StopLossOrder at --',
+              ),
+            ),
+          ],
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 20),
+          child: Text(
+            percentageSellOrderField.description,
+            style: Theme.of(context).textTheme.caption!,
+          ),
         ),
         FormBuilderTextField(
           name: timerBuyOrderField.name,
@@ -99,6 +166,8 @@ class CreateMinimizeLosses extends StatelessWidget {
             FormBuilderValidators.integer(),
             FormBuilderValidators.min(0),
           ]),
+          onChanged: (value) => createBotNotifier.updateConfigField(
+              timerBuyOrderField.name, value),
         ),
         FormBuilderSwitch(
           name: autoRestartField.name,
@@ -110,6 +179,8 @@ class CreateMinimizeLosses extends StatelessWidget {
             FormBuilderValidators.required(),
           ]),
           title: Text(autoRestartField.publicName),
+          onChanged: (value) =>
+              createBotNotifier.updateConfigField(autoRestartField.name, value),
         ),
       ],
     );

@@ -23,14 +23,13 @@ class TradeProvider {
         conn.apiSecret, {}, API_SECURITY_TYPE.userData);
 
     try {
-      final response = await _ref.read(_dioProvider).get<String>(
+      final response = await _ref.read(_dioProvider).get<Map<String, dynamic>>(
           '${conn.url}/api/v3/account',
           options: options,
           queryParameters: secureQuery);
 
       return ApiResponse(
-          AccountInformation.fromJson(jsonDecode(response.data!)),
-          response.statusCode!);
+          AccountInformation.fromJson(response.data!), response.statusCode!);
     } on DioError catch (e) {
       return Future.error(_ref
           .read(_apiUtilsProvider)
@@ -53,14 +52,12 @@ class TradeProvider {
         conn.apiSecret, query, API_SECURITY_TYPE.userData);
 
     try {
-      final response = await _ref.read(_dioProvider).get<String>(
+      final response = await _ref.read(_dioProvider).get<List<dynamic>>(
           '${conn.url}/api/v3/allOrders',
           options: options,
           queryParameters: secureQuery);
 
-      final rawOrders = jsonDecode(response.data!) as List<dynamic>;
-
-      return ApiResponse(rawOrders.map((o) => Order.fromJson(o)).toList(),
+      return ApiResponse(response.data!.map((o) => Order.fromJson(o)).toList(),
           response.statusCode!);
     } on DioError catch (e) {
       return Future.error(
@@ -84,13 +81,13 @@ class TradeProvider {
         conn.apiSecret, query, API_SECURITY_TYPE.userData);
 
     try {
-      final response = await _ref.read(_dioProvider).get<String>(
+      final response = await _ref.read(_dioProvider).get<Map<String, dynamic>>(
           '${conn.url}/api/v3/order',
           options: options,
           queryParameters: secureQuery);
 
       return ApiResponse(
-          OrderData.fromJson(jsonDecode(response.data!)), response.statusCode!);
+          OrderData.fromJson(response.data!), response.statusCode!);
     } on DioError catch (e) {
       return Future.error(
           _ref.read(_apiUtilsProvider).buildApiException('_newOrder', e));
@@ -118,13 +115,13 @@ class TradeProvider {
         conn.apiSecret, query, API_SECURITY_TYPE.userData);
 
     try {
-      final response = await _ref.read(_dioProvider).delete<String>(
-          '${conn.url}/api/v3/order',
-          options: options,
-          queryParameters: secureQuery);
+      final response = await _ref
+          .read(_dioProvider)
+          .delete<Map<String, dynamic>>('${conn.url}/api/v3/order',
+              options: options, queryParameters: secureQuery);
 
-      return ApiResponse(OrderCancel.fromJson(jsonDecode(response.data!)),
-          response.statusCode!);
+      return ApiResponse(
+          OrderCancel.fromJson(response.data!), response.statusCode!);
     } on DioError catch (e) {
       return Future.error(
           _ref.read(_apiUtilsProvider).buildApiException('_newOrder', e));
@@ -160,13 +157,13 @@ class TradeProvider {
         conn.apiSecret, query, API_SECURITY_TYPE.userData);
 
     try {
-      final response = await _ref.read(_dioProvider).post<String>(
+      final response = await _ref.read(_dioProvider).post<Map<String, dynamic>>(
           '${conn.url}/api/v3/order',
           options: options,
           queryParameters: secureQuery);
 
-      return ApiResponse(OrderNewLimit.fromJson(jsonDecode(response.data!)),
-          response.statusCode!);
+      return ApiResponse(
+          OrderNewLimit.fromJson(response.data!), response.statusCode!);
     } on DioError catch (e) {
       return Future.error(
           _ref.read(_apiUtilsProvider).buildApiException('_newOrder', e));
@@ -204,13 +201,13 @@ class TradeProvider {
         conn.apiSecret, query, API_SECURITY_TYPE.userData);
 
     try {
-      final response = await _ref.read(_dioProvider).post<String>(
+      final response = await _ref.read(_dioProvider).post<Map<String, dynamic>>(
           '${conn.url}/api/v3/order',
           options: options,
           queryParameters: secureQuery);
 
-      return ApiResponse(OrderNewStopLimit.fromJson(jsonDecode(response.data!)),
-          response.statusCode!);
+      return ApiResponse(
+          OrderNewStopLimit.fromJson(response.data!), response.statusCode!);
     } on DioError catch (e) {
       return Future.error(
           _ref.read(_apiUtilsProvider).buildApiException('_newOrder', e));

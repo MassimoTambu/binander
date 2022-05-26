@@ -17,12 +17,13 @@ part 'api_constants.dart';
 
 part 'models/api_key_permission.dart';
 part 'models/average_price.dart';
+part 'models/exchange_info.dart';
+part 'models/exchange_filter.dart';
 part 'models/system_status.dart';
 part 'models/account_and_symbol_permission.enum.dart';
-part 'models/symbol_status.enum.dart';
+part 'models/exchange_filter_types.enum.dart';
 part 'models/time_in_force.enum.dart';
-part 'models/rate_limit_types.enum.dart';
-part 'models/rate_limit_intervals.enum.dart';
+part 'models/permissions.enum.dart';
 
 part 'models/oco/oco_status.enum.dart';
 part 'models/oco/oco_order_status.enum.dart';
@@ -35,6 +36,13 @@ part 'models/order/order_status.enum.dart';
 part 'models/order/order_types.enum.dart';
 part 'models/order/order_response_types.enum.dart';
 part 'models/order/order_sides.enum.dart';
+part 'models/rate_limit/rate_limit.dart';
+part 'models/rate_limit/rate_limit_types.enum.dart';
+part 'models/rate_limit/rate_limit_intervals.enum.dart';
+part 'models/symbol/symbol.dart';
+part 'models/symbol/symbol_filter.dart';
+part 'models/symbol/symbol_filter_types.enum.dart';
+part 'models/symbol/symbol_status.enum.dart';
 
 part 'api.g.dart';
 part 'api.freezed.dart';
