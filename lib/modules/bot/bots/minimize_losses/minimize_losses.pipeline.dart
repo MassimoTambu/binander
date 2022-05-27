@@ -16,6 +16,7 @@ import 'package:bottino_fortino/utils/extensions/datetime.extension.dart';
 import 'package:bottino_fortino/utils/extensions/double.extension.dart';
 
 import 'package:clock/clock.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
@@ -44,7 +45,7 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
 
     final botLimits = _getBotLimitsReached();
     if (botLimits.isNotEmpty) {
-      return shutdown(
+      return await shutdown(
           phase: BotPhases.error,
           reason: botLimits.map((l) => l.cause).join(" - "));
     }
@@ -63,7 +64,7 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
       );
       // Asset not found in account
       if (accBalances.isEmpty) {
-        return shutdown(
+        return await shutdown(
             phase: BotPhases.error,
             reason: 'asset not found on wallet account');
       }
@@ -137,7 +138,7 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
 
     changeStatusTo(phase, closingMessage);
 
-    _showSnackBar(closingMessage);
+    _showSnackBar(closingMessage, seconds: phase == BotPhases.error ? 5 : 3);
   }
 
   void changeStatusTo(BotPhases phase, String message) {
@@ -262,21 +263,21 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
         return;
       }
 
-      return shutdown(reason: reason);
+      return await shutdown(reason: reason);
     } else {
       // Unexpected order status:
       // CANCELED | EXPIRED | PARTIALLY_FILLED | PENDING_CANCEL | REJECTED
       // Bot will be turned off
-      return shutdown(
+      return await shutdown(
           reason:
               'Unexpected order status: ${sellOrder.status.name}. Bot will be turned off..');
     }
   }
 
-  void _showSnackBar(String message) {
+  void _showSnackBar(String message, {int seconds = 3}) {
     // Add bot name to message
     message = '${bot.name} - $message';
-    ref.read(snackBarProvider).show(message);
+    ref.read(snackBarProvider).show(message, seconds: seconds);
   }
 
   ApiConnection _getApiConnection() {
@@ -323,14 +324,17 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
           .body;
       bot.data.ordersHistory.upsertOrderInNotEndedRunOrder(buyOrderData);
     } on ApiException catch (e) {
-      final message = 'Failed to submit buy order. Retry in 10s | $e';
+      final message = 'Failed to submit buy order | $e';
 
-      changeStatusTo(BotPhases.starting, message);
+      changeStatusTo(BotPhases.error, message);
 
-      _showSnackBar(message);
+      _showSnackBar(message, seconds: 5);
 
-      bot.data.timer?.cancel();
-      bot.data.timer = Timer(const Duration(seconds: 10), start);
+      if (kDebugMode) {
+        print(message);
+      }
+
+      await shutdown(phase: BotPhases.error, reason: message);
     }
   }
 
@@ -378,7 +382,11 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
 
       changeStatusTo(BotPhases.error, message);
 
-      _showSnackBar(message);
+      _showSnackBar(message, seconds: 5);
+
+      if (kDebugMode) {
+        print(message);
+      }
     }
   }
 
@@ -423,7 +431,11 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
 
       changeStatusTo(BotPhases.error, message);
 
-      _showSnackBar(message);
+      _showSnackBar(message, seconds: 5);
+
+      if (kDebugMode) {
+        print(message);
+      }
     }
   }
 
