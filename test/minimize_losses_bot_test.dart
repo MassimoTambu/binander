@@ -305,10 +305,10 @@ void main() {
       expect(pipeline.bot.data.ordersHistory.profitsOnly.length, 1);
       // No losses
       expect(pipeline.bot.data.ordersHistory.lossesOnly.length, 0);
-      expect(pipeline.bot.data.ordersHistory.getTotalGains(), 9.53);
+      expect(pipeline.bot.data.ordersHistory.getTotalGains(), 9.63);
       final testAsset = wallet.findBalanceByAsset('USDT');
       // Approximation
-      expect(TestUtils.approxPriceToFloor(testAsset.free), 1009.54);
+      expect(TestUtils.approxPriceToFloor(testAsset.free), 1009.63);
       expect(testAsset.locked, 0);
       // There should not be any locked asset
       expect(getAllLockedAssetFromWallet(), 0);
