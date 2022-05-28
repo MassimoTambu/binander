@@ -111,15 +111,19 @@ class PipelineProvider extends StateNotifier<List<Pipeline>> {
     required Duration timerBuyOrder,
     required bool autoRestart,
   }) {
-    final precision = _ref
+    final orderPrecision = _ref
         .read(exchangeInfoProvider)!
-        .getSymbolPrecision(symbol.toString(), isTestNet: testNet);
+        .getOrderPrecision(symbol.toString(), isTestNet: testNet);
+    final quantityPrecision = _ref
+        .read(exchangeInfoProvider)!
+        .getQuantityPrecision(symbol.toString(), isTestNet: testNet);
 
     final bot = MinimizeLossesBot(
       const Uuid().v4(),
       MinimizeLossesPipelineData(
         ordersHistory: OrdersHistory([]),
-        symbolPrecision: precision,
+        orderPrecision: orderPrecision,
+        quantityPrecision: quantityPrecision,
       ),
       name: name,
       testNet: testNet,

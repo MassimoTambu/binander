@@ -86,7 +86,7 @@ class BotTile extends ConsumerWidget {
                     Text(
                       bot.data.lastAveragePrice == null
                           ? 'No data'
-                          : '${bot.data.lastAveragePrice!.price.floorToDoubleWithDecimals(bot.data.symbolPrecision)}',
+                          : '${bot.data.lastAveragePrice!.price.floorToDoubleWithDecimals(bot.data.orderPrecision)}',
                       style: Theme.of(context)
                           .textTheme
                           .labelLarge!
@@ -101,7 +101,7 @@ class BotTile extends ConsumerWidget {
                   padding: const EdgeInsets.only(left: 8),
                   child: Chip(
                     label: Text(
-                      'Stop: ${bot.data.ordersHistory.lastNotEndedRunOrders?.sellOrder?.stopPrice?.floorToDoubleWithDecimals(bot.data.symbolPrecision)}',
+                      'Stop: ${bot.data.ordersHistory.lastNotEndedRunOrders?.sellOrder?.stopPrice?.floorToDoubleWithDecimals(bot.data.orderPrecision)}',
                       style: Theme.of(context)
                           .textTheme
                           .labelLarge!
@@ -116,7 +116,7 @@ class BotTile extends ConsumerWidget {
                   padding: const EdgeInsets.only(left: 8),
                   child: Chip(
                     label: Text(
-                      'New Stop: ${pipeline.calculateNewOrderStopPriceWithProperties().floorToDoubleWithDecimals(bot.data.symbolPrecision)}',
+                      'New Stop: ${pipeline.calculateNewOrderStopPriceWithProperties().floorToDoubleWithDecimals(bot.data.orderPrecision)}',
                       style: Theme.of(context)
                           .textTheme
                           .labelLarge!
@@ -131,7 +131,7 @@ class BotTile extends ConsumerWidget {
                   padding: const EdgeInsets.only(left: 8),
                   child: Chip(
                     label: Text(
-                      'Σ: ${pipeline.calculatePercentageOfDifference().floorToDoubleWithDecimals(bot.data.symbolPrecision)}',
+                      'Σ: ${pipeline.calculatePercentageOfDifference().floorToDoubleWithDecimals(bot.data.orderPrecision)}',
                       style: Theme.of(context)
                           .textTheme
                           .labelLarge!

@@ -15,9 +15,16 @@ class ExchangeInfoProvider {
 
   const ExchangeInfoProvider(this.ref, this.exchangeInfoNetworks);
 
+  List<Symbol> _getNetworkSymbols(bool isTestNet) {
+    if (isTestNet) {
+      return exchangeInfoNetworks.testNet.symbols;
+    }
+    return exchangeInfoNetworks.pubNet.symbols;
+  }
+
   List<Symbol> getCompatibleSymbolsWithMinimizeLosses({bool isTestNet = true}) {
     // Get enabled symbols sorted alphabetically
-    return getNetworkSymbols(isTestNet)
+    return _getNetworkSymbols(isTestNet)
         .where((s) =>
             s.isSpotTradingAllowed &&
             s.orderTypes.any((o) => o == OrderTypes.STOP_LOSS_LIMIT) &&
@@ -26,20 +33,49 @@ class ExchangeInfoProvider {
       ..sort((a, b) => a.symbol.compareTo(b.symbol));
   }
 
-  int getSymbolPrecision(String symbol, {bool isTestNet = true}) {
-    final symbolPrecisions = getNetworkSymbols(isTestNet)
+  int getOrderPrecision(String symbol, {bool isTestNet = true}) {
+    final priceFilters = _getNetworkSymbols(isTestNet)
         .where((s) => s.symbol == symbol)
-        .map((s) => s.quotePrecision);
+        .map((s) => s.filters
+            .firstWhere((f) => f.filterType == SymbolFilterTypes.PRICE_FILTER));
     // Returns precision default value
-    if (symbolPrecisions.isEmpty) return 8;
+    if (priceFilters.isEmpty) return 2;
 
-    return symbolPrecisions.first;
+    final minPrice = priceFilters.first.maybeMap(
+        priceFilter: (p) => double.tryParse(p.minPrice), orElse: () => null);
+
+    if (minPrice == null) return 2;
+
+    return _getDecimalPlaces(minPrice);
   }
 
-  List<Symbol> getNetworkSymbols(bool isTestNet) {
-    if (isTestNet) {
-      return exchangeInfoNetworks.testNet.symbols;
+  int getQuantityPrecision(String symbol, {bool isTestNet = true}) {
+    final priceFilters = _getNetworkSymbols(isTestNet)
+        .where((s) => s.symbol == symbol)
+        .map((s) => s.filters
+            .firstWhere((f) => f.filterType == SymbolFilterTypes.LOT_SIZE));
+    // Returns precision default value
+    if (priceFilters.isEmpty) return 0;
+
+    final minQty = priceFilters.first.maybeMap(
+        lotSize: (l) => double.tryParse(l.minQty), orElse: () => null);
+
+    if (minQty == null) return 0;
+
+    return _getDecimalPlaces(minQty);
+  }
+
+  int _getDecimalPlaces(double value) {
+    int tenMultiple = 10;
+    int count = 0;
+    double manipluatedNum = value;
+
+    while (manipluatedNum.ceil() != manipluatedNum.floor()) {
+      manipluatedNum = value * tenMultiple;
+      count += 1;
+      tenMultiple *= 10;
     }
-    return exchangeInfoNetworks.pubNet.symbols;
+
+    return count;
   }
 }

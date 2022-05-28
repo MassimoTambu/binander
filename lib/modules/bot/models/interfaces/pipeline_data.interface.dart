@@ -10,7 +10,8 @@ abstract class PipelineData {
   var status = const BotStatus(BotPhases.offline, 'offline');
   Timer? timer;
   AveragePrice? lastAveragePrice;
-  final symbolPrecision = 8;
+  final orderPrecision = 8;
+  final quantityPrecision = 8;
   var counter = 0;
 
   PipelineData({OrdersHistory? ordersHistory})

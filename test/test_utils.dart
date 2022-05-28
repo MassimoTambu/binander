@@ -31,7 +31,8 @@ class TestUtils {
         const Uuid().v4(),
         MinimizeLossesPipelineData(
           ordersHistory: OrdersHistory([]),
-          symbolPrecision: 8,
+          orderPrecision: 8,
+          quantityPrecision: 8,
         ),
         name: name,
         testNet: true,
