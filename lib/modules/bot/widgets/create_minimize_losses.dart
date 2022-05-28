@@ -1,8 +1,11 @@
+import 'package:bottino_fortino/api/api.dart';
+import 'package:bottino_fortino/models/crypto_symbol.dart';
 import 'package:bottino_fortino/modules/bot/bots/minimize_losses/minimize_losses.config.dart';
 import 'package:bottino_fortino/modules/bot/models/create_minimize_losses_params.dart';
 import 'package:bottino_fortino/modules/bot/providers/create_minimize_losses.provider.dart';
 import 'package:bottino_fortino/modules/dashboard/providers/create_bot.provider.dart';
 import 'package:bottino_fortino/providers/exchange_info.provider.dart';
+import 'package:bottino_fortino/providers/pipeline.provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -87,6 +90,28 @@ class CreateMinimizeLosses extends ConsumerWidget {
               .toList(),
           validator: FormBuilderValidators.compose([
             FormBuilderValidators.required<String>(),
+            (String? val) {
+              if (val == null) return null;
+              final botCount = ref
+                  .read(pipelineProvider)
+                  .where((p) => p.bot.config.symbol!.symbol == val)
+                  .length;
+
+              final maxAlgoFilter = symbols
+                  .firstWhere((s) => s.symbol == CryptoSymbol(val).toString())
+                  .filters
+                  .firstWhere((f) =>
+                      f.filterType == SymbolFilterTypes.MAX_NUM_ALGO_ORDERS)
+                  .maybeMap(
+                      maxNumAlgoOrders: (f) => f.maxNumAlgoOrders,
+                      orElse: () => null);
+
+              if (maxAlgoFilter == null || botCount < maxAlgoFilter) {
+                return null;
+              }
+
+              return 'Max num algo orders reached';
+            }
           ]),
           onChanged: (value) {
             createBotNotifier.updateConfigField(symbolField.name, value);
