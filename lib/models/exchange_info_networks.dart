@@ -1,4 +1,4 @@
-import 'package:bottino_fortino/api/api.dart';
+import 'package:binander/api/api.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'exchange_info_networks.freezed.dart';

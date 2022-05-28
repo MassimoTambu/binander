@@ -1,4 +1,4 @@
-import 'package:bottino_fortino/modules/bot/models/bot_phases.enum.dart';
+import 'package:binander/modules/bot/models/bot_phases.enum.dart';
 import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 

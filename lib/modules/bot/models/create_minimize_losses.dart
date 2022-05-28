@@ -1,4 +1,4 @@
-import 'package:bottino_fortino/models/crypto_symbol.dart';
+import 'package:binander/models/crypto_symbol.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'create_minimize_losses.freezed.dart';

@@ -1,9 +1,9 @@
 import 'dart:async';
 
-import 'package:bottino_fortino/api/api.dart';
-import 'package:bottino_fortino/modules/bot/models/bot_phases.enum.dart';
-import 'package:bottino_fortino/modules/bot/models/bot_status.dart';
-import 'package:bottino_fortino/modules/bot/models/orders_history.dart';
+import 'package:binander/api/api.dart';
+import 'package:binander/modules/bot/models/bot_phases.enum.dart';
+import 'package:binander/modules/bot/models/bot_status.dart';
+import 'package:binander/modules/bot/models/orders_history.dart';
 
 abstract class PipelineData {
   final OrdersHistory ordersHistory;

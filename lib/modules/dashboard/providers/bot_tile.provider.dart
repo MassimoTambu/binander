@@ -1,8 +1,8 @@
-import 'package:bottino_fortino/modules/bot/models/bot_phases.enum.dart';
-import 'package:bottino_fortino/modules/bot/models/interfaces/pipeline.interface.dart';
-import 'package:bottino_fortino/modules/bot/models/run_orders.dart';
-import 'package:bottino_fortino/modules/dashboard/models/bot_tile.notifier.dart';
-import 'package:bottino_fortino/modules/dashboard/models/orders_order.enum.dart';
+import 'package:binander/modules/bot/models/bot_phases.enum.dart';
+import 'package:binander/modules/bot/models/interfaces/pipeline.interface.dart';
+import 'package:binander/modules/bot/models/run_orders.dart';
+import 'package:binander/modules/dashboard/models/bot_tile.notifier.dart';
+import 'package:binander/modules/dashboard/models/orders_order.enum.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final botTileProvider = StateNotifierProvider<BotTileProvider, BotTileNotifier>(

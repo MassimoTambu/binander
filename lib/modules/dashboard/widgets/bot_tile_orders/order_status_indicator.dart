@@ -1,4 +1,4 @@
-import 'package:bottino_fortino/api/api.dart';
+import 'package:binander/api/api.dart';
 import 'package:flutter/material.dart';
 
 class OrderStatusIndicator extends StatelessWidget {

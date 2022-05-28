@@ -1,8 +1,8 @@
-import 'package:bottino_fortino/models/config_field.dart';
-import 'package:bottino_fortino/modules/bot/bots/minimize_losses/minimize_losses.config.dart';
-import 'package:bottino_fortino/modules/bot/models/bot_types.enum.dart';
-import 'package:bottino_fortino/providers/pipeline.provider.dart';
-import 'package:bottino_fortino/providers/snackbar.provider.dart';
+import 'package:binander/models/config_field.dart';
+import 'package:binander/modules/bot/bots/minimize_losses/minimize_losses.config.dart';
+import 'package:binander/modules/bot/models/bot_types.enum.dart';
+import 'package:binander/providers/pipeline.provider.dart';
+import 'package:binander/providers/snackbar.provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

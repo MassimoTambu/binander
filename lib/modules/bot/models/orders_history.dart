@@ -1,6 +1,6 @@
-import 'package:bottino_fortino/api/api.dart';
-import 'package:bottino_fortino/modules/bot/models/roi.enum.dart';
-import 'package:bottino_fortino/modules/bot/models/run_orders.dart';
+import 'package:binander/api/api.dart';
+import 'package:binander/modules/bot/models/roi.enum.dart';
+import 'package:binander/modules/bot/models/run_orders.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'orders_history.freezed.dart';

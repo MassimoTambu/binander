@@ -1,5 +1,5 @@
-import 'package:bottino_fortino/modules/dashboard/widgets/crypto_info_container/crypto_info_title.dart';
-import 'package:bottino_fortino/widgets/crypto_info/crypto_info.dart';
+import 'package:binander/modules/dashboard/widgets/crypto_info_container/crypto_info_title.dart';
+import 'package:binander/widgets/crypto_info/crypto_info.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

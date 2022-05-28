@@ -1,12 +1,12 @@
-import 'package:bottino_fortino/api/api.dart';
-import 'package:bottino_fortino/models/crypto_symbol.dart';
-import 'package:bottino_fortino/modules/bot/bots/minimize_losses/minimize_losses.pipeline.dart';
-import 'package:bottino_fortino/modules/bot/models/create_minimize_losses.dart';
-import 'package:bottino_fortino/modules/bot/models/create_minimize_losses_params.dart';
-import 'package:bottino_fortino/modules/settings/models/api_connection.dart';
-import 'package:bottino_fortino/modules/settings/providers/settings.provider.dart';
-import 'package:bottino_fortino/providers/exchange_info.provider.dart';
-import 'package:bottino_fortino/utils/extensions/double.extension.dart';
+import 'package:binander/api/api.dart';
+import 'package:binander/models/crypto_symbol.dart';
+import 'package:binander/modules/bot/bots/minimize_losses/minimize_losses.pipeline.dart';
+import 'package:binander/modules/bot/models/create_minimize_losses.dart';
+import 'package:binander/modules/bot/models/create_minimize_losses_params.dart';
+import 'package:binander/modules/settings/models/api_connection.dart';
+import 'package:binander/modules/settings/providers/settings.provider.dart';
+import 'package:binander/providers/exchange_info.provider.dart';
+import 'package:binander/utils/extensions/double.extension.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final createMinimizeLossesProvider = FutureProvider.autoDispose

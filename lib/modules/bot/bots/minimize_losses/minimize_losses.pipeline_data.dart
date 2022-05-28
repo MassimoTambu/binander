@@ -1,10 +1,10 @@
 import 'dart:async';
 
-import 'package:bottino_fortino/api/api.dart';
-import 'package:bottino_fortino/modules/bot/models/bot_phases.enum.dart';
-import 'package:bottino_fortino/modules/bot/models/bot_status.dart';
-import 'package:bottino_fortino/modules/bot/models/interfaces/pipeline_data.interface.dart';
-import 'package:bottino_fortino/modules/bot/models/orders_history.dart';
+import 'package:binander/api/api.dart';
+import 'package:binander/modules/bot/models/bot_phases.enum.dart';
+import 'package:binander/modules/bot/models/bot_status.dart';
+import 'package:binander/modules/bot/models/interfaces/pipeline_data.interface.dart';
+import 'package:binander/modules/bot/models/orders_history.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'minimize_losses.pipeline_data.freezed.dart';

@@ -1,7 +1,7 @@
-import 'package:bottino_fortino/modules/dashboard/models/orders_order.enum.dart';
-import 'package:bottino_fortino/modules/dashboard/providers/bot_order_tile.provider.dart';
-import 'package:bottino_fortino/modules/dashboard/providers/bot_tile.provider.dart';
-import 'package:bottino_fortino/modules/dashboard/widgets/bot_tile_orders/bot_tile_run_orders.dart';
+import 'package:binander/modules/dashboard/models/orders_order.enum.dart';
+import 'package:binander/modules/dashboard/providers/bot_order_tile.provider.dart';
+import 'package:binander/modules/dashboard/providers/bot_tile.provider.dart';
+import 'package:binander/modules/dashboard/widgets/bot_tile_orders/bot_tile_run_orders.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

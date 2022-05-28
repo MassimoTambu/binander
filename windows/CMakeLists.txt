@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.15)
-project(bottino_fortino LANGUAGES CXX)
+project(binander LANGUAGES CXX)
 
-set(BINARY_NAME "bottino_fortino")
+set(BINARY_NAME "binander")
 
 cmake_policy(SET CMP0063 NEW)
 

@@ -1,6 +1,6 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:bottino_fortino/modules/dashboard/providers/bot_tile.provider.dart';
-import 'package:bottino_fortino/providers/pipeline.provider.dart';
+import 'package:binander/modules/dashboard/providers/bot_tile.provider.dart';
+import 'package:binander/providers/pipeline.provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

@@ -1,8 +1,8 @@
 library api;
 
-import 'package:bottino_fortino/models/crypto_symbol.dart';
-import 'package:bottino_fortino/modules/settings/models/api_connection.dart';
-import 'package:bottino_fortino/utils/parse.utils.dart';
+import 'package:binander/models/crypto_symbol.dart';
+import 'package:binander/modules/settings/models/api_connection.dart';
+import 'package:binander/utils/parse.utils.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';

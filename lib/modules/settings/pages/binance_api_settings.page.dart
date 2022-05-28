@@ -1,7 +1,7 @@
-import 'package:bottino_fortino/models/config_field.dart';
-import 'package:bottino_fortino/modules/settings/models/settings.config.dart';
-import 'package:bottino_fortino/modules/settings/providers/settings.provider.dart';
-import 'package:bottino_fortino/utils/media_query.utils.dart';
+import 'package:binander/models/config_field.dart';
+import 'package:binander/modules/settings/models/settings.config.dart';
+import 'package:binander/modules/settings/providers/settings.provider.dart';
+import 'package:binander/utils/media_query.utils.dart';
 import 'package:flutter/material.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';

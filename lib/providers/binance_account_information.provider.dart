@@ -1,5 +1,5 @@
-import 'package:bottino_fortino/api/api.dart';
-import 'package:bottino_fortino/modules/settings/models/api_connection.dart';
+import 'package:binander/api/api.dart';
+import 'package:binander/modules/settings/models/api_connection.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final binanceAccountInformationProvider = FutureProvider.family

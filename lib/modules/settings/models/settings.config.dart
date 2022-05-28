@@ -1,6 +1,6 @@
-import 'package:bottino_fortino/models/config_field.dart';
-import 'package:bottino_fortino/models/interfaces/config.interface.dart';
-import 'package:bottino_fortino/modules/settings/models/api_connection.dart';
+import 'package:binander/models/config_field.dart';
+import 'package:binander/models/interfaces/config.interface.dart';
+import 'package:binander/modules/settings/models/api_connection.dart';
 
 class SettingsConfig implements Config {
   ApiConnection pubNetConnection;

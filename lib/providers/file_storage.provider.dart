@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:bottino_fortino/modules/bot/models/bot.dart';
-import 'package:bottino_fortino/providers/snackbar.provider.dart';
+import 'package:binander/modules/bot/models/bot.dart';
+import 'package:binander/providers/snackbar.provider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

@@ -1,7 +1,7 @@
-import 'package:bottino_fortino/models/secure_storage_key.dart';
-import 'package:bottino_fortino/modules/settings/models/api_connection.dart';
-import 'package:bottino_fortino/modules/settings/models/settings.dart';
-import 'package:bottino_fortino/providers/memory_storage.provider.dart';
+import 'package:binander/models/secure_storage_key.dart';
+import 'package:binander/modules/settings/models/api_connection.dart';
+import 'package:binander/modules/settings/models/settings.dart';
+import 'package:binander/providers/memory_storage.provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

@@ -1,6 +1,6 @@
-import 'package:bottino_fortino/api/api.dart';
-import 'package:bottino_fortino/models/exchange_info_networks.dart';
-import 'package:bottino_fortino/providers/exchange_info_networks.provider.dart';
+import 'package:binander/api/api.dart';
+import 'package:binander/models/exchange_info_networks.dart';
+import 'package:binander/providers/exchange_info_networks.provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final exchangeInfoProvider = Provider<ExchangeInfoProvider?>(

@@ -1,5 +1,5 @@
-import 'package:bottino_fortino/modules/bot/models/run_orders.dart';
-import 'package:bottino_fortino/utils/extensions/iterable.extension.dart';
+import 'package:binander/modules/bot/models/run_orders.dart';
+import 'package:binander/utils/extensions/iterable.extension.dart';
 import 'package:flutter/material.dart';
 
 import '../widgets/bot_tile_orders/order_container.dart';

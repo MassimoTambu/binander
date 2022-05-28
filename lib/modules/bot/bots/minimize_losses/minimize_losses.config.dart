@@ -1,6 +1,6 @@
-import 'package:bottino_fortino/models/config_field.dart';
-import 'package:bottino_fortino/models/crypto_symbol.dart';
-import 'package:bottino_fortino/models/interfaces/config.interface.dart';
+import 'package:binander/models/config_field.dart';
+import 'package:binander/models/crypto_symbol.dart';
+import 'package:binander/models/interfaces/config.interface.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'minimize_losses.config.g.dart';

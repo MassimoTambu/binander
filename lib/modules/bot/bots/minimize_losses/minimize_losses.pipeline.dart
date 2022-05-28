@@ -1,19 +1,19 @@
 import 'dart:async';
 
-import 'package:bottino_fortino/api/api.dart';
-import 'package:bottino_fortino/modules/bot/bots/minimize_losses/minimize_losses.pipeline_data.dart';
-import 'package:bottino_fortino/modules/bot/models/bot.dart';
-import 'package:bottino_fortino/modules/bot/models/bot_limit.dart';
-import 'package:bottino_fortino/modules/bot/models/bot_phases.enum.dart';
-import 'package:bottino_fortino/modules/bot/models/bot_status.dart';
-import 'package:bottino_fortino/modules/bot/models/interfaces/pipeline.interface.dart';
-import 'package:bottino_fortino/modules/bot/models/roi.enum.dart';
-import 'package:bottino_fortino/modules/settings/models/api_connection.dart';
-import 'package:bottino_fortino/modules/settings/providers/settings.provider.dart';
-import 'package:bottino_fortino/providers/pipeline.provider.dart';
-import 'package:bottino_fortino/providers/snackbar.provider.dart';
-import 'package:bottino_fortino/utils/extensions/datetime.extension.dart';
-import 'package:bottino_fortino/utils/extensions/double.extension.dart';
+import 'package:binander/api/api.dart';
+import 'package:binander/modules/bot/bots/minimize_losses/minimize_losses.pipeline_data.dart';
+import 'package:binander/modules/bot/models/bot.dart';
+import 'package:binander/modules/bot/models/bot_limit.dart';
+import 'package:binander/modules/bot/models/bot_phases.enum.dart';
+import 'package:binander/modules/bot/models/bot_status.dart';
+import 'package:binander/modules/bot/models/interfaces/pipeline.interface.dart';
+import 'package:binander/modules/bot/models/roi.enum.dart';
+import 'package:binander/modules/settings/models/api_connection.dart';
+import 'package:binander/modules/settings/providers/settings.provider.dart';
+import 'package:binander/providers/pipeline.provider.dart';
+import 'package:binander/providers/snackbar.provider.dart';
+import 'package:binander/utils/extensions/datetime.extension.dart';
+import 'package:binander/utils/extensions/double.extension.dart';
 
 import 'package:clock/clock.dart';
 import 'package:flutter/foundation.dart';

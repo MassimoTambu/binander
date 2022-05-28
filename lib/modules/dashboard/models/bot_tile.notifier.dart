@@ -1,5 +1,5 @@
-import 'package:bottino_fortino/modules/bot/models/interfaces/pipeline.interface.dart';
-import 'package:bottino_fortino/modules/dashboard/models/orders_order.enum.dart';
+import 'package:binander/modules/bot/models/interfaces/pipeline.interface.dart';
+import 'package:binander/modules/dashboard/models/orders_order.enum.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'bot_tile.notifier.freezed.dart';

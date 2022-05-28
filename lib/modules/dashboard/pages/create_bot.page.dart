@@ -1,9 +1,9 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:bottino_fortino/modules/bot/models/bot.dart';
-import 'package:bottino_fortino/modules/bot/models/bot_types.enum.dart';
-import 'package:bottino_fortino/modules/bot/widgets/create_minimize_losses.dart';
-import 'package:bottino_fortino/modules/dashboard/providers/create_bot.provider.dart';
-import 'package:bottino_fortino/utils/media_query.utils.dart';
+import 'package:binander/modules/bot/models/bot.dart';
+import 'package:binander/modules/bot/models/bot_types.enum.dart';
+import 'package:binander/modules/bot/widgets/create_minimize_losses.dart';
+import 'package:binander/modules/dashboard/providers/create_bot.provider.dart';
+import 'package:binander/utils/media_query.utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

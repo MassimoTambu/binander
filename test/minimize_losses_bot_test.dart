@@ -1,8 +1,8 @@
-import 'package:bottino_fortino/api/api.dart';
-import 'package:bottino_fortino/modules/bot/bots/minimize_losses/minimize_losses.pipeline.dart';
-import 'package:bottino_fortino/modules/bot/models/bot_phases.enum.dart';
-import 'package:bottino_fortino/providers/pipeline.provider.dart';
-import 'package:bottino_fortino/providers/secure_storage.provider.dart';
+import 'package:binander/api/api.dart';
+import 'package:binander/modules/bot/bots/minimize_losses/minimize_losses.pipeline.dart';
+import 'package:binander/modules/bot/models/bot_phases.enum.dart';
+import 'package:binander/providers/pipeline.provider.dart';
+import 'package:binander/providers/secure_storage.provider.dart';
 import 'package:clock/clock.dart';
 import 'package:fake_async/fake_async.dart';
 import 'package:flutter/widgets.dart';

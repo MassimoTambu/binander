@@ -1,6 +1,6 @@
-import 'package:bottino_fortino/modules/bot/bots/minimize_losses/minimize_losses.config.dart';
-import 'package:bottino_fortino/modules/bot/bots/minimize_losses/minimize_losses.pipeline_data.dart';
-import 'package:bottino_fortino/modules/bot/models/bot_types.enum.dart';
+import 'package:binander/modules/bot/bots/minimize_losses/minimize_losses.config.dart';
+import 'package:binander/modules/bot/bots/minimize_losses/minimize_losses.pipeline_data.dart';
+import 'package:binander/modules/bot/models/bot_types.enum.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'bot.freezed.dart';

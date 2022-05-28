@@ -1,4 +1,4 @@
-import 'package:bottino_fortino/models/secure_storage_key.dart';
+import 'package:binander/models/secure_storage_key.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 

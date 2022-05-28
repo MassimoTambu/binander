@@ -1,11 +1,11 @@
-import 'package:bottino_fortino/modules/bot/bots/minimize_losses/minimize_losses.config.dart';
-import 'package:bottino_fortino/modules/bot/bots/minimize_losses/minimize_losses.pipeline.dart';
-import 'package:bottino_fortino/modules/dashboard/providers/bot_tile.provider.dart';
-import 'package:bottino_fortino/modules/dashboard/widgets/bot_tile/bot_tile_buttons.dart';
-import 'package:bottino_fortino/modules/dashboard/widgets/bot_tile_orders/bot_tile_orders.dart';
-import 'package:bottino_fortino/modules/dashboard/widgets/total_gains_chip.dart';
-import 'package:bottino_fortino/utils/extensions/double.extension.dart';
-import 'package:bottino_fortino/utils/extensions/string.extension.dart';
+import 'package:binander/modules/bot/bots/minimize_losses/minimize_losses.config.dart';
+import 'package:binander/modules/bot/bots/minimize_losses/minimize_losses.pipeline.dart';
+import 'package:binander/modules/dashboard/providers/bot_tile.provider.dart';
+import 'package:binander/modules/dashboard/widgets/bot_tile/bot_tile_buttons.dart';
+import 'package:binander/modules/dashboard/widgets/bot_tile_orders/bot_tile_orders.dart';
+import 'package:binander/modules/dashboard/widgets/total_gains_chip.dart';
+import 'package:binander/utils/extensions/double.extension.dart';
+import 'package:binander/utils/extensions/string.extension.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

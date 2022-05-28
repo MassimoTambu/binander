@@ -1,9 +1,9 @@
-import 'package:bottino_fortino/api/api.dart';
-import 'package:bottino_fortino/modules/settings/providers/settings.provider.dart';
-import 'package:bottino_fortino/providers/binance_pub_net_status.provider.dart';
-import 'package:bottino_fortino/providers/binance_test_net_status.provider.dart';
-import 'package:bottino_fortino/router/app_router.dart';
-import 'package:bottino_fortino/widgets/binance_status.dart';
+import 'package:binander/api/api.dart';
+import 'package:binander/modules/settings/providers/settings.provider.dart';
+import 'package:binander/providers/binance_pub_net_status.provider.dart';
+import 'package:binander/providers/binance_test_net_status.provider.dart';
+import 'package:binander/router/app_router.dart';
+import 'package:binander/widgets/binance_status.dart';
 import 'package:flutter/material.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

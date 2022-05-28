@@ -1,4 +1,4 @@
-import 'package:bottino_fortino/api/api.dart';
+import 'package:binander/api/api.dart';
 
 class TestWallet {
   List<AccountBalance> balances;

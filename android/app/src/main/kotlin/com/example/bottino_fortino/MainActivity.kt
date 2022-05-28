@@ -1,4 +1,4 @@
-package com.example.bottino_fortino
+package com.example.binander
 
 import io.flutter.embedding.android.FlutterActivity
 
