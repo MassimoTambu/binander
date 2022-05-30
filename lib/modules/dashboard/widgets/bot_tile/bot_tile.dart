@@ -14,7 +14,8 @@ class BotTile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final pipeline = ref.watch(botTileProvider.select((p) => p.pipeline));
+    final pr = ref.watch(botTileProvider);
+    final pipeline = pr.pipeline;
     final bot = pipeline.bot;
     return ExpansionTile(
       title: Wrap(

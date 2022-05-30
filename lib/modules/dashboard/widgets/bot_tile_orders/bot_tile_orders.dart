@@ -10,8 +10,8 @@ class BotTileOrders extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final allOrders = ref.watch(botTileProvider
-        .select((p) => p.pipeline.bot.data.ordersHistory.runOrders));
+    final allOrders =
+        ref.watch(botTileProvider).pipeline.bot.data.ordersHistory.runOrders;
     const items = [
       {'Date (newer)': OrdersOrder.dateNewest},
       {'Date (oldest)': OrdersOrder.dateOldest},

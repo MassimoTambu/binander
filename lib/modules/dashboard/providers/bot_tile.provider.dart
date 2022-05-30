@@ -21,7 +21,6 @@ class BotTileProvider extends StateNotifier<BotTileNotifier> {
                   pipeline.bot.data.status.phase == BotPhases.offline,
           selectedOrder: OrdersOrder.dateNewest,
         ));
-// ..sort((a, b) => _sortByDate(a, b))
 
   void orderBy(OrdersOrder orderFactor) {
     final runOrders = state.pipeline.bot.data.ordersHistory.runOrders;

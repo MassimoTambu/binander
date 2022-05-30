@@ -13,12 +13,13 @@ class RunOrders with _$RunOrders {
     @Default(false) bool hasEnded,
   }) = _RunOrders;
 
-  /// Returns the buy order found. Should always be no more than one buy order
+  /// Returns the buy order found.
+  /// Could exists more than one buy order like cancelled buy orders
   OrderData? get buyOrder {
     final buyOrders = orders.where((o) => o.side == OrderSides.BUY);
     if (buyOrders.isEmpty) return null;
 
-    return buyOrders.first;
+    return buyOrders.last;
   }
 
   /// Returns the last sell order found.
