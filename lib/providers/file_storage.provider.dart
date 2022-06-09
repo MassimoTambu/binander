@@ -5,6 +5,7 @@ import 'package:binander/modules/bot/models/bot.dart';
 import 'package:binander/providers/snackbar.provider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:path_provider/path_provider.dart';
 
 final fileStorageProvider = Provider<FileStorageProvider>((ref) {
   return FileStorageProvider(ref);
@@ -18,10 +19,15 @@ class FileStorageProvider {
 
   static const encoder = JsonEncoder.withIndent('  ');
 
-  static final String defaultApplicationPath = Directory.current.absolute.path;
-  static final String defaultFileName = '$defaultApplicationPath/data.json';
+  static String defaultApplicationPath = Directory.current.absolute.path;
+  static String defaultFileName = '$defaultApplicationPath/data.json';
 
   Future<bool> init() async {
+    if (Platform.isAndroid) {
+      defaultApplicationPath =
+          (await getApplicationDocumentsDirectory()).absolute.path;
+      defaultFileName = '$defaultApplicationPath/data.json';
+    }
     if (kDebugMode) {
       print('init fileStorage');
     }

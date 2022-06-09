@@ -1,5 +1,6 @@
 import 'package:binander/modules/bot/bots/minimize_losses/minimize_losses.config.dart';
 import 'package:binander/modules/bot/bots/minimize_losses/minimize_losses.pipeline.dart';
+import 'package:binander/modules/bot/bots/minimize_losses/minimize_losses.pipeline_data.dart';
 import 'package:binander/modules/dashboard/providers/bot_tile.provider.dart';
 import 'package:binander/modules/dashboard/widgets/bot_tile/bot_tile_buttons.dart';
 import 'package:binander/modules/dashboard/widgets/bot_tile_orders/bot_tile_orders.dart';
@@ -14,8 +15,8 @@ class BotTile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final pr = ref.watch(botTileProvider);
-    final pipeline = pr.pipeline;
+    final botTile = ref.watch(botTileProvider);
+    final pipeline = botTile.pipeline;
     final bot = pipeline.bot;
     return ExpansionTile(
       title: Wrap(
@@ -132,7 +133,7 @@ class BotTile extends ConsumerWidget {
                   padding: const EdgeInsets.only(left: 8),
                   child: Chip(
                     label: Text(
-                      'Σ: ${pipeline.calculatePercentageOfDifference().floorToDoubleWithDecimals(bot.data.orderPrecision)}',
+                      'T: ${pipeline.calculatePercentageOfDifference().floorToDoubleWithDecimals(bot.data.orderPrecision)}/${MinimizeLossesPipelineData.tolerance}',
                       style: Theme.of(context)
                           .textTheme
                           .labelLarge!
