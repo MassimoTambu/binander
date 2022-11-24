@@ -7,4 +7,6 @@ enum Permissions {
   MARGIN,
   LEVERAGED,
   TRD_GRP_003,
+  TRD_GRP_004,
+  TRD_GRP_005,
 }
