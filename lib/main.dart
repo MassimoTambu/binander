@@ -12,13 +12,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:form_builder_validators/localization/l10n.dart';
 
 Future<void> main() async {
-  runApp(ProviderScope(child: BottinoFortino()));
+  runApp(const ProviderScope(child: BottinoFortino()));
 }
 
 class BottinoFortino extends ConsumerWidget {
-  BottinoFortino({Key? key}) : super(key: key);
-
-  final _router = AppRouter();
+  const BottinoFortino({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -49,9 +47,10 @@ class BottinoFortino extends ConsumerWidget {
               });
               return MaterialApp.router(
                 scaffoldMessengerKey: snackbarKey,
-                routerDelegate: _router.delegate(),
-                routeInformationProvider: _router.routeInfoProvider(),
-                routeInformationParser: _router.defaultRouteParser(),
+                routerConfig: goRouter,
+                debugShowCheckedModeBanner: false,
+                restorationScopeId: 'app',
+                onGenerateTitle: (BuildContext context) => 'Binance',
                 localizationsDelegates: const [
                   FormBuilderLocalizations.delegate
                 ],

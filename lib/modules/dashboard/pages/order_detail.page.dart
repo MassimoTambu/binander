@@ -1,13 +1,13 @@
 import 'package:binander/api/api.dart';
 import 'package:binander/router/app_router.dart';
-import 'package:auto_route/auto_route.dart';
 import 'package:binander/utils/datetime.utils.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
-class OrderDetailPage extends StatelessWidget {
+class OrderDetailsPage extends StatelessWidget {
   final OrderData _order;
 
-  const OrderDetailPage(this._order, {Key? key}) : super(key: key);
+  const OrderDetailsPage(this._order, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +31,7 @@ class OrderDetailPage extends StatelessWidget {
         centerTitle: true,
         actions: [
           IconButton(
-            onPressed: () => context.router.push(const SettingsRoute()),
+            onPressed: () => context.pushNamed(AppRoute.settings.name),
             icon: const Icon(Icons.settings),
           ),
         ],
@@ -43,7 +43,7 @@ class OrderDetailPage extends StatelessWidget {
           itemBuilder: (context, i) => SelectableText(
             orderInfos[i],
             style: TextStyle(
-              fontSize: Theme.of(context).textTheme.headline6!.fontSize,
+              fontSize: Theme.of(context).textTheme.titleLarge!.fontSize,
             ),
             textAlign: TextAlign.center,
           ),

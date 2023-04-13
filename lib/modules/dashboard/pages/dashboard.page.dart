@@ -3,15 +3,15 @@ import 'package:binander/modules/dashboard/widgets/bot_tile/bot_tile.dart';
 import 'package:binander/modules/dashboard/widgets/crypto_info_container/crypto_info_container.dart';
 import 'package:binander/providers/pipeline.provider.dart';
 import 'package:binander/router/app_router.dart';
-import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 class DashboardPage extends ConsumerWidget {
   const DashboardPage({Key? key}) : super(key: key);
 
   void _navigateToAddBotPage(BuildContext context) {
-    context.router.push(const CreateBotRoute());
+    context.pushNamed(AppRoute.createBot.name);
   }
 
   @override
@@ -24,7 +24,7 @@ class DashboardPage extends ConsumerWidget {
         centerTitle: true,
         actions: [
           IconButton(
-            onPressed: () => context.router.push(const SettingsRoute()),
+            onPressed: () => context.pushNamed(AppRoute.settings.name),
             icon: const Icon(Icons.settings),
           ),
         ],
@@ -37,7 +37,7 @@ class DashboardPage extends ConsumerWidget {
             padding: const EdgeInsets.all(15),
             child: Text(
               'Bots',
-              style: Theme.of(context).textTheme.headline5,
+              style: Theme.of(context).textTheme.headlineSmall,
             ),
           )),
           SliverList(

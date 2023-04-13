@@ -5,14 +5,14 @@ import 'package:binander/providers/binance_test_net_status.provider.dart';
 import 'package:binander/router/app_router.dart';
 import 'package:binander/widgets/binance_status.dart';
 import 'package:flutter/material.dart';
-import 'package:auto_route/auto_route.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 class SettingsPage extends ConsumerWidget {
   const SettingsPage({Key? key}) : super(key: key);
 
   void _navigateToApiSettingsPage(BuildContext context) {
-    context.router.push(BinanceApiSettingsRoute());
+    context.pushNamed(AppRoute.binanceApiSettings.name);
   }
 
   @override
