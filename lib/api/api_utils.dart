@@ -1,13 +1,11 @@
 part of api;
 
 final _apiUtilsProvider = Provider<ApiUtils>((ref) {
-  return ApiUtils(ref.read);
+  return const ApiUtils();
 });
 
 class ApiUtils {
-  final Reader read;
-
-  const ApiUtils(this.read);
+  const ApiUtils();
 
   Map<String, String> createQueryWithSecurity(
     String apiSecret,

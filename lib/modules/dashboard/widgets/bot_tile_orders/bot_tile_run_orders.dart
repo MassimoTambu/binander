@@ -1,10 +1,10 @@
-import 'package:auto_route/auto_route.dart';
 import 'package:binander/modules/dashboard/providers/bot_order_tile.provider.dart';
 import 'package:binander/modules/dashboard/widgets/bot_tile_orders/order_container.dart';
 import 'package:binander/modules/dashboard/widgets/total_gains_chip.dart';
 import 'package:binander/router/app_router.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 class BotTileRunOrders extends ConsumerWidget {
   const BotTileRunOrders({Key? key}) : super(key: key);
@@ -33,8 +33,8 @@ class BotTileRunOrders extends ConsumerWidget {
         Card(
           child: InkWell(
             borderRadius: BorderRadius.circular(5),
-            onTap: () =>
-                context.router.push(RunOrderHistoryRoute(runOrders: runOrders)),
+            onTap: () => context.pushNamed(AppRoute.runOrderHistory.name,
+                extra: runOrders),
             child: const Padding(
               padding: EdgeInsets.all(8),
               child: Text('Show complete history'),
