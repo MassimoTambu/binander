@@ -1,12 +1,12 @@
-import 'package:binander/api/api.dart';
-import 'package:binander/modules/bot/bots/minimize_losses/minimize_losses.pipeline.dart';
-import 'package:binander/modules/bot/models/bot_phases.enum.dart';
-import 'package:binander/providers/pipeline.provider.dart';
-import 'package:binander/providers/secure_storage.provider.dart';
+import 'package:binander/src/api/api.dart';
+import 'package:binander/src/features/bot/domain/bots/bot_phases.dart';
+import 'package:binander/src/features/bot/domain/bots/minimize_losses/minimize_losses.pipeline.dart';
+import 'package:binander/src/features/bot/presentation/pipeline_provider.dart';
+import 'package:binander/src/utils/secure_storage_provider.dart';
 import 'package:clock/clock.dart';
 import 'package:fake_async/fake_async.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
@@ -16,13 +16,8 @@ import 'test_order_book.dart';
 import 'test_utils.dart';
 import 'test_wallet.dart';
 
-@GenerateMocks([
-  SecureStorageProvider,
-  ApiProvider,
-  SpotProvider,
-  MarketProvider,
-  TradeProvider
-])
+@GenerateMocks(
+    [SecureStorage, ApiProvider, SpotProvider, MarketProvider, TradeProvider])
 void main() {
   final mockSecureStorageProvider = MockSecureStorageProvider();
   final mockApiProvider = MockApiProvider();

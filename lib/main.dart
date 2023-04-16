@@ -1,80 +1,38 @@
-import 'package:binander/models/constants/globals.dart';
-import 'package:binander/models/constants/theme_dark.dart';
-import 'package:binander/models/constants/theme_light.dart';
-import 'package:binander/modules/bot/models/interfaces/pipeline.interface.dart';
-import 'package:binander/modules/settings/providers/settings.provider.dart';
-import 'package:binander/providers/file_storage.provider.dart';
-import 'package:binander/providers/init.provider.dart';
-import 'package:binander/providers/pipeline.provider.dart';
-import 'package:binander/router/app_router.dart';
+import 'dart:async';
+
+import 'package:binander/src/app.dart';
+import 'package:binander/src/localization/string_hardcoded.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:form_builder_validators/localization/l10n.dart';
+// ignore: depend_on_referenced_packages
+import 'package:flutter_web_plugins/url_strategy.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-Future<void> main() async {
-  runApp(const ProviderScope(child: BottinoFortino()));
-}
+void main() async {
+  // * For more info on error handling, see:
+  // * https://docs.flutter.dev/testing/errors
+  await runZonedGuarded(() async {
+    WidgetsFlutterBinding.ensureInitialized();
+    // turn off the # in the URLs on the web
+    usePathUrlStrategy();
 
-class BottinoFortino extends ConsumerWidget {
-  const BottinoFortino({Key? key}) : super(key: key);
+    // * Entry point of the app
+    runApp(const ProviderScope(child: Binander()));
 
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return Container(
-      child: ref.watch(initProvider).when(
-            data: (_) {
-              // Autosave bots to file when pipelineProvider changes
-              ref.listen<List<Pipeline>>(pipelineProvider,
-                  (prevPipelines, newPipelines) {
-                final oldBots = prevPipelines?.map((e) => e.bot).toList() ?? [];
-                final newBots = newPipelines.map((e) => e.bot).toList();
-
-                // Upsert bots
-                ref
-                    .watch(fileStorageProvider)
-                    .upsertBots(newPipelines.map((e) => e.bot).toList());
-
-                // Find bots to remove
-                final botsToRemove = oldBots
-                    .where((b1) => newBots.every((b2) => b2.uuid != b1.uuid));
-
-                if (botsToRemove.isNotEmpty) {
-                  // Remove bots from file
-                  ref
-                      .read(fileStorageProvider)
-                      .removeBots(botsToRemove.toList());
-                }
-              });
-              return MaterialApp.router(
-                scaffoldMessengerKey: snackbarKey,
-                routerConfig: goRouter,
-                debugShowCheckedModeBanner: false,
-                restorationScopeId: 'app',
-                onGenerateTitle: (BuildContext context) => 'Binance',
-                localizationsDelegates: const [
-                  FormBuilderLocalizations.delegate
-                ],
-                theme: themeLight,
-                darkTheme: themeDark,
-                themeMode: ref.watch(settingsProvider).themeMode,
-              );
-            },
-            error: (error, st) => Container(
-              color: Colors.white,
-              child: Center(
-                child: Text(
-                  error.toString(),
-                  style: const TextStyle(color: Colors.red),
-                ),
-              ),
-            ),
-            loading: () => Container(
-              color: Colors.white,
-              child: const Center(
-                child: CircularProgressIndicator(),
-              ),
-            ),
-          ),
-    );
-  }
+    // * This code will present some error UI if any uncaught exception happens
+    FlutterError.onError = (FlutterErrorDetails details) {
+      FlutterError.presentError(details);
+    };
+    ErrorWidget.builder = (FlutterErrorDetails details) {
+      return Scaffold(
+        appBar: AppBar(
+          backgroundColor: Colors.red,
+          title: Text('An error occurred'.hardcoded),
+        ),
+        body: Center(child: Text(details.toString())),
+      );
+    };
+  }, (Object error, StackTrace stack) {
+    // * Log any errors to console
+    debugPrint(error.toString());
+  });
 }

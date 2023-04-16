@@ -51,3 +51,10 @@ Generate *.freezed and *.g dart files
 ```bash
   flutter pub run build_runner watch
 ```
+
+
+TODOS
+- Make API connection a provider dependency
+- Use data layer
+- Create controllers
+- Create a message provider: by do this we can disconnect the snackBar provider from the domain classes
