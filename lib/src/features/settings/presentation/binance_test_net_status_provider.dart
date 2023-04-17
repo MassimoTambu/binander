@@ -1,10 +1,17 @@
-import 'package:binander/api/api.dart';
-import 'package:binander/modules/settings/providers/settings.provider.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:binander/src/api/api.dart';
+import 'package:binander/src/features/settings/presentation/settings_provider.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-final binanceTestNetStatusProvider =
-    FutureProvider.autoDispose<ApiResponse<AccountInformation>>((ref) async {
-  final testConn =
-      ref.watch(settingsProvider.select((p) => p.testNetConnection));
-  return await ref.read(apiProvider).spot.trade.getAccountInformation(testConn);
-});
+part 'binance_test_net_status_provider.g.dart';
+
+@riverpod
+Future<ApiResponse<AccountInformation>> binanceTestNetStatus(
+    BinanceTestNetStatusRef ref) async {
+  final testConn = ref.watch(
+      settingsStorageProvider.select((p) => p.requireValue.testNetConnection));
+  return await ref
+      .watch(binanceApiProvider(testConn))
+      .spot
+      .trade
+      .getAccountInformation();
+}

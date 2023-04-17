@@ -1,33 +1,31 @@
-import 'package:binander/models/config_field.dart';
-import 'package:binander/modules/bot/bots/minimize_losses/minimize_losses.config.dart';
-import 'package:binander/modules/bot/models/bot_types.enum.dart';
-import 'package:binander/providers/pipeline.provider.dart';
-import 'package:binander/providers/snackbar.provider.dart';
+import 'package:binander/src/features/bot/domain/bots/bot_types.dart';
+import 'package:binander/src/features/bot/domain/bots/minimize_losses/minimize_losses_config.dart';
+import 'package:binander/src/features/bot/presentation/pipeline_provider.dart';
+import 'package:binander/src/models/config_field.dart';
+import 'package:binander/src/utils/snackbar_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-final createBotProvider =
-    StateNotifierProvider.autoDispose<CreateBotProvider, CreateBotNotifier>(
-        (ref) {
-  return CreateBotProvider(ref);
-});
+part 'create_bot_provider.g.dart';
 
-class CreateBotProvider extends StateNotifier<CreateBotNotifier> {
-  final Ref ref;
+@riverpod
+class CreateBotController extends _$CreateBotController {
   final formKey = GlobalKey<FormBuilderState>();
 
-  CreateBotProvider(this.ref)
-      : super(CreateBotNotifier(
-          '',
-          true,
-          BotTypes.minimizeLosses,
-          MinimizeLossesConfig().configFields,
-        ));
+  @override
+  CreateBotNotifier build() {
+    return CreateBotNotifier(
+      '',
+      true,
+      BotTypes.minimizeLosses,
+      MinimizeLossesConfig().configFields,
+    );
+  }
 
   void createBot() {
     final bot = ref
-        .read(pipelineProvider.notifier)
+        .read(pipelineControllerProvider.notifier)
         .createBotFromForm(formKey.currentState!.fields);
 
     ref.read(snackBarProvider).show('Bot ${bot.name} created!');

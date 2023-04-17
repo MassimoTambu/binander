@@ -1,15 +1,15 @@
-import 'package:binander/api/api.dart';
-import 'package:binander/modules/settings/providers/settings.provider.dart';
-import 'package:binander/providers/binance_pub_net_status.provider.dart';
-import 'package:binander/providers/binance_test_net_status.provider.dart';
-import 'package:binander/router/app_router.dart';
-import 'package:binander/widgets/binance_status.dart';
+import 'package:binander/src/api/api.dart';
+import 'package:binander/src/common_widgets/binance_status.dart';
+import 'package:binander/src/features/settings/presentation/binance_pub_net_status_provider.dart';
+import 'package:binander/src/features/settings/presentation/binance_test_net_status_provider.dart';
+import 'package:binander/src/features/settings/presentation/settings_provider.dart';
+import 'package:binander/src/routing/app_router.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class SettingsScreen extends ConsumerWidget {
-  const SettingsScreen({Key? key}) : super(key: key);
+  const SettingsScreen({super.key});
 
   void _navigateToApiSettingsPage(BuildContext context) {
     context.pushNamed(AppRoute.binanceApiSettings.name);
@@ -58,12 +58,13 @@ class SettingsScreen extends ConsumerWidget {
             onTap: () => _navigateToApiSettingsPage(context),
           ),
           SwitchListTile(
-            value: ref.watch(settingsProvider).themeMode == ThemeMode.dark,
+            value: ref.watch(settingsStorageProvider).requireValue.themeMode ==
+                ThemeMode.dark,
             title: const Text('Dark theme'),
             subtitle: const Text('Enable dark theme'),
             onChanged: (value) {
               ref
-                  .read(settingsProvider.notifier)
+                  .read(settingsStorageProvider.notifier)
                   .updateThemeMode(value ? ThemeMode.dark : ThemeMode.light);
             },
           ),

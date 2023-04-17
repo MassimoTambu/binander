@@ -2,11 +2,10 @@
 
 part of api;
 
-enum Permissions {
+//TODO Check if name is singular or plural
+enum AccountOrSymbolPermission {
   SPOT,
   MARGIN,
   LEVERAGED,
-  TRD_GRP_003,
-  TRD_GRP_004,
-  TRD_GRP_005,
+  TRD_GRP_002,
 }

@@ -1,11 +1,11 @@
-import 'package:binander/api/api.dart';
+import 'package:binander/src/api/api.dart';
 import 'package:flutter/material.dart';
 
 class OrderStatusIndicator extends StatelessWidget {
   final IconData _icon;
   final Color _color;
 
-  const OrderStatusIndicator(OrderStatus status, {Key? key})
+  const OrderStatusIndicator(OrderStatus status, {super.key})
       : _icon = status == OrderStatus.NEW ||
                 status == OrderStatus.PARTIALLY_FILLED ||
                 status == OrderStatus.PENDING_CANCEL
@@ -23,8 +23,7 @@ class OrderStatusIndicator extends StatelessWidget {
                 ? Colors.green
                 : status == OrderStatus.CANCELED
                     ? Colors.grey
-                    : Colors.black,
-        super(key: key);
+                    : Colors.black;
 
   @override
   Widget build(BuildContext context) {

@@ -1,22 +1,23 @@
-import 'package:binander/api/api.dart';
-import 'package:binander/models/exchange_info_networks.dart';
-import 'package:binander/modules/settings/providers/settings.provider.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:binander/src/api/api.dart';
+import 'package:binander/src/features/settings/presentation/settings_provider.dart';
+import 'package:binander/src/models/exchange_info_networks.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-final exchangeInfoNetworksProvider =
-    FutureProvider<ExchangeInfoNetworks>((ref) async {
-  final pubNet = ref
-      .watch(apiProvider)
-      .spot
-      .market
-      .getExchangeInfo(ref.watch(settingsProvider).pubNetConnection);
-  final testNet = ref
-      .watch(apiProvider)
-      .spot
-      .market
-      .getExchangeInfo(ref.watch(settingsProvider).testNetConnection);
+part 'exchange_info_networks_provider.g.dart';
+
+@riverpod
+Future<ExchangeInfoNetworks> exchangeInfoNetworks(
+    ExchangeInfoNetworksRef ref) async {
+  final pubNetConn =
+      ref.watch(settingsStorageProvider).requireValue.pubNetConnection;
+  final pubNet =
+      ref.watch(binanceApiProvider(pubNetConn)).spot.market.getExchangeInfo();
+  final testNetConn =
+      ref.watch(settingsStorageProvider).requireValue.testNetConnection;
+  final testNet =
+      ref.watch(binanceApiProvider(testNetConn)).spot.market.getExchangeInfo();
 
   final res = await Future.wait([pubNet, testNet]);
 
   return ExchangeInfoNetworks(pubNet: res[0].body, testNet: res[1].body);
-});
+}

@@ -1,6 +1,6 @@
 import 'package:binander/src/api/api.dart';
-import 'package:binander/src/features/bot/models/roi.dart';
-import 'package:binander/src/features/bot/models/run_orders.dart';
+import 'package:binander/src/features/bot/domain/roi.dart';
+import 'package:binander/src/features/bot/domain/run_orders.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'orders_history.freezed.dart';

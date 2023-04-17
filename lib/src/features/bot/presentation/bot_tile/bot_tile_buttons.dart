@@ -1,15 +1,15 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:binander/modules/dashboard/providers/bot_tile.provider.dart';
-import 'package:binander/providers/pipeline.provider.dart';
+import 'package:binander/src/features/bot/presentation/bot_tile_controller.dart';
+import 'package:binander/src/features/bot/presentation/pipeline_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class BotTileButtons extends ConsumerWidget {
-  const BotTileButtons({Key? key}) : super(key: key);
+  const BotTileButtons({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final botTile = ref.watch(botTileProvider);
+    final botTile = ref.watch(botTileControllerProvider);
     final isStartDisabled = botTile.isStartButtonDisabled;
     final isPauseDisabled = botTile.isPauseButtonDisabled;
     final isStarted = !botTile.hasToStart;
@@ -88,7 +88,7 @@ class BotTileButtons extends ConsumerWidget {
 
             if (confirm == true) {
               await ref
-                  .read(pipelineProvider.notifier)
+                  .read(pipelineControllerProvider.notifier)
                   .removeBots([botTile.pipeline.bot.uuid]);
             }
           },

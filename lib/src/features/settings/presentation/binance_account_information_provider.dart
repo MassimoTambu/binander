@@ -1,15 +1,17 @@
 import 'package:binander/src/api/api.dart';
-import 'package:binander/src/features/settings/models/api_connection.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:binander/src/features/settings/domain/api_connection.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-final binanceAccountInformationProvider = FutureProvider.family
-    .autoDispose<ApiResponse<AccountInformation>, ApiConnection>(
-        (ref, apiConnection) async {
+part 'binance_account_information_provider.g.dart';
+
+@riverpod
+Future<ApiResponse<AccountInformation>> binanceAccountInformation(
+    BinanceAccountInformationRef ref, ApiConnection apiConnection) async {
   final response = await ref
-      .read(apiProvider)
+      .read(binanceApiProvider(apiConnection))
       .spot
       .trade
-      .getAccountInformation(apiConnection);
+      .getAccountInformation();
 
   // Remove empty balances and sort
   response.body.balances
@@ -17,4 +19,4 @@ final binanceAccountInformationProvider = FutureProvider.family
     ..sort(((a, b) => a.asset.compareTo(b.asset)));
 
   return response;
-});
+}

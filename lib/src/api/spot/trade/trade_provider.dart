@@ -1,30 +1,32 @@
 part of api;
 
-final _tradeProvider = Provider<TradeProvider>((ref) {
-  return TradeProvider(ref);
-});
+@riverpod
+Trade _trade(_TradeRef ref, ApiConnection apiConnection) {
+  final apiUtils = ref.watch(_apiUtilsProvider);
+  return Trade(ref, apiConnection, apiUtils);
+}
 
-class TradeProvider {
+class Trade {
   final Ref _ref;
-  late final ApiUtils apiUtils = _ref.read(_apiUtilsProvider);
+  final ApiConnection _conn;
+  final ApiUtils apiUtils;
 
-  TradeProvider(this._ref);
+  const Trade(this._ref, this._conn, this.apiUtils);
 
-  Future<ApiResponse<AccountInformation>> getAccountInformation(
-      ApiConnection conn) async {
+  Future<ApiResponse<AccountInformation>> getAccountInformation() async {
     final headers = <String, dynamic>{};
 
     apiUtils.addSecurityToHeader(
-        conn.apiKey, headers, API_SECURITY_TYPE.userData);
+        _conn.apiKey, headers, API_SECURITY_TYPES.userData);
 
     final options = Options(headers: headers);
 
     final secureQuery = apiUtils.createQueryWithSecurity(
-        conn.apiSecret, {}, API_SECURITY_TYPE.userData);
+        _conn.apiSecret, {}, API_SECURITY_TYPES.userData);
 
     try {
       final response = await _ref.read(_dioProvider).get<Map<String, dynamic>>(
-          '${conn.url}/api/v3/account',
+          '${_conn.url}/api/v3/account',
           options: options,
           queryParameters: secureQuery);
 
@@ -37,23 +39,22 @@ class TradeProvider {
     }
   }
 
-  Future<ApiResponse<List<Order>>> getAllOrders(
-      ApiConnection conn, CryptoSymbol symbol) async {
+  Future<ApiResponse<List<Order>>> getAllOrders(CryptoSymbol symbol) async {
     final headers = <String, dynamic>{};
 
     apiUtils.addSecurityToHeader(
-        conn.apiKey, headers, API_SECURITY_TYPE.userData);
+        _conn.apiKey, headers, API_SECURITY_TYPES.userData);
 
     final options = Options(headers: headers);
 
     final query = {'symbol': symbol.toString()};
     // 'symbol=$symbol&timestamp=$timestamp&signature=';
     final secureQuery = apiUtils.createQueryWithSecurity(
-        conn.apiSecret, query, API_SECURITY_TYPE.userData);
+        _conn.apiSecret, query, API_SECURITY_TYPES.userData);
 
     try {
       final response = await _ref.read(_dioProvider).get<List<dynamic>>(
-          '${conn.url}/api/v3/allOrders',
+          '${_conn.url}/api/v3/allOrders',
           options: options,
           queryParameters: secureQuery);
 
@@ -66,11 +67,11 @@ class TradeProvider {
   }
 
   Future<ApiResponse<OrderData>> getQueryOrder(
-      ApiConnection conn, CryptoSymbol symbol, int orderId) async {
+      CryptoSymbol symbol, int orderId) async {
     final headers = <String, dynamic>{};
 
     apiUtils.addSecurityToHeader(
-        conn.apiKey, headers, API_SECURITY_TYPE.userData);
+        _conn.apiKey, headers, API_SECURITY_TYPES.userData);
 
     final options = Options(headers: headers);
 
@@ -78,11 +79,11 @@ class TradeProvider {
 
     // 'symbol=$symbol&timestamp=$timestamp&signature=';
     final secureQuery = apiUtils.createQueryWithSecurity(
-        conn.apiSecret, query, API_SECURITY_TYPE.userData);
+        _conn.apiSecret, query, API_SECURITY_TYPES.userData);
 
     try {
       final response = await _ref.read(_dioProvider).get<Map<String, dynamic>>(
-          '${conn.url}/api/v3/order',
+          '${_conn.url}/api/v3/order',
           options: options,
           queryParameters: secureQuery);
 
@@ -95,14 +96,13 @@ class TradeProvider {
   }
 
   Future<ApiResponse<OrderCancel>> cancelOrder(
-    ApiConnection conn,
     CryptoSymbol symbol,
     int orderId,
   ) async {
     final headers = <String, dynamic>{};
 
     apiUtils.addSecurityToHeader(
-        conn.apiKey, headers, API_SECURITY_TYPE.userData);
+        _conn.apiKey, headers, API_SECURITY_TYPES.userData);
 
     final options = Options(headers: headers);
 
@@ -112,12 +112,12 @@ class TradeProvider {
     };
     // 'symbol=$symbol&timestamp=$timestamp&signature=';
     final secureQuery = apiUtils.createQueryWithSecurity(
-        conn.apiSecret, query, API_SECURITY_TYPE.userData);
+        _conn.apiSecret, query, API_SECURITY_TYPES.userData);
 
     try {
       final response = await _ref
           .read(_dioProvider)
-          .delete<Map<String, dynamic>>('${conn.url}/api/v3/order',
+          .delete<Map<String, dynamic>>('${_conn.url}/api/v3/order',
               options: options, queryParameters: secureQuery);
 
       return ApiResponse(
@@ -129,7 +129,6 @@ class TradeProvider {
   }
 
   Future<ApiResponse<OrderNewLimit>> newLimitOrder(
-    ApiConnection conn,
     CryptoSymbol symbol,
     OrderSides side,
     double quantity,
@@ -139,7 +138,7 @@ class TradeProvider {
     final headers = <String, dynamic>{};
 
     apiUtils.addSecurityToHeader(
-        conn.apiKey, headers, API_SECURITY_TYPE.userData);
+        _conn.apiKey, headers, API_SECURITY_TYPES.userData);
 
     final options = Options(headers: headers);
 
@@ -154,11 +153,11 @@ class TradeProvider {
 
     // 'symbol=$symbol&timestamp=$timestamp&signature=';
     final secureQuery = apiUtils.createQueryWithSecurity(
-        conn.apiSecret, query, API_SECURITY_TYPE.userData);
+        _conn.apiSecret, query, API_SECURITY_TYPES.userData);
 
     try {
       final response = await _ref.read(_dioProvider).post<Map<String, dynamic>>(
-          '${conn.url}/api/v3/order',
+          '${_conn.url}/api/v3/order',
           options: options,
           queryParameters: secureQuery);
 
@@ -171,7 +170,6 @@ class TradeProvider {
   }
 
   Future<ApiResponse<OrderNewStopLimit>> newStopLimitOrder(
-    ApiConnection conn,
     CryptoSymbol symbol,
     OrderSides side,
     double quantity,
@@ -182,7 +180,7 @@ class TradeProvider {
     final headers = <String, dynamic>{};
 
     apiUtils.addSecurityToHeader(
-        conn.apiKey, headers, API_SECURITY_TYPE.userData);
+        _conn.apiKey, headers, API_SECURITY_TYPES.userData);
 
     final options = Options(headers: headers);
 
@@ -198,11 +196,11 @@ class TradeProvider {
 
     // 'symbol=$symbol&timestamp=$timestamp&signature=';
     final secureQuery = apiUtils.createQueryWithSecurity(
-        conn.apiSecret, query, API_SECURITY_TYPE.userData);
+        _conn.apiSecret, query, API_SECURITY_TYPES.userData);
 
     try {
       final response = await _ref.read(_dioProvider).post<Map<String, dynamic>>(
-          '${conn.url}/api/v3/order',
+          '${_conn.url}/api/v3/order',
           options: options,
           queryParameters: secureQuery);
 

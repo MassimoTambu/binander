@@ -1,9 +1,9 @@
 import 'dart:async';
 
 import 'package:binander/src/api/api.dart';
-import 'package:binander/src/features/bot/models/bot_phases.dart';
-import 'package:binander/src/features/bot/models/bot_status.dart';
-import 'package:binander/src/features/bot/models/orders_history.dart';
+import 'package:binander/src/features/bot/domain/bots/bot_phases.dart';
+import 'package:binander/src/features/bot/domain/bots/bot_status.dart';
+import 'package:binander/src/features/bot/domain/orders_history.dart';
 
 abstract class PipelineData {
   final OrdersHistory ordersHistory;

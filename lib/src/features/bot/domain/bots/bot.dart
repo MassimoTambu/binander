@@ -1,6 +1,6 @@
-import 'package:binander/src/features/bot/domain/bots/minimize_losses/minimize_losses.config.dart';
-import 'package:binander/src/features/bot/domain/bots/minimize_losses/minimize_losses.pipeline_data.dart';
-import 'package:binander/src/features/bot/models/bot_types.dart';
+import 'package:binander/src/features/bot/domain/bots/bot_types.dart';
+import 'package:binander/src/features/bot/domain/bots/minimize_losses/minimize_losses_config.dart';
+import 'package:binander/src/features/bot/domain/bots/minimize_losses/minimize_losses_pipeline_data.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'bot.freezed.dart';

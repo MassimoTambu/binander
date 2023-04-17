@@ -1,13 +1,13 @@
-import 'package:binander/api/api.dart';
-import 'package:binander/router/app_router.dart';
-import 'package:binander/utils/datetime.utils.dart';
+import 'package:binander/src/api/api.dart';
+import 'package:binander/src/routing/app_router.dart';
+import 'package:binander/src/utils/date_formatter.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 class OrderDetailsScreen extends StatelessWidget {
   final OrderData _order;
 
-  const OrderDetailsScreen(this._order, {Key? key}) : super(key: key);
+  const OrderDetailsScreen(this._order, {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -21,8 +21,8 @@ class OrderDetailsScreen extends StatelessWidget {
       'Side: ${_order.side.name}',
       'Status: ${_order.status.name}',
       'Type: ${_order.type.name}',
-      'Time: ${DateTimeUtils.toHmsddMMy(_order.time)}',
-      'Updated time: ${DateTimeUtils.toHmsddMMy(_order.updateTime)}',
+      'Time: ${kDateFormatter.format(_order.time)}',
+      'Updated time: ${kDateFormatter.format(_order.updateTime)}',
     ];
 
     return Scaffold(

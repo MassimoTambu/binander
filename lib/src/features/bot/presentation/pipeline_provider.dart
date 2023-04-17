@@ -1,34 +1,33 @@
-import 'package:binander/models/crypto_symbol.dart';
-import 'package:binander/modules/bot/bots/minimize_losses/minimize_losses.config.dart';
-import 'package:binander/modules/bot/bots/minimize_losses/minimize_losses.pipeline.dart';
-import 'package:binander/modules/bot/bots/minimize_losses/minimize_losses.pipeline_data.dart';
-import 'package:binander/modules/bot/models/bot.dart';
-import 'package:binander/modules/bot/models/bot_status.dart';
-import 'package:binander/modules/bot/models/bot_types.enum.dart';
-import 'package:binander/modules/bot/models/interfaces/pipeline.interface.dart';
-import 'package:binander/modules/bot/models/orders_history.dart';
-import 'package:binander/providers/exchange_info.provider.dart';
-import 'package:binander/providers/file_storage.provider.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:binander/src/features/bot/domain/bots/bot.dart';
+import 'package:binander/src/features/bot/domain/bots/bot_status.dart';
+import 'package:binander/src/features/bot/domain/bots/bot_types.dart';
+import 'package:binander/src/features/bot/domain/bots/minimize_losses/minimize_losses_config.dart';
+import 'package:binander/src/features/bot/domain/bots/minimize_losses/minimize_losses_pipeline.dart';
+import 'package:binander/src/features/bot/domain/bots/minimize_losses/minimize_losses_pipeline_data.dart';
+import 'package:binander/src/features/bot/domain/orders_history.dart';
+import 'package:binander/src/features/bot/domain/pipeline.dart';
+import 'package:binander/src/features/settings/presentation/exchange_info_provider.dart';
+import 'package:binander/src/models/crypto_symbol.dart';
+import 'package:binander/src/utils/file_storage_provider.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:uuid/uuid.dart';
 
-final pipelineProvider =
-    StateNotifierProvider<PipelineProvider, List<Pipeline>>((ref) {
-  return PipelineProvider(ref);
-});
+part 'pipeline_provider.g.dart';
 
-class PipelineProvider extends StateNotifier<List<Pipeline>> {
-  final Ref _ref;
-
-  PipelineProvider(this._ref) : super([]) {
-    _ref.listen<Map<String, dynamic>>(fileStorageProvider.select((p) => p.data),
-        (previous, next) {
-      // We can prevent reloading by storinh the hashCode in json and then analyze them
+@riverpod
+class PipelineController extends _$PipelineController {
+  @override
+  List<Pipeline> build() {
+    ref.listen<Map<String, dynamic>>(
+        fileStorageProvider.select((p) => p.requireValue), (previous, next) {
+      // We can prevent reloading by storing the hashCode in json and then analyze them
       _loadBotsFromFile(next);
     });
 
-    _loadBotsFromFile(_ref.watch(fileStorageProvider).data);
+    _loadBotsFromFile(ref.watch(fileStorageProvider).requireValue);
+
+    return [];
   }
 
   void updateBotStatus(String uuid, BotStatus status) {
@@ -111,10 +110,10 @@ class PipelineProvider extends StateNotifier<List<Pipeline>> {
     required Duration timerBuyOrder,
     required bool autoRestart,
   }) {
-    final orderPrecision = _ref
+    final orderPrecision = ref
         .read(exchangeInfoProvider)!
         .getOrderPrecision(symbol.toString(), isTestNet: testNet);
-    final quantityPrecision = _ref
+    final quantityPrecision = ref
         .read(exchangeInfoProvider)!
         .getQuantityPrecision(symbol.toString(), isTestNet: testNet);
 
@@ -137,7 +136,7 @@ class PipelineProvider extends StateNotifier<List<Pipeline>> {
       ),
     );
 
-    final pipeline = MinimizeLossesPipeline(_ref, bot);
+    final pipeline = MinimizeLossesPipeline(ref, bot);
 
     state = [...state, pipeline];
 
@@ -155,8 +154,8 @@ class PipelineProvider extends StateNotifier<List<Pipeline>> {
 
     // Update state removing cancelled bots
     state = [...state.where((p) => uuids.every((u) => p.bot.uuid != u))];
-    _ref
-        .read(fileStorageProvider)
+    ref
+        .read(fileStorageProvider.notifier)
         .removeBots(pipelines.map((p) => p.bot).toList());
   }
 
@@ -174,7 +173,7 @@ class PipelineProvider extends StateNotifier<List<Pipeline>> {
   Pipeline _createBotPipeline(Bot bot) {
     return bot.map(
       minimizeLosses: (minimizeLosses) =>
-          MinimizeLossesPipeline(_ref, minimizeLosses),
+          MinimizeLossesPipeline(ref, minimizeLosses),
     );
   }
 }

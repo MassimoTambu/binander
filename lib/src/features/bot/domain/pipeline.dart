@@ -1,4 +1,4 @@
-import 'package:binander/src/features/bot/models/bot.dart';
+import 'package:binander/src/features/bot/domain/bots/bot.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 abstract class Pipeline {

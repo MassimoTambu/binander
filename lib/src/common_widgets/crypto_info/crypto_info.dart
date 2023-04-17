@@ -1,24 +1,30 @@
 import 'package:binander/src/common_widgets/crypto_info/crypto_info_tile.dart';
 import 'package:binander/src/common_widgets/detailed_error_box.dart';
-import 'package:binander/src/features/settings/models/api_connection.dart';
+import 'package:binander/src/features/settings/domain/api_connection.dart';
+import 'package:binander/src/features/settings/presentation/binance_account_information_provider.dart';
 import 'package:binander/src/features/settings/presentation/settings_provider.dart';
-import 'package:binander/src/providers/binance_account_information.provider.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-final isTestNetProvider = Provider<bool>((ref) => throw UnimplementedError());
+part 'crypto_info.g.dart';
+
+@riverpod
+bool isTestNet(ref) => throw UnimplementedError();
 
 class CryptoInfo extends ConsumerWidget {
-  const CryptoInfo({Key? key}) : super(key: key);
+  const CryptoInfo({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     late final ApiConnection apiConn;
 
     if (ref.watch(isTestNetProvider)) {
-      apiConn = ref.watch(settingsProvider.select((p) => p.testNetConnection));
+      apiConn = ref.watch(settingsStorageProvider
+          .select((p) => p.requireValue.testNetConnection));
     } else {
-      apiConn = ref.watch(settingsProvider.select((p) => p.pubNetConnection));
+      apiConn = ref.watch(settingsStorageProvider
+          .select((p) => p.requireValue.pubNetConnection));
     }
 
     final res = ref.watch(binanceAccountInformationProvider(apiConn));

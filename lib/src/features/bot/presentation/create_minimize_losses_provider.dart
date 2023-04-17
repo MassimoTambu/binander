@@ -1,20 +1,22 @@
-import 'package:binander/api/api.dart';
-import 'package:binander/models/crypto_symbol.dart';
-import 'package:binander/modules/bot/bots/minimize_losses/minimize_losses.pipeline.dart';
-import 'package:binander/modules/bot/models/create_minimize_losses.dart';
-import 'package:binander/modules/bot/models/create_minimize_losses_params.dart';
-import 'package:binander/modules/settings/models/api_connection.dart';
-import 'package:binander/modules/settings/providers/settings.provider.dart';
-import 'package:binander/providers/exchange_info.provider.dart';
-import 'package:binander/utils/extensions/double.extension.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:binander/src/api/api.dart';
+import 'package:binander/src/features/bot/domain/bots/minimize_losses/minimize_losses_pipeline.dart';
+import 'package:binander/src/features/bot/domain/create_minimize_losses.dart';
+import 'package:binander/src/features/bot/domain/create_minimize_losses_params.dart';
+import 'package:binander/src/features/settings/domain/api_connection.dart';
+import 'package:binander/src/features/settings/presentation/exchange_info_provider.dart';
+import 'package:binander/src/features/settings/presentation/settings_provider.dart';
+import 'package:binander/src/models/crypto_symbol.dart';
+import 'package:binander/src/utils/floor_to_double_with_decimals.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-final createMinimizeLossesProvider = FutureProvider.autoDispose
-    .family<CreateMinimizeLosses, CreateMinimizeLossesParams>(
-        (ref, params) async {
+part 'create_minimize_losses_provider.g.dart';
+
+@riverpod
+Future<CreateMinimizeLosses> createMinimizeLosses(
+    CreateMinimizeLossesRef ref, CreateMinimizeLossesParams params) async {
   final ApiConnection apiConn = params.isTestNet
-      ? ref.read(settingsProvider).testNetConnection
-      : ref.read(settingsProvider).pubNetConnection;
+      ? ref.read(settingsStorageProvider).requireValue.testNetConnection
+      : ref.read(settingsStorageProvider).requireValue.pubNetConnection;
   final percentageSellOrder = double.tryParse(params.percentageSellOrder ?? '');
   final symbol = params.symbol;
 
@@ -23,10 +25,10 @@ final createMinimizeLossesProvider = FutureProvider.autoDispose
   }
 
   final res = await ref
-      .read(apiProvider)
+      .read(binanceApiProvider(apiConn))
       .spot
       .market
-      .getAveragePrice(apiConn, CryptoSymbol(symbol));
+      .getAveragePrice(CryptoSymbol(symbol));
 
   final lastAvgPrice = res.body.price;
 
@@ -44,4 +46,4 @@ final createMinimizeLossesProvider = FutureProvider.autoDispose
             percentageSellOrder: percentageSellOrder)
         .floorToDoubleWithDecimals(quantityPrecision),
   );
-});
+}
