@@ -1,14 +1,14 @@
-import 'package:binander/api/api.dart';
-import 'package:binander/modules/dashboard/widgets/bot_tile_orders/order_status_indicator.dart';
-import 'package:binander/router/app_router.dart';
-import 'package:binander/utils/datetime.utils.dart';
+import 'package:binander/src/api/api.dart';
+import 'package:binander/src/features/bot/presentation/bot_tile_orders/order_status_indicator.dart';
+import 'package:binander/src/routing/app_router.dart';
+import 'package:binander/src/utils/date_formatter.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 class OrderContainer extends StatelessWidget {
   final OrderData _order;
 
-  const OrderContainer(this._order, {Key? key}) : super(key: key);
+  const OrderContainer(this._order, {super.key});
 
   String writeTextPhrase() {
     if (_order.side == OrderSides.BUY && _order.status == OrderStatus.FILLED) {
@@ -24,7 +24,7 @@ class OrderContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final String formattedDate = DateTimeUtils.toHmsddMMy(_order.updateTime);
+    final String formattedDate = kDateFormatter.format(_order.updateTime);
     final textPhrase = writeTextPhrase();
 
     return Card(

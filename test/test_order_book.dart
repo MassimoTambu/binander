@@ -1,4 +1,4 @@
-import 'package:binander/api/api.dart';
+import 'package:binander/src/api/api.dart';
 
 import 'test_utils.dart';
 import 'test_wallet.dart';

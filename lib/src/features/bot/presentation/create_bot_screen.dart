@@ -1,20 +1,21 @@
-import 'package:auto_route/auto_route.dart';
-import 'package:binander/modules/bot/models/bot.dart';
-import 'package:binander/modules/bot/models/bot_types.enum.dart';
-import 'package:binander/modules/bot/widgets/create_minimize_losses.dart';
-import 'package:binander/modules/dashboard/providers/create_bot.provider.dart';
-import 'package:binander/utils/media_query.utils.dart';
+import 'package:binander/src/features/bot/domain/bots/bot.dart';
+import 'package:binander/src/features/bot/domain/bots/bot_types.dart';
+import 'package:binander/src/features/bot/presentation/create_bot_provider.dart';
+import 'package:binander/src/features/bot/presentation/create_minimize_losses.dart';
+import 'package:binander/src/utils/media_query_utils.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
+import 'package:go_router/go_router.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class CreateBotScreen extends ConsumerWidget {
-  const CreateBotScreen({Key? key}) : super(key: key);
+  const CreateBotScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final createBotNotifier = ref.watch(createBotProvider.notifier);
+    final createBotNotifier = ref.watch(createBotControllerProvider.notifier);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Create bot'),
@@ -63,8 +64,8 @@ class CreateBotScreen extends ConsumerWidget {
                   TextButton(
                     onPressed: () {
                       if (createBotNotifier.formKey.currentState!.validate()) {
-                        ref.read(createBotProvider.notifier).createBot();
-                        context.router.navigateBack();
+                        createBotNotifier.createBot();
+                        context.pop();
                       }
                     },
                     child: const Text('Create'),
@@ -80,34 +81,36 @@ class CreateBotScreen extends ConsumerWidget {
 }
 
 class SelectBotField extends ConsumerWidget {
-  const SelectBotField({Key? key}) : super(key: key);
+  const SelectBotField({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return FormBuilderDropdown(
+    return FormBuilderDropdown<BotTypes>(
       name: 'bot_type',
-      initialValue: ref.read(createBotProvider).botTypes,
+      initialValue: ref.watch(createBotControllerProvider).botTypes,
       items: BotTypes.values.map((BotTypes botType) {
-        return DropdownMenuItem<BotTypes>(
+        return DropdownMenuItem(
           value: botType,
           child: Text(botType.name),
         );
       }).toList(),
       onChanged: (BotTypes? newBotType) {
         newBotType ??= BotTypes.minimizeLosses;
-        ref.read(createBotProvider.notifier).update(botTypes: newBotType);
+        ref
+            .read(createBotControllerProvider.notifier)
+            .update(botTypes: newBotType);
       },
     );
   }
 }
 
 class BotConfigContainer extends ConsumerWidget {
-  const BotConfigContainer({Key? key}) : super(key: key);
+  const BotConfigContainer({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     late final Widget form;
-    switch (ref.watch(createBotProvider).botTypes) {
+    switch (ref.watch(createBotControllerProvider).botTypes) {
       case BotTypes.minimizeLosses:
         form = const CreateMinimizeLosses();
         break;
@@ -121,7 +124,7 @@ class BotConfigContainer extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            '${ref.watch(createBotProvider).botTypes.name} options',
+            '${ref.watch(createBotControllerProvider).botTypes.name} options',
             style: TextStyle(
                 fontSize: Theme.of(context).textTheme.titleMedium?.fontSize),
           ),

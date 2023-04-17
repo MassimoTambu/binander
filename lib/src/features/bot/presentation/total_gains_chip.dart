@@ -1,11 +1,11 @@
-import 'package:binander/api/api.dart';
-import 'package:binander/modules/bot/models/run_orders.dart';
+import 'package:binander/src/api/api.dart';
+import 'package:binander/src/features/bot/domain/run_orders.dart';
 import 'package:flutter/material.dart';
 
 class TotalGainsChip extends StatelessWidget {
   final Iterable<RunOrders> _runOrders;
 
-  const TotalGainsChip(this._runOrders, {Key? key}) : super(key: key);
+  const TotalGainsChip(this._runOrders, {super.key});
 
   @override
   Widget build(BuildContext context) {

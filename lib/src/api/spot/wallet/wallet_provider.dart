@@ -1,19 +1,21 @@
 part of api;
 
-final _walletProvider = Provider<WalletProvider>((ref) {
-  return WalletProvider(ref);
-});
+@riverpod
+Wallet _wallet(_WalletRef ref, ApiConnection apiConnection) =>
+    Wallet(ref, apiConnection, ref.watch(_apiUtilsProvider));
 
-class WalletProvider {
+class Wallet {
   final Ref _ref;
+  final ApiConnection _conn;
+  final ApiUtils _apiUtils;
 
-  const WalletProvider(this._ref);
+  const Wallet(this._ref, this._conn, this._apiUtils);
 
-  Future<ApiResponse<SystemStatus>> getSystemStatus(ApiConnection conn) async {
+  Future<ApiResponse<SystemStatus>> getSystemStatus() async {
     try {
       final response = await _ref
           .read(_dioProvider)
-          .get<Map<String, dynamic>>('${conn.url}/sapi/v1/system/status');
+          .get<Map<String, dynamic>>('${_conn.url}/sapi/v1/system/status');
 
       return ApiResponse(
         SystemStatus.fromJson(response.data!),
@@ -26,23 +28,20 @@ class WalletProvider {
   }
 
   /// Check ApiKey Permission status
-  Future<ApiResponse<ApiKeyPermission>> getPubNetApiKeyPermission(
-      ApiConnection conn) async {
-    final apiUtils = _ref.read(_apiUtilsProvider);
-
+  Future<ApiResponse<ApiKeyPermission>> getPubNetApiKeyPermission() async {
     final headers = <String, dynamic>{};
 
-    apiUtils.addSecurityToHeader(
-        conn.apiKey, headers, API_SECURITY_TYPE.userData);
+    _apiUtils.addSecurityToHeader(
+        _conn.apiKey, headers, API_SECURITY_TYPES.userData);
 
     final options = Options(headers: headers);
 
-    final secureQuery = apiUtils.createQueryWithSecurity(
-        conn.apiSecret, {}, API_SECURITY_TYPE.userData);
+    final secureQuery = _apiUtils.createQueryWithSecurity(
+        _conn.apiSecret, {}, API_SECURITY_TYPES.userData);
 
     try {
       final response = await _ref.read(_dioProvider).get<Map<String, dynamic>>(
-          '${conn.url}/sapi/v1/account/apiRestrictions',
+          '${_conn.url}/sapi/v1/account/apiRestrictions',
           options: options,
           queryParameters: secureQuery);
 

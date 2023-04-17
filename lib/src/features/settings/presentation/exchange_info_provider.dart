@@ -1,19 +1,20 @@
-import 'package:binander/api/api.dart';
-import 'package:binander/models/exchange_info_networks.dart';
-import 'package:binander/providers/exchange_info_networks.provider.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:binander/src/api/api.dart';
+import 'package:binander/src/features/settings/presentation/exchange_info_networks_provider.dart';
+import 'package:binander/src/models/exchange_info_networks.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-final exchangeInfoProvider = Provider<ExchangeInfoProvider?>(
-  (ref) => ref.watch(exchangeInfoNetworksProvider).whenOrNull(
-        data: (data) => ExchangeInfoProvider(ref, data),
-      ),
-);
+part 'exchange_info_provider.g.dart';
+
+@riverpod
+ExchangeInfoProvider? exchangeInfo(ExchangeInfoRef ref) =>
+    ref.watch(exchangeInfoNetworksProvider).whenOrNull(
+          data: (data) => ExchangeInfoProvider(data),
+        );
 
 class ExchangeInfoProvider {
-  final Ref ref;
   final ExchangeInfoNetworks exchangeInfoNetworks;
 
-  const ExchangeInfoProvider(this.ref, this.exchangeInfoNetworks);
+  const ExchangeInfoProvider(this.exchangeInfoNetworks);
 
   List<Symbol> _getNetworkSymbols(bool isTestNet) {
     if (isTestNet) {

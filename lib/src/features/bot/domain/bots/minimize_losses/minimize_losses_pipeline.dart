@@ -1,25 +1,25 @@
 import 'dart:async';
 
 import 'package:binander/src/api/api.dart';
-import 'package:binander/src/features/bot/domain/bots/minimize_losses/minimize_losses.pipeline_data.dart';
-import 'package:binander/src/features/bot/models/bot.dart';
-import 'package:binander/src/features/bot/models/bot_limit.dart';
-import 'package:binander/src/features/bot/models/bot_phases.dart';
-import 'package:binander/src/features/bot/models/bot_status.dart';
-import 'package:binander/src/features/bot/models/interfaces/pipeline.dart';
-import 'package:binander/src/features/bot/models/roi.dart';
-import 'package:binander/src/features/settings/models/api_connection.dart';
+import 'package:binander/src/features/bot/domain/bots/bot.dart';
+import 'package:binander/src/features/bot/domain/bots/bot_limit.dart';
+import 'package:binander/src/features/bot/domain/bots/bot_phases.dart';
+import 'package:binander/src/features/bot/domain/bots/bot_status.dart';
+import 'package:binander/src/features/bot/domain/bots/minimize_losses/minimize_losses_pipeline_data.dart';
+import 'package:binander/src/features/bot/domain/pipeline.dart';
+import 'package:binander/src/features/bot/domain/roi.dart';
+import 'package:binander/src/features/bot/presentation/pipeline_provider.dart';
 import 'package:binander/src/features/settings/presentation/settings_provider.dart';
-import 'package:binander/src/providers/pipeline_provider.dart';
-import 'package:binander/src/providers/snackbar_provider.dart';
+import 'package:binander/src/utils/date_only_compare.dart';
 import 'package:binander/src/utils/floor_to_double_with_decimals.dart';
+import 'package:binander/src/utils/snackbar_provider.dart';
 
 import 'package:clock/clock.dart';
 import 'package:flutter/foundation.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-part 'minimize_losses.pipeline.freezed.dart';
+part 'minimize_losses_pipeline.freezed.dart';
 
 @freezed
 class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
@@ -142,7 +142,9 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
 
   void changeStatusTo(BotPhases phase, String message) {
     final status = BotStatus(phase, message);
-    ref.read(pipelineProvider.notifier).updateBotStatus(bot.uuid, status);
+    ref
+        .read(pipelineControllerProvider.notifier)
+        .updateBotStatus(bot.uuid, status);
   }
 
   void _incrementPipelineCounter() {
@@ -279,28 +281,21 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
     ref.read(snackBarProvider).show(message, seconds: seconds);
   }
 
-  ApiConnection _getApiConnection() {
-    if (bot.testNet) {
-      return ref.read(settingsProvider).testNetConnection;
-    }
-    return ref.read(settingsProvider).pubNetConnection;
+  BinanceApi _getBinanceApi() {
+    final apiConn = bot.testNet
+        ? ref.read(settingsStorageProvider).requireValue.testNetConnection
+        : ref.read(settingsStorageProvider).requireValue.pubNetConnection;
+    return ref.read(binanceApiProvider(apiConn));
   }
 
   Future<AveragePrice> _getCurrentCryptoPrice() async {
-    final res = await ref
-        .read(apiProvider)
-        .spot
-        .market
-        .getAveragePrice(_getApiConnection(), bot.config.symbol!);
+    final res =
+        await _getBinanceApi().spot.market.getAveragePrice(bot.config.symbol!);
     return res.body;
   }
 
   Future<AccountInformation> _getAccountInformation() async {
-    final res = await ref
-        .read(apiProvider)
-        .spot
-        .trade
-        .getAccountInformation(_getApiConnection());
+    final res = await _getBinanceApi().spot.trade.getAccountInformation();
     return res.body;
   }
 
@@ -314,12 +309,10 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
   Future<void> _trySubmitBuyOrder(double rightPairQty) async {
     try {
       final newBuyOrder = await _submitBuyOrder(rightPairQty);
-      final buyOrderData = (await ref
-              .read(apiProvider)
+      final buyOrderData = (await _getBinanceApi()
               .spot
               .trade
-              .getQueryOrder(
-                  _getApiConnection(), bot.config.symbol!, newBuyOrder.orderId))
+              .getQueryOrder(bot.config.symbol!, newBuyOrder.orderId))
           .body;
       bot.data.ordersHistory.upsertOrderInNotEndedRunOrder(buyOrderData);
     } on ApiException catch (e) {
@@ -341,8 +334,7 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
   Future<OrderNewLimit> _submitBuyOrder(double rightPairQty) async {
     final currentApproxPrice = bot.data.lastAveragePrice!.price
         .floorToDoubleWithDecimals(bot.data.orderPrecision);
-    final res = await ref.read(apiProvider).spot.trade.newLimitOrder(
-        _getApiConnection(),
+    final res = await _getBinanceApi().spot.trade.newLimitOrder(
         bot.config.symbol!,
         OrderSides.BUY,
         _calculateBuyOrderQuantity(
@@ -358,8 +350,7 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
   }
 
   Future<OrderData> _getBuyOrder() async {
-    final res = await ref.read(apiProvider).spot.trade.getQueryOrder(
-        _getApiConnection(),
+    final res = await _getBinanceApi().spot.trade.getQueryOrder(
         bot.config.symbol!,
         bot.data.ordersHistory.lastNotEndedRunOrders!.buyOrder!.orderId);
 
@@ -369,12 +360,10 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
   Future<void> _trySubmitSellOrder() async {
     try {
       final stopLimitOrder = await _submitStopSellOrder();
-      final sellOrderData = (await ref
-              .read(apiProvider)
+      final sellOrderData = (await _getBinanceApi()
               .spot
               .trade
-              .getQueryOrder(_getApiConnection(), bot.config.symbol!,
-                  stopLimitOrder.orderId))
+              .getQueryOrder(bot.config.symbol!, stopLimitOrder.orderId))
           .body;
       bot.data.ordersHistory.upsertOrderInNotEndedRunOrder(sellOrderData);
     } on ApiException {
@@ -396,8 +385,7 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
     final stopPrice = calculateNewOrderStopPriceWithProperties()
         .floorToDoubleWithDecimals(bot.data.orderPrecision);
 
-    final res = await ref.read(apiProvider).spot.trade.newStopLimitOrder(
-        _getApiConnection(),
+    final res = await _getBinanceApi().spot.trade.newStopLimitOrder(
         bot.config.symbol!,
         OrderSides.SELL,
         bot.data.ordersHistory.lastNotEndedRunOrders!.buyOrder!.executedQty,
@@ -407,8 +395,7 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
   }
 
   Future<OrderData> _getSellOrder() async {
-    final res = await ref.read(apiProvider).spot.trade.getQueryOrder(
-        _getApiConnection(),
+    final res = await _getBinanceApi().spot.trade.getQueryOrder(
         bot.config.symbol!,
         bot.data.ordersHistory.lastNotEndedRunOrders!.sellOrder!.orderId);
     return res.body;
@@ -422,8 +409,10 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
   Future<void> _trySubmitCancelOrder(int orderId) async {
     try {
       final orderCancel = await _submitCancelOrder(orderId);
-      final orderData = (await ref.read(apiProvider).spot.trade.getQueryOrder(
-              _getApiConnection(), bot.config.symbol!, orderCancel.orderId))
+      final orderData = (await _getBinanceApi()
+              .spot
+              .trade
+              .getQueryOrder(bot.config.symbol!, orderCancel.orderId))
           .body;
       bot.data.ordersHistory.lastNotEndedRunOrders?.orders.add(orderData);
     } on ApiException {
@@ -440,11 +429,10 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
   }
 
   Future<OrderCancel> _submitCancelOrder(int orderId) async {
-    final res = await ref
-        .read(apiProvider)
+    final res = await _getBinanceApi()
         .spot
         .trade
-        .cancelOrder(_getApiConnection(), bot.config.symbol!, orderId);
+        .cancelOrder(bot.config.symbol!, orderId);
 
     return res.body;
   }

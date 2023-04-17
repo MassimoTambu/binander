@@ -1,5 +1,8 @@
-import 'package:binander/modules/bot/models/run_orders.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:binander/src/features/bot/domain/run_orders.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-final currentRunOrdersTile =
-    Provider<RunOrders>((ref) => throw UnimplementedError());
+part 'bot_order_tile_provider.g.dart';
+
+@riverpod
+RunOrders currentRunOrdersTile(CurrentRunOrdersTileRef ref) =>
+    throw UnimplementedError();

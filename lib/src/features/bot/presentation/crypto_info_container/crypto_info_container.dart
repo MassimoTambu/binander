@@ -1,17 +1,17 @@
-import 'package:binander/modules/dashboard/widgets/crypto_info_container/crypto_info_title.dart';
-import 'package:binander/widgets/crypto_info/crypto_info.dart';
+import 'package:binander/src/common_widgets/crypto_info/crypto_info.dart';
+import 'package:binander/src/features/bot/presentation/crypto_info_container/crypto_info_title.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class CryptoInfoContainer extends ConsumerWidget {
-  const CryptoInfoContainer({Key? key}) : super(key: key);
+  const CryptoInfoContainer({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return ExpansionTile(
       title: Text(
         "Funds",
-        style: Theme.of(context).textTheme.headline5,
+        style: Theme.of(context).textTheme.headlineSmall,
       ),
       initiallyExpanded: true,
       children: [

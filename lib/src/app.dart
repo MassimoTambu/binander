@@ -22,7 +22,7 @@ class Binander extends ConsumerWidget {
       value: ref.watch(initProvider),
       data: (_) {
         // Autosave bots to file when pipelineProvider changes
-        ref.listen<List<Pipeline>>(pipelineProvider,
+        ref.listen<List<Pipeline>>(pipelineControllerProvider,
             (prevPipelines, newPipelines) {
           final oldBots = prevPipelines?.map((e) => e.bot).toList() ?? [];
           final newBots = newPipelines.map((e) => e.bot).toList();

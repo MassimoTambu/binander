@@ -1,28 +1,28 @@
-import 'package:binander/models/config_field.dart';
-import 'package:binander/modules/settings/models/settings.config.dart';
-import 'package:binander/modules/settings/providers/settings.provider.dart';
-import 'package:binander/utils/media_query.utils.dart';
+import 'package:binander/src/features/settings/domain/settings_config.dart';
+import 'package:binander/src/features/settings/presentation/settings_provider.dart';
+import 'package:binander/src/models/config_field.dart';
+import 'package:binander/src/utils/media_query_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class BinanceApiSettingsScreen extends ConsumerWidget {
-  BinanceApiSettingsScreen({Key? key}) : super(key: key);
+  BinanceApiSettingsScreen({super.key});
 
   final _formKey = GlobalKey<FormBuilderState>();
 
   void onSave(BuildContext context, WidgetRef ref) {
     if (_formKey.currentState!.validate()) {
       final fields = _formKey.currentState!.fields;
-      ref.read(settingsProvider.notifier).updateFromForm(
+      ref.read(settingsStorageProvider.notifier).updateFromForm(
             pubNetApiKey: fields[SettingsConfig.pubNetApiKeyName]!.value,
             pubNetApiSecret: fields[SettingsConfig.pubNetApiSecretName]!.value,
             testNetApiKey: fields[SettingsConfig.testNetApiKeyName]!.value,
             testNetApiSecret:
                 fields[SettingsConfig.testNetApiSecretName]!.value,
           );
-      context.router.navigateBack();
+      context.router.back();
     }
   }
 
@@ -63,14 +63,14 @@ class BinanceApiSettingsScreen extends ConsumerWidget {
 }
 
 class ConfigContainer extends ConsumerWidget {
-  const ConfigContainer({Key? key}) : super(key: key);
+  const ConfigContainer({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final settings = ref.watch(settingsProvider);
+    final settings = ref.watch(settingsStorageProvider);
     final settingsConfig = SettingsConfig.create(
-      pubNetConnection: settings.pubNetConnection,
-      testNetConnection: settings.testNetConnection,
+      pubNetConnection: settings.requireValue.pubNetConnection,
+      testNetConnection: settings.requireValue.testNetConnection,
     );
 
     final pubNetConfigs = settingsConfig.configFields.entries
@@ -98,8 +98,8 @@ class ConfigGroup extends StatelessWidget {
   final Iterable<MapEntry<String, ConfigField>> configFields;
   final String title;
 
-  const ConfigGroup({Key? key, required this.configFields, required this.title})
-      : super(key: key);
+  const ConfigGroup(
+      {super.key, required this.configFields, required this.title});
 
   @override
   Widget build(BuildContext context) {

@@ -1,14 +1,14 @@
 import 'dart:async';
 
 import 'package:binander/src/api/api.dart';
-import 'package:binander/src/features/bot/models/bot_phases.dart';
-import 'package:binander/src/features/bot/models/bot_status.dart';
-import 'package:binander/src/features/bot/models/interfaces/pipeline_data.dart';
-import 'package:binander/src/features/bot/models/orders_history.dart';
+import 'package:binander/src/features/bot/domain/bots/bot_phases.dart';
+import 'package:binander/src/features/bot/domain/bots/bot_status.dart';
+import 'package:binander/src/features/bot/domain/orders_history.dart';
+import 'package:binander/src/features/bot/domain/pipeline_data.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-part 'minimize_losses.pipeline_data.freezed.dart';
-part 'minimize_losses.pipeline_data.g.dart';
+part 'minimize_losses_pipeline_data.freezed.dart';
+part 'minimize_losses_pipeline_data.g.dart';
 
 @unfreezed
 class MinimizeLossesPipelineData

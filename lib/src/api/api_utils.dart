@@ -10,12 +10,12 @@ class ApiUtils {
   Map<String, String> createQueryWithSecurity(
     String apiSecret,
     Map<String, String> query,
-    API_SECURITY_TYPE securityType,
+    API_SECURITY_TYPES securityType,
   ) {
     switch (securityType) {
-      case API_SECURITY_TYPE.trade:
-      case API_SECURITY_TYPE.margin:
-      case API_SECURITY_TYPE.userData:
+      case API_SECURITY_TYPES.trade:
+      case API_SECURITY_TYPES.margin:
+      case API_SECURITY_TYPES.userData:
         _addTimestamp(query);
         _addSignature(apiSecret, query);
         break;
@@ -30,14 +30,14 @@ class ApiUtils {
   void addSecurityToHeader(
     String apiKey,
     Map<String, dynamic> headers,
-    API_SECURITY_TYPE securityType,
+    API_SECURITY_TYPES securityType,
   ) {
     switch (securityType) {
-      case API_SECURITY_TYPE.trade:
-      case API_SECURITY_TYPE.margin:
-      case API_SECURITY_TYPE.userData:
-      case API_SECURITY_TYPE.userStream:
-      case API_SECURITY_TYPE.marketData:
+      case API_SECURITY_TYPES.trade:
+      case API_SECURITY_TYPES.margin:
+      case API_SECURITY_TYPES.userData:
+      case API_SECURITY_TYPES.userStream:
+      case API_SECURITY_TYPES.marketData:
         headers.addAll(
             {'Content-Type': 'application/json', 'X-MBX-APIKEY': apiKey});
 

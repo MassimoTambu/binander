@@ -3,7 +3,7 @@ import 'package:binander/src/models/crypto_symbol.dart';
 import 'package:binander/src/models/interfaces/config.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-part 'minimize_losses.config.g.dart';
+part 'minimize_losses_config.g.dart';
 
 @JsonSerializable()
 class MinimizeLossesConfig implements Config {

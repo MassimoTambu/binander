@@ -1,4 +1,4 @@
-import 'package:binander/api/api.dart';
+import 'package:binander/src/api/api.dart';
 
 class TestWallet {
   List<AccountBalance> balances;

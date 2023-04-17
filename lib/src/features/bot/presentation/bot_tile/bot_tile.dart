@@ -1,21 +1,21 @@
-import 'package:binander/modules/bot/bots/minimize_losses/minimize_losses.config.dart';
-import 'package:binander/modules/bot/bots/minimize_losses/minimize_losses.pipeline.dart';
-import 'package:binander/modules/bot/bots/minimize_losses/minimize_losses.pipeline_data.dart';
-import 'package:binander/modules/dashboard/providers/bot_tile.provider.dart';
-import 'package:binander/modules/dashboard/widgets/bot_tile/bot_tile_buttons.dart';
-import 'package:binander/modules/dashboard/widgets/bot_tile_orders/bot_tile_orders.dart';
-import 'package:binander/modules/dashboard/widgets/total_gains_chip.dart';
-import 'package:binander/utils/extensions/double.extension.dart';
-import 'package:binander/utils/extensions/string.extension.dart';
+import 'package:binander/src/features/bot/domain/bots/minimize_losses/minimize_losses_config.dart';
+import 'package:binander/src/features/bot/domain/bots/minimize_losses/minimize_losses_pipeline.dart';
+import 'package:binander/src/features/bot/domain/bots/minimize_losses/minimize_losses_pipeline_data.dart';
+import 'package:binander/src/features/bot/presentation/bot_tile/bot_tile_buttons.dart';
+import 'package:binander/src/features/bot/presentation/bot_tile_controller.dart';
+import 'package:binander/src/features/bot/presentation/bot_tile_orders/bot_tile_orders.dart';
+import 'package:binander/src/features/bot/presentation/total_gains_chip.dart';
+import 'package:binander/src/utils/floor_to_double_with_decimals.dart';
+import 'package:binander/src/utils/string_capitalize.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class BotTile extends ConsumerWidget {
-  const BotTile({Key? key}) : super(key: key);
+  const BotTile({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final botTile = ref.watch(botTileProvider);
+    final botTile = ref.watch(botTileControllerProvider);
     final pipeline = botTile.pipeline;
     final bot = pipeline.bot;
     return ExpansionTile(
@@ -30,7 +30,7 @@ class BotTile extends ConsumerWidget {
             children: [
               Text(
                 bot.name,
-                style: Theme.of(context).textTheme.headline6,
+                style: Theme.of(context).textTheme.titleLarge,
               ),
               const SizedBox(width: 4),
               IconButton(
@@ -166,14 +166,14 @@ class BotTile extends ConsumerWidget {
 }
 
 class _BotTileRightChips extends ConsumerWidget {
-  const _BotTileRightChips({Key? key}) : super(key: key);
+  const _BotTileRightChips();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final botStatus =
-        ref.watch(botTileProvider.select((p) => p.pipeline.bot.data.status));
-    final testNet =
-        ref.watch(botTileProvider.select((p) => p.pipeline.bot.testNet));
+    final botStatus = ref.watch(
+        botTileControllerProvider.select((p) => p.pipeline.bot.data.status));
+    final testNet = ref
+        .watch(botTileControllerProvider.select((p) => p.pipeline.bot.testNet));
 
     return Wrap(
       spacing: 8,

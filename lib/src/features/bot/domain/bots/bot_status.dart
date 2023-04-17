@@ -1,4 +1,4 @@
-import 'package:binander/src/features/bot/models/bot_phases.dart';
+import 'package:binander/src/features/bot/domain/bots/bot_phases.dart';
 import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 

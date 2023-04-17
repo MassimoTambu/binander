@@ -16,14 +16,12 @@ class SettingsStorage extends _$SettingsStorage {
 
     final pubNetConnection = ApiConnection(
         url: pubNetUrl,
-        apiKey: data.requireValue[SecureStorageKeys.pubNetApiKey.name] ?? '',
-        apiSecret:
-            data.requireValue[SecureStorageKeys.pubNetApiSecret.name] ?? '');
+        apiKey: data[SecureStorageKeys.pubNetApiKey.name] ?? '',
+        apiSecret: data[SecureStorageKeys.pubNetApiSecret.name] ?? '');
     final testNetConnection = ApiConnection(
         url: testNetUrl,
-        apiKey: data.requireValue[SecureStorageKeys.testNetApiKey.name] ?? '',
-        apiSecret:
-            data.requireValue[SecureStorageKeys.testNetApiSecret.name] ?? '');
+        apiKey: data[SecureStorageKeys.testNetApiKey.name] ?? '',
+        apiSecret: data[SecureStorageKeys.testNetApiSecret.name] ?? '');
     return Settings(
       pubNetConnection: pubNetConnection,
       testNetConnection: testNetConnection,
@@ -89,10 +87,10 @@ class SettingsStorage extends _$SettingsStorage {
 
   static ThemeMode _setDefaultThemeMode(Ref ref) {
     const themeMode = SecureStorageKeys.themeMode;
-    final memory = ref.read(memoryStorageProvider);
+    final memoryData = ref.read(memoryStorageProvider);
 
     final selectedThemeMode = ThemeMode.values.firstWhere(
-        (key) => key.name == memory.requireValue[themeMode.name], orElse: () {
+        (key) => key.name == memoryData[themeMode.name], orElse: () {
       ref
           .read(memoryStorageProvider.notifier)
           .write(themeMode, defaultThemeMode.name);

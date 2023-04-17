@@ -1,6 +1,6 @@
 import 'package:binander/src/api/api.dart';
 import 'package:binander/src/features/bot/domain/bots/bot_phases.dart';
-import 'package:binander/src/features/bot/domain/bots/minimize_losses/minimize_losses.pipeline.dart';
+import 'package:binander/src/features/bot/domain/bots/minimize_losses/minimize_losses_pipeline.dart';
 import 'package:binander/src/features/bot/presentation/pipeline_provider.dart';
 import 'package:binander/src/utils/secure_storage_provider.dart';
 import 'package:clock/clock.dart';
@@ -16,14 +16,13 @@ import 'test_order_book.dart';
 import 'test_utils.dart';
 import 'test_wallet.dart';
 
-@GenerateMocks(
-    [SecureStorage, ApiProvider, SpotProvider, MarketProvider, TradeProvider])
+@GenerateMocks([SecureStorage, BinanceApi, Spot, Market, Trade])
 void main() {
-  final mockSecureStorageProvider = MockSecureStorageProvider();
-  final mockApiProvider = MockApiProvider();
-  final mockSpotProvider = MockSpotProvider();
-  final mockMarketProvider = MockMarketProvider();
-  final mockTradeProvider = MockTradeProvider();
+  final mockSecureStorageProvider = MockSecureStorage();
+  final mockBinanceApiProvider = MockBinanceApi();
+  final mockSpotProvider = MockSpot();
+  final mockMarketProvider = MockMarket();
+  final mockTradeProvider = MockTrade();
   late ProviderContainer container;
   var wallet = TestWallet([]);
   var orderBook = TestOrderBook.create(orders: [], getPriceStrategy: () => 0.0);
@@ -37,27 +36,27 @@ void main() {
     container = ProviderContainer(
       overrides: [
         secureStorageProvider.overrideWithValue(mockSecureStorageProvider),
-        apiProvider.overrideWithValue(mockApiProvider),
+        binanceApiProvider().overrideWithValue(mockBinanceApiProvider),
       ],
     );
 
     // Setup API providers
-    when(mockApiProvider.spot).thenReturn(mockSpotProvider);
+    when(mockBinanceApiProvider.spot).thenReturn(mockSpotProvider);
     when(mockSpotProvider.market).thenReturn(mockMarketProvider);
     when(mockSpotProvider.trade).thenReturn(mockTradeProvider);
 
     // Setup API calls
 
-    when(mockMarketProvider.getAveragePrice(any, any)).thenAnswer((_) async =>
+    when(mockMarketProvider.getAveragePrice(any)).thenAnswer((_) async =>
         ApiResponse(AveragePrice(1, orderBook.getPriceStrategy()), 200));
 
-    when(mockTradeProvider.getAccountInformation(any)).thenAnswer((_) async =>
+    when(mockTradeProvider.getAccountInformation()).thenAnswer((_) async =>
         ApiResponse(
             AccountInformation(0, 0, 0, 0, true, false, false, clock.now(),
                 'SPOT', wallet.balances.toList(), ['SPOT']),
             200));
 
-    when(mockTradeProvider.newLimitOrder(any, any, OrderSides.BUY, any, any))
+    when(mockTradeProvider.newLimitOrder(any, OrderSides.BUY, any, any))
         .thenAnswer(
       (i) async {
         final buyOrder = orderBook.addNewLimitOrder(
@@ -71,7 +70,7 @@ void main() {
     );
 
     when(mockTradeProvider.newStopLimitOrder(
-            any, any, OrderSides.SELL, any, any, any))
+            any, OrderSides.SELL, any, any, any))
         .thenAnswer(
       (i) async {
         final stopSellOrder = orderBook.addNewStopLimitOrder(
@@ -85,14 +84,14 @@ void main() {
       },
     );
 
-    when(mockTradeProvider.getQueryOrder(any, any, any)).thenAnswer(
+    when(mockTradeProvider.getQueryOrder(any, any)).thenAnswer(
       (i) async {
         final order = orderBook.updateOrder(wallet, i.positionalArguments[2]);
         return ApiResponse(order, 201);
       },
     );
 
-    when(mockTradeProvider.cancelOrder(any, any, any)).thenAnswer(
+    when(mockTradeProvider.cancelOrder(any, any)).thenAnswer(
       (i) async {
         final orderCancel =
             orderBook.cancelOrder(wallet, i.positionalArguments[2]);
@@ -104,7 +103,7 @@ void main() {
 
   tearDown(() async {
     reset(mockSecureStorageProvider);
-    reset(mockApiProvider);
+    reset(mockBinanceApiProvider);
     reset(mockSpotProvider);
     reset(mockMarketProvider);
     reset(mockTradeProvider);
@@ -169,10 +168,10 @@ void main() {
 
     wallet.balances = TestUtils.fillWalletWithAccountBalances();
     final bot = TestUtils.createMinimizeLossesBot(maxInvestmentPerOrder: 200);
-    container.read(pipelineProvider.notifier).addBots([bot]);
+    container.read(pipelineControllerProvider.notifier).addBots([bot]);
 
     pipeline = container
-        .read(pipelineProvider)
+        .read(pipelineControllerProvider)
         .whereType<MinimizeLossesPipeline>()
         .first;
 
@@ -220,10 +219,10 @@ void main() {
 
     wallet.balances = TestUtils.fillWalletWithAccountBalances();
     final bot = TestUtils.createMinimizeLossesBot();
-    container.read(pipelineProvider.notifier).addBots([bot]);
+    container.read(pipelineControllerProvider.notifier).addBots([bot]);
 
     pipeline = container
-        .read(pipelineProvider)
+        .read(pipelineControllerProvider)
         .whereType<MinimizeLossesPipeline>()
         .first;
 
@@ -276,10 +275,10 @@ void main() {
     wallet.balances = TestUtils.fillWalletWithAccountBalances();
     final bot = TestUtils.createMinimizeLossesBot(
         timerBuyOrder: const Duration(minutes: 1));
-    container.read(pipelineProvider.notifier).addBots([bot]);
+    container.read(pipelineControllerProvider.notifier).addBots([bot]);
 
     pipeline = container
-        .read(pipelineProvider)
+        .read(pipelineControllerProvider)
         .whereType<MinimizeLossesPipeline>()
         .first;
 
@@ -308,7 +307,7 @@ void main() {
       // There should not be any locked asset
       expect(getAllLockedAssetFromWallet(), 0);
 
-      verify(mockTradeProvider.cancelOrder(any, any, any)).called(2);
+      verify(mockTradeProvider.cancelOrder(any, any)).called(2);
     });
   });
 
@@ -330,10 +329,10 @@ void main() {
 
     wallet.balances = TestUtils.fillWalletWithAccountBalances();
     final bot = TestUtils.createMinimizeLossesBot(dailyLossSellOrders: 1);
-    container.read(pipelineProvider.notifier).addBots([bot]);
+    container.read(pipelineControllerProvider.notifier).addBots([bot]);
 
     pipeline = container
-        .read(pipelineProvider)
+        .read(pipelineControllerProvider)
         .whereType<MinimizeLossesPipeline>()
         .first;
 
@@ -360,11 +359,11 @@ void main() {
       // There should not be any locked asset
       expect(getAllLockedAssetFromWallet(), 0);
 
-      verify(mockMarketProvider.getAveragePrice(any, any));
-      verify(mockTradeProvider.newLimitOrder(any, any, any, any, any));
-      verify(mockTradeProvider.newStopLimitOrder(any, any, any, any, any, any));
-      verify(mockTradeProvider.getQueryOrder(any, any, any));
-      verify(mockTradeProvider.getAccountInformation(any));
+      verify(mockMarketProvider.getAveragePrice(any));
+      verify(mockTradeProvider.newLimitOrder(any, any, any, any));
+      verify(mockTradeProvider.newStopLimitOrder(any, any, any, any, any));
+      verify(mockTradeProvider.getQueryOrder(any, any));
+      verify(mockTradeProvider.getAccountInformation());
       verifyNoMoreInteractions(mockMarketProvider);
       verifyNoMoreInteractions(mockTradeProvider);
 
@@ -408,10 +407,10 @@ void main() {
 
     wallet.balances = TestUtils.fillWalletWithAccountBalances();
     final bot = TestUtils.createMinimizeLossesBot();
-    container.read(pipelineProvider.notifier).addBots([bot]);
+    container.read(pipelineControllerProvider.notifier).addBots([bot]);
 
     pipeline = container
-        .read(pipelineProvider)
+        .read(pipelineControllerProvider)
         .whereType<MinimizeLossesPipeline>()
         .first;
 
@@ -493,10 +492,10 @@ void main() {
 
     wallet.balances = TestUtils.fillWalletWithAccountBalances();
     final bot = TestUtils.createMinimizeLossesBot();
-    container.read(pipelineProvider.notifier).addBots([bot]);
+    container.read(pipelineControllerProvider.notifier).addBots([bot]);
 
     pipeline = container
-        .read(pipelineProvider)
+        .read(pipelineControllerProvider)
         .whereType<MinimizeLossesPipeline>()
         .first;
 
@@ -524,7 +523,7 @@ void main() {
       expect(getAllLockedAssetFromWallet(), 0);
       // 2 cancel orders: one cancelled at 7th lap and the other at 9th lap
       // Cancelled to moving the sell order higher
-      verify(mockTradeProvider.cancelOrder(any, any, any)).called(2);
+      verify(mockTradeProvider.cancelOrder(any, any)).called(2);
     });
   });
 
@@ -535,10 +534,10 @@ void main() {
 
     wallet.balances = TestUtils.fillWalletWithAccountBalances();
     final bot = TestUtils.createMinimizeLossesBot(symbol: 'BNB-NAZD');
-    container.read(pipelineProvider.notifier).addBots([bot]);
+    container.read(pipelineControllerProvider.notifier).addBots([bot]);
 
     pipeline = container
-        .read(pipelineProvider)
+        .read(pipelineControllerProvider)
         .whereType<MinimizeLossesPipeline>()
         .first;
 
@@ -556,7 +555,7 @@ void main() {
       expect(pipeline.bot.data.ordersHistory.runOrders.length, 0);
       // There should not be any locked asset
       expect(getAllLockedAssetFromWallet(), 0);
-      verify(mockTradeProvider.getAccountInformation(any)).called(1);
+      verify(mockTradeProvider.getAccountInformation()).called(1);
       verifyNoMoreInteractions(mockMarketProvider);
       verifyNoMoreInteractions(mockTradeProvider);
       expect(pipeline.bot.data.status.reason,
@@ -597,10 +596,10 @@ void main() {
 
     wallet.balances = TestUtils.fillWalletWithAccountBalances();
     final bot = TestUtils.createMinimizeLossesBot(maxInvestmentPerOrder: 200);
-    container.read(pipelineProvider.notifier).addBots([bot]);
+    container.read(pipelineControllerProvider.notifier).addBots([bot]);
 
     pipeline = container
-        .read(pipelineProvider)
+        .read(pipelineControllerProvider)
         .whereType<MinimizeLossesPipeline>()
         .first;
 
@@ -704,10 +703,10 @@ void main() {
     wallet.balances = TestUtils.fillWalletWithAccountBalances();
     final bot = TestUtils.createMinimizeLossesBot(
         dailyLossSellOrders: 1, autoRestart: true);
-    container.read(pipelineProvider.notifier).addBots([bot]);
+    container.read(pipelineControllerProvider.notifier).addBots([bot]);
 
     pipeline = container
-        .read(pipelineProvider)
+        .read(pipelineControllerProvider)
         .whereType<MinimizeLossesPipeline>()
         .first;
 

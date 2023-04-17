@@ -1,24 +1,24 @@
-import 'package:binander/api/api.dart';
-import 'package:binander/models/crypto_symbol.dart';
-import 'package:binander/modules/bot/bots/minimize_losses/minimize_losses.config.dart';
-import 'package:binander/modules/bot/models/create_minimize_losses_params.dart';
-import 'package:binander/modules/bot/providers/create_minimize_losses.provider.dart';
-import 'package:binander/modules/dashboard/providers/create_bot.provider.dart';
-import 'package:binander/providers/exchange_info.provider.dart';
-import 'package:binander/providers/pipeline.provider.dart';
+import 'package:binander/src/api/api.dart';
+import 'package:binander/src/features/bot/domain/bots/minimize_losses/minimize_losses_config.dart';
+import 'package:binander/src/features/bot/domain/create_minimize_losses_params.dart';
+import 'package:binander/src/features/bot/presentation/create_bot_provider.dart';
+import 'package:binander/src/features/bot/presentation/create_minimize_losses_provider.dart';
+import 'package:binander/src/features/bot/presentation/pipeline_provider.dart';
+import 'package:binander/src/features/settings/presentation/exchange_info_provider.dart';
+import 'package:binander/src/models/crypto_symbol.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class CreateMinimizeLosses extends ConsumerWidget {
-  const CreateMinimizeLosses({Key? key}) : super(key: key);
+  const CreateMinimizeLosses({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final configFields = ref.watch(createBotProvider).configFields;
-    final isTestNet = ref.watch(createBotProvider).isTestNet;
-    final createBotNotifier = ref.watch(createBotProvider.notifier);
+    final configFields = ref.watch(createBotControllerProvider).configFields;
+    final isTestNet = ref.watch(createBotControllerProvider).isTestNet;
+    final createBotNotifier = ref.watch(createBotControllerProvider.notifier);
     final dailyLossField =
         configFields[MinimizeLossesConfig.dailyLossSellOrdersName]!;
     final maxInvestmentField =
@@ -93,7 +93,7 @@ class CreateMinimizeLosses extends ConsumerWidget {
             (String? val) {
               if (val == null) return null;
               final botCount = ref
-                  .read(pipelineProvider)
+                  .read(pipelineControllerProvider)
                   .where((p) => p.bot.config.symbol!.symbol == val)
                   .length;
 
@@ -121,8 +121,8 @@ class CreateMinimizeLosses extends ConsumerWidget {
           padding: const EdgeInsets.only(top: 24),
           child: Text(
             percentageSellOrderField.publicName,
-            style: Theme.of(context).textTheme.caption!.copyWith(
-                fontSize: Theme.of(context).textTheme.subtitle1!.fontSize),
+            style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                fontSize: Theme.of(context).textTheme.titleMedium!.fontSize),
           ),
         ),
         Wrap(
@@ -144,7 +144,7 @@ class CreateMinimizeLosses extends ConsumerWidget {
                     percentageSellOrderField.defaultValue?.toString(),
                 decoration: InputDecoration(
                     suffixText: '%',
-                    suffixStyle: Theme.of(context).textTheme.bodyText1),
+                    suffixStyle: Theme.of(context).textTheme.bodyLarge),
                 validator: FormBuilderValidators.compose([
                   FormBuilderValidators.required(errorText: 'Required'),
                   FormBuilderValidators.numeric(errorText: 'Numbers only'),
@@ -175,14 +175,14 @@ class CreateMinimizeLosses extends ConsumerWidget {
           padding: const EdgeInsets.symmetric(vertical: 20),
           child: Text(
             percentageSellOrderField.description,
-            style: Theme.of(context).textTheme.caption!,
+            style: Theme.of(context).textTheme.bodySmall!,
           ),
         ),
         FormBuilderTextField(
           name: timerBuyOrderField.name,
           decoration: InputDecoration(
             prefixText: 'minutes: ',
-            prefixStyle: Theme.of(context).textTheme.bodyText1,
+            prefixStyle: Theme.of(context).textTheme.bodyLarge,
             label: Text(timerBuyOrderField.publicName),
             helperText: timerBuyOrderField.description,
           ),

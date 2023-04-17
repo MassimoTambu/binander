@@ -1,8 +1,8 @@
-import 'package:binander/modules/bot/models/interfaces/pipeline.interface.dart';
-import 'package:binander/modules/dashboard/models/orders_order.enum.dart';
+import 'package:binander/src/features/bot/domain/order_kinds.dart';
+import 'package:binander/src/features/bot/domain/pipeline.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-part 'bot_tile.notifier.freezed.dart';
+part 'bot_tile_notifier.freezed.dart';
 
 @freezed
 class BotTileNotifier with _$BotTileNotifier {
@@ -11,6 +11,6 @@ class BotTileNotifier with _$BotTileNotifier {
     required bool hasToStart,
     required bool isStartButtonDisabled,
     required bool isPauseButtonDisabled,
-    required OrdersOrder selectedOrder,
+    required OrderKinds selectedOrder,
   }) = _BotTileNotifier;
 }

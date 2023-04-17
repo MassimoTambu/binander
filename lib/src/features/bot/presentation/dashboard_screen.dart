@@ -1,14 +1,14 @@
-import 'package:binander/modules/dashboard/providers/bot_tile.provider.dart';
-import 'package:binander/modules/dashboard/widgets/bot_tile/bot_tile.dart';
-import 'package:binander/modules/dashboard/widgets/crypto_info_container/crypto_info_container.dart';
-import 'package:binander/providers/pipeline.provider.dart';
-import 'package:binander/router/app_router.dart';
+import 'package:binander/src/features/bot/presentation/bot_tile/bot_tile.dart';
+import 'package:binander/src/features/bot/presentation/bot_tile_controller.dart';
+import 'package:binander/src/features/bot/presentation/crypto_info_container/crypto_info_container.dart';
+import 'package:binander/src/features/bot/presentation/pipeline_provider.dart';
+import 'package:binander/src/routing/app_router.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class DashboardScreen extends ConsumerWidget {
-  const DashboardScreen({Key? key}) : super(key: key);
+  const DashboardScreen({super.key});
 
   void _navigateToAddBotPage(BuildContext context) {
     context.pushNamed(AppRoute.createBot.name);
@@ -16,7 +16,7 @@ class DashboardScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final pipelines = ref.watch(pipelineProvider);
+    final pipelines = ref.watch(pipelineControllerProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -45,8 +45,7 @@ class DashboardScreen extends ConsumerWidget {
               ((_, i) {
                 return ProviderScope(
                   overrides: [
-                    botTileProvider
-                        .overrideWithValue(BotTileProvider(pipelines[i])),
+                    currentPipelineProvider.overrideWithValue(pipelines[i]),
                   ],
                   child: const BotTile(),
                 );
