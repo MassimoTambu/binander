@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:binander/src/features/bot/domain/bots/bot.dart';
-import 'package:binander/src/utils/snackbar_provider.dart';
+import 'package:binander/src/utils/snackbar_utils.dart';
 import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -90,9 +90,7 @@ class FileStorage extends _$FileStorage {
       await raf.lock(FileLock.blockingExclusive);
       await raf.writeString(encoder.convert(state.requireValue));
     } catch (e) {
-      ref
-          .read(snackBarProvider)
-          .show('Error while saving file: $e', seconds: 5);
+      showSnackBarAction('Error while saving file: $e', seconds: 5);
     } finally {
       raf.closeSync();
     }

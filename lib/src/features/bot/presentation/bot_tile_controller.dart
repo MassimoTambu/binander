@@ -8,7 +8,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'bot_tile_controller.g.dart';
 
 @riverpod
-Pipeline currentPipeline() => throw UnimplementedError();
+Pipeline currentPipeline(CurrentPipelineRef ref) => throw UnimplementedError();
 
 @riverpod
 class BotTileController extends _$BotTileController {
