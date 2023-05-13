@@ -8,11 +8,11 @@ class BinanceStatusIndicator<T> extends ConsumerWidget {
   final bool Function(ApiResponse<T>) validate;
 
   const BinanceStatusIndicator({
-    Key? key,
+    super.key,
     required this.title,
     required this.futureProvider,
     required this.validate,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

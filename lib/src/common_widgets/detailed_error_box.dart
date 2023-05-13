@@ -4,8 +4,7 @@ class DetailedErrorBox extends StatelessWidget {
   final Object error;
   final StackTrace? stackTrace;
 
-  const DetailedErrorBox(this.error, this.stackTrace, {Key? key})
-      : super(key: key);
+  const DetailedErrorBox(this.error, this.stackTrace, {super.key});
 
   @override
   Widget build(BuildContext context) {
