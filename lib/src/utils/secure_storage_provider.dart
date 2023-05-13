@@ -29,7 +29,7 @@ class SecureStorage {
 }
 
 @Riverpod(keepAlive: true)
-SecureStorage secureStorage() => SecureStorage();
+SecureStorage secureStorage(SecureStorageRef ref) => SecureStorage();
 
 @Riverpod(keepAlive: true)
 Future<Map<String, String>> secureStorageReadAllFuture(

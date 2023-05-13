@@ -2,7 +2,7 @@ import 'package:binander/src/features/bot/domain/bots/bot_types.dart';
 import 'package:binander/src/features/bot/domain/bots/minimize_losses/minimize_losses_config.dart';
 import 'package:binander/src/features/bot/presentation/pipeline_provider.dart';
 import 'package:binander/src/models/config_field.dart';
-import 'package:binander/src/utils/snackbar_provider.dart';
+import 'package:binander/src/utils/snackbar_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -28,7 +28,7 @@ class CreateBotController extends _$CreateBotController {
         .read(pipelineControllerProvider.notifier)
         .createBotFromForm(formKey.currentState!.fields);
 
-    ref.read(snackBarProvider).show('Bot ${bot.name} created!');
+    showSnackBarAction('Bot ${bot.name} created!');
   }
 
   void update({

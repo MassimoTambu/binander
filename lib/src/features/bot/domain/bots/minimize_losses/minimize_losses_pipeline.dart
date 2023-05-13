@@ -12,7 +12,7 @@ import 'package:binander/src/features/bot/presentation/pipeline_provider.dart';
 import 'package:binander/src/features/settings/presentation/settings_provider.dart';
 import 'package:binander/src/utils/date_only_compare.dart';
 import 'package:binander/src/utils/floor_to_double_with_decimals.dart';
-import 'package:binander/src/utils/snackbar_provider.dart';
+import 'package:binander/src/utils/snackbar_utils.dart';
 
 import 'package:clock/clock.dart';
 import 'package:flutter/foundation.dart';
@@ -278,7 +278,7 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
   void _showSnackBar(String message, {int seconds = 3}) {
     // Add bot name to message
     message = '${bot.name} - $message';
-    ref.read(snackBarProvider).show(message, seconds: seconds);
+    showSnackBarAction(message, seconds: seconds);
   }
 
   BinanceApi _getBinanceApi() {
