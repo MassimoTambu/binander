@@ -6,7 +6,7 @@ final currentAccountBalance =
     Provider<AccountBalance>((ref) => throw UnimplementedError());
 
 class CryptoInfoTile extends ConsumerWidget {
-  const CryptoInfoTile({Key? key}) : super(key: key);
+  const CryptoInfoTile({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
