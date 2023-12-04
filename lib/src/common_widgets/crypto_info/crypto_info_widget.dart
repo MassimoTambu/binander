@@ -1,5 +1,5 @@
+import 'package:binander/src/common_widgets/async_value_widget.dart';
 import 'package:binander/src/common_widgets/crypto_info/crypto_info_tile_widget.dart';
-import 'package:binander/src/common_widgets/detailed_error_box_widget.dart';
 import 'package:binander/src/features/settings/domain/api_connection.dart';
 import 'package:binander/src/features/settings/presentation/binance_account_information_provider.dart';
 import 'package:binander/src/features/settings/presentation/settings_storage_provider.dart';
@@ -27,8 +27,10 @@ class CryptoInfoWidget extends ConsumerWidget {
           ref.watch(settingsStorageProvider.select((p) => p.pubNetConnection));
     }
 
-    final res = ref.watch(binanceAccountInformationProvider(apiConn));
-    return res.when(
+    final accountInformation =
+        ref.watch(binanceAccountInformationProvider(apiConn));
+    return AsyncValueWidget(
+      value: accountInformation,
       data: (data) {
         return ListView.builder(
           scrollDirection: Axis.vertical,
@@ -42,14 +44,6 @@ class CryptoInfoWidget extends ConsumerWidget {
               child: const CryptoInfoTileWidget(),
             );
           }),
-        );
-      },
-      error: (error, stackTrace) {
-        return DetailedErrorBoxWidget(error, stackTrace);
-      },
-      loading: () {
-        return const Center(
-          child: CircularProgressIndicator(),
         );
       },
     );
