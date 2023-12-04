@@ -1,4 +1,4 @@
-// TODO IS IT REALLY USEFUL???
+// This class is only useful for static parsing functions for fromJson and toJson methods
 class ParseUtils {
   static int stringToInt(String number) {
     return int.parse(number);

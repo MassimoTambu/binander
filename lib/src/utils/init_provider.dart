@@ -11,7 +11,7 @@ part 'init_provider.g.dart';
 @riverpod
 Future<void> init(InitRef ref) async {
   debugPrint('init initProvider');
-  final (fileStorage, secureStorageData) = await (
+  final (_, secureStorageData) = await (
     ref.watch(fileStorageProvider.future),
     ref.watch(secureStorageReadAllFutureProvider.future)
   ).wait;

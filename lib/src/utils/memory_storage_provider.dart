@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:binander/src/models/secure_storage_key.dart';
 import 'package:binander/src/utils/secure_storage_provider.dart';
 import 'package:flutter/foundation.dart';
