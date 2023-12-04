@@ -16,15 +16,13 @@ class BinanceStatusIndicator<T> extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final res = ref.watch(futureProvider);
-
     return InkWell(
       onTap: () => ref.refresh(futureProvider),
       child: Column(
         children: [
           Text(title),
           const SizedBox(height: 5),
-          res.when(
+          ref.watch(futureProvider).when(
             data: (data) {
               if (validate(data)) {
                 return const Icon(Icons.check_circle, color: Colors.green);

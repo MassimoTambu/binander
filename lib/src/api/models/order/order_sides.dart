@@ -2,4 +2,7 @@
 
 part of '../../api.dart';
 
-enum OrderSides { BUY, SELL }
+enum OrderSides {
+  BUY,
+  SELL,
+}

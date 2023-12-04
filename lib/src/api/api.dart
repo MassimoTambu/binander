@@ -23,7 +23,6 @@ part 'api_utils.dart';
 part 'dio_provider.dart';
 part 'models/account/account_balance.dart';
 part 'models/account/account_information.dart';
-part 'models/account_and_symbol_permission.dart';
 part 'models/api_key_permission.dart';
 part 'models/average_price.dart';
 part 'models/exchange_filter.dart';

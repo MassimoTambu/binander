@@ -1,4 +1,4 @@
-import 'package:binander/src/common_widgets/error_message_widget.dart';
+import 'package:binander/src/common_widgets/detailed_error_box_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -24,7 +24,7 @@ class AsyncValueWidget<T> extends StatelessWidget {
   Widget build(BuildContext context) {
     return value.when(
       data: data,
-      error: (e, st) => Center(child: ErrorMessageWidget(e.toString())),
+      error: (e, st) => Center(child: DetailedErrorBoxWidget(e.toString(), st)),
       loading: () => loader,
     );
   }
@@ -54,7 +54,8 @@ class AsyncValueSliverWidget<T> extends StatelessWidget {
       data: data,
       loading: () => loader,
       error: (e, st) => SliverToBoxAdapter(
-        child: Center(child: ErrorMessageWidget(e.toString())),
+        child: Center(
+            child: Center(child: DetailedErrorBoxWidget(e.toString(), st))),
       ),
     );
   }

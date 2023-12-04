@@ -1,3 +1,4 @@
+import 'package:binander/src/common_widgets/async_value_widget.dart';
 import 'package:binander/src/constants/globals.dart';
 import 'package:binander/src/constants/theme_dark.dart';
 import 'package:binander/src/constants/theme_light.dart';
@@ -17,43 +18,42 @@ class Binander extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return ref.watch(initProvider).when(
-          loading: () => Container(),
-          error: (error, stackTrace) => Container(),
-          data: (data) {
-            ref.listen<List<Pipeline>>(pipelineControllerProvider,
-                (prevPipelines, newPipelines) {
-              final oldBots = prevPipelines?.map((e) => e.bot).toList() ?? [];
-              final newBots = newPipelines.map((e) => e.bot).toList();
+    return AsyncValueWidget(
+      value: ref.watch(initProvider),
+      data: (data) {
+        ref.listen<List<Pipeline>>(pipelineControllerProvider,
+            (prevPipelines, newPipelines) {
+          final oldBots = prevPipelines?.map((e) => e.bot).toList() ?? [];
+          final newBots = newPipelines.map((e) => e.bot).toList();
 
-              // Upsert bots
-              ref
-                  .watch(fileStorageProvider.notifier)
-                  .upsertBots(newPipelines.map((e) => e.bot).toList());
+          // Upsert bots
+          ref
+              .watch(fileStorageProvider.notifier)
+              .upsertBots(newPipelines.map((e) => e.bot).toList());
 
-              // Find bots to remove
-              final botsToRemove = oldBots
-                  .where((b1) => newBots.every((b2) => b2.uuid != b1.uuid));
+          // Find bots to remove
+          final botsToRemove =
+              oldBots.where((b1) => newBots.every((b2) => b2.uuid != b1.uuid));
 
-              if (botsToRemove.isNotEmpty) {
-                // Remove bots from file
-                ref
-                    .read(fileStorageProvider.notifier)
-                    .removeBots(botsToRemove.toList());
-              }
-            });
-            return MaterialApp.router(
-              scaffoldMessengerKey: snackbarKey,
-              routerConfig: goRouter,
-              debugShowCheckedModeBanner: false,
-              restorationScopeId: 'app',
-              onGenerateTitle: (BuildContext context) => 'Binander'.hardcoded,
-              localizationsDelegates: const [FormBuilderLocalizations.delegate],
-              theme: themeLight,
-              darkTheme: themeDark,
-              themeMode: ref.watch(settingsStorageProvider).themeMode,
-            );
-          },
+          if (botsToRemove.isNotEmpty) {
+            // Remove bots from file
+            ref
+                .read(fileStorageProvider.notifier)
+                .removeBots(botsToRemove.toList());
+          }
+        });
+        return MaterialApp.router(
+          scaffoldMessengerKey: snackbarKey,
+          routerConfig: goRouter,
+          debugShowCheckedModeBanner: false,
+          restorationScopeId: 'app',
+          onGenerateTitle: (BuildContext context) => 'Binander'.hardcoded,
+          localizationsDelegates: const [FormBuilderLocalizations.delegate],
+          theme: themeLight,
+          darkTheme: themeDark,
+          themeMode: ref.watch(settingsStorageProvider).themeMode,
         );
+      },
+    );
   }
 }
