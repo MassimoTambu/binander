@@ -1,7 +1,6 @@
-
 // ignore_for_file: constant_identifier_names
 
-part of api;
+part of '../api.dart';
 
 // Time in force (timeInForce):
 

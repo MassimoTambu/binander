@@ -1,4 +1,4 @@
-part of api;
+part of '../../api.dart';
 
 @freezed
 class AccountBalance with _$AccountBalance {

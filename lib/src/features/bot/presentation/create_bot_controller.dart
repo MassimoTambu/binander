@@ -1,13 +1,13 @@
 import 'package:binander/src/features/bot/domain/bots/bot_types.dart';
 import 'package:binander/src/features/bot/domain/bots/minimize_losses/minimize_losses_config.dart';
-import 'package:binander/src/features/bot/presentation/pipeline_provider.dart';
+import 'package:binander/src/features/bot/presentation/pipeline_controller.dart';
 import 'package:binander/src/models/config_field.dart';
 import 'package:binander/src/utils/snackbar_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-part 'create_bot_provider.g.dart';
+part 'create_bot_controller.g.dart';
 
 @riverpod
 class CreateBotController extends _$CreateBotController {

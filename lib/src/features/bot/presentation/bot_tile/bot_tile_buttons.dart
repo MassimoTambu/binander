@@ -1,7 +1,7 @@
-import 'package:auto_route/auto_route.dart';
 import 'package:binander/src/features/bot/presentation/bot_tile_controller.dart';
-import 'package:binander/src/features/bot/presentation/pipeline_provider.dart';
+import 'package:binander/src/features/bot/presentation/pipeline_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class BotTileButtons extends ConsumerWidget {
@@ -9,7 +9,7 @@ class BotTileButtons extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final botTile = ref.watch(botTileControllerProvider);
+    final botTile = ref.watch(currentBotTileControllerProvider);
     final isStartDisabled = botTile.isStartButtonDisabled;
     final isPauseDisabled = botTile.isPauseButtonDisabled;
     final isStarted = !botTile.hasToStart;
@@ -77,10 +77,10 @@ class BotTileButtons extends ConsumerWidget {
                     }),
                     actions: [
                       TextButton(
-                          onPressed: () => context.router.pop(false),
+                          onPressed: () => context.pop(false),
                           child: const Text('No')),
                       TextButton(
-                          onPressed: () => context.router.pop(true),
+                          onPressed: () => context.pop(true),
                           child: const Text('Yes')),
                     ],
                   );

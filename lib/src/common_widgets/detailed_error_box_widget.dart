@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-class DetailedErrorBox extends StatelessWidget {
+class DetailedErrorBoxWidget extends StatelessWidget {
   final Object error;
   final StackTrace? stackTrace;
 
-  const DetailedErrorBox(this.error, this.stackTrace, {super.key});
+  const DetailedErrorBoxWidget(this.error, this.stackTrace, {super.key});
 
   @override
   Widget build(BuildContext context) {

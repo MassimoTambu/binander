@@ -1,8 +1,8 @@
 import 'package:binander/src/api/api.dart';
-import 'package:binander/src/common_widgets/binance_status.dart';
+import 'package:binander/src/common_widgets/binance_status_indicator.dart';
 import 'package:binander/src/features/settings/presentation/binance_pub_net_status_provider.dart';
 import 'package:binander/src/features/settings/presentation/binance_test_net_status_provider.dart';
-import 'package:binander/src/features/settings/presentation/settings_provider.dart';
+import 'package:binander/src/features/settings/presentation/settings_storage_provider.dart';
 import 'package:binander/src/routing/app_router.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -58,8 +58,8 @@ class SettingsScreen extends ConsumerWidget {
             onTap: () => _navigateToApiSettingsPage(context),
           ),
           SwitchListTile(
-            value: ref.watch(settingsStorageProvider).requireValue.themeMode ==
-                ThemeMode.dark,
+            value:
+                ref.watch(settingsStorageProvider).themeMode == ThemeMode.dark,
             title: const Text('Dark theme'),
             subtitle: const Text('Enable dark theme'),
             onChanged: (value) {

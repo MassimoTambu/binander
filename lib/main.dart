@@ -34,5 +34,6 @@ void main() async {
   }, (Object error, StackTrace stack) {
     // * Log any errors to console
     debugPrint(error.toString());
+    debugPrint(stack.toString());
   });
 }

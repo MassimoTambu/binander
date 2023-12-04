@@ -1,32 +1,11 @@
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+
 import 'package:binander/src/features/bot/domain/bot_tile_notifier.dart';
-import 'package:binander/src/features/bot/domain/bots/bot_phases.dart';
 import 'package:binander/src/features/bot/domain/order_kinds.dart';
-import 'package:binander/src/features/bot/domain/pipeline.dart';
 import 'package:binander/src/features/bot/domain/run_orders.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-part 'bot_tile_controller.g.dart';
-
-@riverpod
-Pipeline currentPipeline(CurrentPipelineRef ref) => throw UnimplementedError();
-
-@riverpod
-class BotTileController extends _$BotTileController {
-  @override
-  BotTileNotifier build() {
-    final pipeline = ref.watch(currentPipelineProvider);
-    return BotTileNotifier(
-      pipeline: pipeline,
-      hasToStart: pipeline.bot.data.status.phase == BotPhases.offline ||
-          pipeline.bot.data.status.phase == BotPhases.error,
-      isStartButtonDisabled:
-          pipeline.bot.data.status.phase == BotPhases.stopping,
-      isPauseButtonDisabled:
-          pipeline.bot.data.status.phase == BotPhases.stopping ||
-              pipeline.bot.data.status.phase == BotPhases.offline,
-      selectedOrder: OrderKinds.dateNewest,
-    );
-  }
+class BotTileController extends StateNotifier<BotTileNotifier> {
+  BotTileController(super.botTileNotifier);
 
   void orderBy(OrderKinds orderFactor) {
     final runOrders = state.pipeline.bot.data.ordersHistory.runOrders;
@@ -62,3 +41,7 @@ class BotTileController extends _$BotTileController {
     return aTime.compareTo(bTime);
   }
 }
+
+final currentBotTileControllerProvider =
+    StateNotifierProvider.autoDispose<BotTileController, BotTileNotifier>(
+        (ref) => throw UnimplementedError());

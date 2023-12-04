@@ -1,4 +1,4 @@
-part of api;
+part of 'api.dart';
 
 @riverpod
 BinanceApi binanceApi(BinanceApiRef ref, ApiConnection apiConnection) {

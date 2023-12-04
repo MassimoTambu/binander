@@ -1,4 +1,4 @@
-part of api;
+part of '../../api.dart';
 
 @riverpod
 Trade _trade(_TradeRef ref, ApiConnection apiConnection) {
@@ -32,7 +32,7 @@ class Trade {
 
       return ApiResponse(
           AccountInformation.fromJson(response.data!), response.statusCode!);
-    } on DioError catch (e) {
+    } catch (e) {
       return Future.error(_ref
           .read(_apiUtilsProvider)
           .buildApiException('getAccountInformation', e));
@@ -60,7 +60,7 @@ class Trade {
 
       return ApiResponse(response.data!.map((o) => Order.fromJson(o)).toList(),
           response.statusCode!);
-    } on DioError catch (e) {
+    } catch (e) {
       return Future.error(
           _ref.read(_apiUtilsProvider).buildApiException('getAllorders', e));
     }
@@ -89,7 +89,7 @@ class Trade {
 
       return ApiResponse(
           OrderData.fromJson(response.data!), response.statusCode!);
-    } on DioError catch (e) {
+    } catch (e) {
       return Future.error(
           _ref.read(_apiUtilsProvider).buildApiException('_newOrder', e));
     }
@@ -122,7 +122,7 @@ class Trade {
 
       return ApiResponse(
           OrderCancel.fromJson(response.data!), response.statusCode!);
-    } on DioError catch (e) {
+    } catch (e) {
       return Future.error(
           _ref.read(_apiUtilsProvider).buildApiException('_newOrder', e));
     }
@@ -163,7 +163,7 @@ class Trade {
 
       return ApiResponse(
           OrderNewLimit.fromJson(response.data!), response.statusCode!);
-    } on DioError catch (e) {
+    } catch (e) {
       return Future.error(
           _ref.read(_apiUtilsProvider).buildApiException('_newOrder', e));
     }
@@ -206,7 +206,7 @@ class Trade {
 
       return ApiResponse(
           OrderNewStopLimit.fromJson(response.data!), response.statusCode!);
-    } on DioError catch (e) {
+    } catch (e) {
       return Future.error(
           _ref.read(_apiUtilsProvider).buildApiException('_newOrder', e));
     }

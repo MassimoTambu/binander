@@ -1,6 +1,6 @@
 // ignore_for_file: constant_identifier_names
 
-part of api;
+part of '../../api.dart';
 
 /// RESPONSE	This is used when the ListStatus is responding to a failed action. (E.g. Orderlist placement or cancellation)
 ///

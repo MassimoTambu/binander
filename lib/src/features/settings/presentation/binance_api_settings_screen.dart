@@ -1,10 +1,10 @@
 import 'package:binander/src/features/settings/domain/settings_config.dart';
-import 'package:binander/src/features/settings/presentation/settings_provider.dart';
+import 'package:binander/src/features/settings/presentation/settings_storage_provider.dart';
 import 'package:binander/src/models/config_field.dart';
 import 'package:binander/src/utils/media_query_utils.dart';
 import 'package:flutter/material.dart';
-import 'package:auto_route/auto_route.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class BinanceApiSettingsScreen extends ConsumerWidget {
@@ -22,7 +22,7 @@ class BinanceApiSettingsScreen extends ConsumerWidget {
             testNetApiSecret:
                 fields[SettingsConfig.testNetApiSecretName]!.value,
           );
-      context.router.back();
+      context.pop();
     }
   }
 
@@ -69,8 +69,8 @@ class ConfigContainer extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final settings = ref.watch(settingsStorageProvider);
     final settingsConfig = SettingsConfig.create(
-      pubNetConnection: settings.requireValue.pubNetConnection,
-      testNetConnection: settings.requireValue.testNetConnection,
+      pubNetConnection: settings.pubNetConnection,
+      testNetConnection: settings.testNetConnection,
     );
 
     final pubNetConfigs = settingsConfig.configFields.entries

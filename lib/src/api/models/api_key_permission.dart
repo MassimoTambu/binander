@@ -1,11 +1,12 @@
-part of api;
+part of '../api.dart';
 
 @freezed
 class ApiKeyPermission with _$ApiKeyPermission {
   const factory ApiKeyPermission(
     bool ipRestrict,
-    @JsonKey(fromJson: ParseUtils.unixToDateTime, toJson: ParseUtils.dateTimeToUnix)
-        DateTime createTime,
+    @JsonKey(
+        fromJson: ParseUtils.unixToDateTime, toJson: ParseUtils.dateTimeToUnix)
+    DateTime createTime,
 
     /// This option allows you to withdraw via API. You must apply the IP Access Restriction filter in order to enable withdrawals
     bool enableWithdrawals,
@@ -30,8 +31,11 @@ class ApiKeyPermission with _$ApiKeyPermission {
     bool enableSpotAndMarginTrading,
 
     /// Expiration time for spot and margin trading permission
-    @JsonKey(required: false, fromJson: ParseUtils.nullUnixToDateTime, toJson: ParseUtils.nullDateTimeToUnix)
-        DateTime? tradingAuthorityExpirationTime,
+    @JsonKey(
+        required: false,
+        fromJson: ParseUtils.nullUnixToDateTime,
+        toJson: ParseUtils.nullDateTimeToUnix)
+    DateTime? tradingAuthorityExpirationTime,
   ) = _ApiKeyPermission;
 
   factory ApiKeyPermission.fromJson(Map<String, dynamic> json) =>

@@ -1,5 +1,4 @@
-
-part of api;
+part of 'api.dart';
 
 @freezed
 class ApiException with _$ApiException implements Exception {

@@ -43,13 +43,13 @@ final goRouter = GoRouter(
       },
       routes: [
         GoRoute(
-          path: '/create-bot',
+          path: 'create-bot',
           name: AppRoute.createBot.name,
           builder: (context, state) => const CreateBotScreen(),
         ),
         GoRoute(
-          path: '/order-details',
-          name: AppRoute.createBot.name,
+          path: 'order-details',
+          name: AppRoute.orderDetails.name,
           builder: (context, state) {
             //TODO CHANGE
             final orderData = state.extra as OrderData;
@@ -57,7 +57,7 @@ final goRouter = GoRouter(
           },
         ),
         GoRoute(
-          path: '/run-order-history',
+          path: 'run-order-history',
           name: AppRoute.runOrderHistory.name,
           builder: (context, state) {
             //TODO CHANGE
@@ -73,7 +73,7 @@ final goRouter = GoRouter(
       builder: (context, state) => const SettingsScreen(),
       routes: [
         GoRoute(
-          path: '/binance-api-settings',
+          path: 'binance-api-settings',
           name: AppRoute.binanceApiSettings.name,
           builder: (context, state) => BinanceApiSettingsScreen(),
         ),

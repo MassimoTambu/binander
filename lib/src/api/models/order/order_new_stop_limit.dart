@@ -1,4 +1,4 @@
-part of api;
+part of '../../api.dart';
 
 @freezed
 class OrderNewStopLimit with _$OrderNewStopLimit {
@@ -7,8 +7,9 @@ class OrderNewStopLimit with _$OrderNewStopLimit {
     int orderId,
     int orderListId,
     String clientOrderId,
-    @JsonKey(fromJson: ParseUtils.unixToDateTime, toJson: ParseUtils.dateTimeToUnix)
-        DateTime transactTime,
+    @JsonKey(
+        fromJson: ParseUtils.unixToDateTime, toJson: ParseUtils.dateTimeToUnix)
+    DateTime transactTime,
   ) = _OrderNewStopLimit;
 
   factory OrderNewStopLimit.fromJson(Map<String, dynamic> json) =>

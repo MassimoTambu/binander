@@ -4,7 +4,7 @@ import 'package:binander/src/features/bot/domain/create_minimize_losses.dart';
 import 'package:binander/src/features/bot/domain/create_minimize_losses_params.dart';
 import 'package:binander/src/features/settings/domain/api_connection.dart';
 import 'package:binander/src/features/settings/presentation/exchange_info_provider.dart';
-import 'package:binander/src/features/settings/presentation/settings_provider.dart';
+import 'package:binander/src/features/settings/presentation/settings_storage_provider.dart';
 import 'package:binander/src/models/crypto_symbol.dart';
 import 'package:binander/src/utils/floor_to_double_with_decimals.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -15,8 +15,8 @@ part 'create_minimize_losses_provider.g.dart';
 Future<CreateMinimizeLosses> createMinimizeLosses(
     CreateMinimizeLossesRef ref, CreateMinimizeLossesParams params) async {
   final ApiConnection apiConn = params.isTestNet
-      ? ref.read(settingsStorageProvider).requireValue.testNetConnection
-      : ref.read(settingsStorageProvider).requireValue.pubNetConnection;
+      ? ref.read(settingsStorageProvider).testNetConnection
+      : ref.read(settingsStorageProvider).pubNetConnection;
   final percentageSellOrder = double.tryParse(params.percentageSellOrder ?? '');
   final symbol = params.symbol;
 

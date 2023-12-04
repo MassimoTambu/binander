@@ -1,6 +1,6 @@
 // ignore_for_file: constant_identifier_names
 
-part of api;
+part of '../../api.dart';
 
 // NEW	The order has been accepted by the engine.
 // PARTIALLY_FILLED	A part of the order has been filled.

@@ -21,9 +21,7 @@ class FileStorage extends _$FileStorage {
       defaultFileName = '$defaultApplicationPath/data.json';
     }
 
-    await readData();
-
-    return state.requireValue;
+    return await _readData();
   }
 
   static const encoder = JsonEncoder.withIndent('  ');
@@ -31,24 +29,28 @@ class FileStorage extends _$FileStorage {
   static String defaultApplicationPath = Directory.current.absolute.path;
   static String defaultFileName = '$defaultApplicationPath/data.json';
 
+  /// Reads data and updates state
   Future<void> readData() async {
-    final file = File.fromUri(Uri.file(defaultFileName));
-
-    if (await file.exists()) {
-      final dataFromFile = await file.readAsString();
-      state = jsonDecode(dataFromFile);
-    } else {
-      _loadSchema();
-      _saveFile();
-    }
+    state = const AsyncLoading();
+    state = AsyncData(await _readData());
   }
 
-  void _loadSchema() {
-    state = const AsyncData({'bots': <Map<String, dynamic>>[]});
+  Future<Map<String, dynamic>> _readData() async {
+    final file = File.fromUri(Uri.file(defaultFileName));
+    late final Map<String, dynamic> data;
+
+    if (await file.exists()) {
+      data = jsonDecode(await file.readAsString());
+    } else {
+      data = const {'bots': <Map<String, dynamic>>[]};
+      _saveFile();
+    }
+
+    return data;
   }
 
   Future<void> upsertBots(List<Bot> bots) async {
-    for (var bot in bots) {
+    for (final bot in bots) {
       _upsertBot(bot);
     }
 

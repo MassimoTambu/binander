@@ -1,4 +1,4 @@
-part of api;
+part of '../api.dart';
 
 @riverpod
 Spot _spot(_SpotRef ref, ApiConnection apiConnection) => Spot(

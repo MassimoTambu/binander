@@ -1,4 +1,4 @@
-part of api;
+part of '../../api.dart';
 
 @riverpod
 Wallet _wallet(_WalletRef ref, ApiConnection apiConnection) =>
@@ -21,7 +21,7 @@ class Wallet {
         SystemStatus.fromJson(response.data!),
         response.statusCode!,
       );
-    } on DioError catch (e) {
+    } catch (e) {
       return Future.error(
           _ref.read(_apiUtilsProvider).buildApiException('getSystemStatus', e));
     }
@@ -49,7 +49,7 @@ class Wallet {
         ApiKeyPermission.fromJson(response.data!),
         response.statusCode!,
       );
-    } on DioError catch (e) {
+    } catch (e) {
       return Future.error(
           _ref.read(_apiUtilsProvider).buildApiException('getSystemStatus', e));
     }
