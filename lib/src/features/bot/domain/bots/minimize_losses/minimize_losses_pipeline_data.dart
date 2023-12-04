@@ -21,13 +21,17 @@ class MinimizeLossesPipelineData
     @override required final int orderPrecision,
     @override required final int quantityPrecision,
     @override @Default(0) int counter,
-    @override @JsonKey(ignore: true) Timer? timer,
-    @override @JsonKey(ignore: true) AveragePrice? lastAveragePrice,
+    @override
+    @JsonKey(includeFromJson: false, includeToJson: false)
+    Timer? timer,
+    @override
+    @JsonKey(includeFromJson: false, includeToJson: false)
+    AveragePrice? lastAveragePrice,
     DateTime? buyOrderStartedAt,
     @override
-    @JsonKey(ignore: true)
+    @JsonKey(includeFromJson: false, includeToJson: false)
     @Default(BotStatus(BotPhases.offline, 'offline'))
-        BotStatus status,
+    BotStatus status,
   }) = _MinimizeLossesPipeLineData;
 
   factory MinimizeLossesPipelineData.fromJson(Map<String, dynamic> json) =>

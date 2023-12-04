@@ -5,8 +5,8 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 final currentAccountBalance =
     Provider<AccountBalance>((ref) => throw UnimplementedError());
 
-class CryptoInfoTile extends ConsumerWidget {
-  const CryptoInfoTile({super.key});
+class CryptoInfoTileWidget extends ConsumerWidget {
+  const CryptoInfoTileWidget({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

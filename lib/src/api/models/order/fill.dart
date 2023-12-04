@@ -1,14 +1,17 @@
-part of api;
+part of '../../api.dart';
 
 @freezed
 class Fill with _$Fill {
   const factory Fill(
-    @JsonKey(fromJson: ParseUtils.stringToDouble, toJson: ParseUtils.doubleToString)
-        double price,
-    @JsonKey(fromJson: ParseUtils.stringToDouble, toJson: ParseUtils.doubleToString)
-        double qty,
-    @JsonKey(fromJson: ParseUtils.stringToDouble, toJson: ParseUtils.doubleToString)
-        double commission,
+    @JsonKey(
+        fromJson: ParseUtils.stringToDouble, toJson: ParseUtils.doubleToString)
+    double price,
+    @JsonKey(
+        fromJson: ParseUtils.stringToDouble, toJson: ParseUtils.doubleToString)
+    double qty,
+    @JsonKey(
+        fromJson: ParseUtils.stringToDouble, toJson: ParseUtils.doubleToString)
+    double commission,
     String commissionAsset,
     int tradeId,
   ) = _Fill;

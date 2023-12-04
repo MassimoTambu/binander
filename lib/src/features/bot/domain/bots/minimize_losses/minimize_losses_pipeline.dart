@@ -8,8 +8,8 @@ import 'package:binander/src/features/bot/domain/bots/bot_status.dart';
 import 'package:binander/src/features/bot/domain/bots/minimize_losses/minimize_losses_pipeline_data.dart';
 import 'package:binander/src/features/bot/domain/pipeline.dart';
 import 'package:binander/src/features/bot/domain/roi.dart';
-import 'package:binander/src/features/bot/presentation/pipeline_provider.dart';
-import 'package:binander/src/features/settings/presentation/settings_provider.dart';
+import 'package:binander/src/features/bot/presentation/pipeline_controller.dart';
+import 'package:binander/src/features/settings/presentation/settings_storage_provider.dart';
 import 'package:binander/src/utils/date_only_compare.dart';
 import 'package:binander/src/utils/floor_to_double_with_decimals.dart';
 import 'package:binander/src/utils/snackbar_utils.dart';
@@ -283,8 +283,8 @@ class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
 
   BinanceApi _getBinanceApi() {
     final apiConn = bot.testNet
-        ? ref.read(settingsStorageProvider).requireValue.testNetConnection
-        : ref.read(settingsStorageProvider).requireValue.pubNetConnection;
+        ? ref.read(settingsStorageProvider).testNetConnection
+        : ref.read(settingsStorageProvider).pubNetConnection;
     return ref.read(binanceApiProvider(apiConn));
   }
 

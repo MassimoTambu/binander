@@ -1,28 +1,29 @@
 import 'package:binander/src/api/api.dart';
 import 'package:binander/src/features/bot/domain/bots/bot_phases.dart';
 import 'package:binander/src/features/bot/domain/bots/minimize_losses/minimize_losses_pipeline.dart';
-import 'package:binander/src/features/bot/presentation/pipeline_provider.dart';
+import 'package:binander/src/features/bot/presentation/pipeline_controller.dart';
+import 'package:binander/src/features/settings/domain/api_connection.dart';
 import 'package:binander/src/utils/secure_storage_provider.dart';
 import 'package:clock/clock.dart';
 import 'package:fake_async/fake_async.dart';
 import 'package:flutter/widgets.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:mockito/annotations.dart';
-import 'package:mockito/mockito.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 
-import 'minimize_losses_bot_test.mocks.dart';
+import 'mocks.dart';
 import 'test_order_book.dart';
 import 'test_utils.dart';
 import 'test_wallet.dart';
 
-@GenerateMocks([SecureStorage, BinanceApi, Spot, Market, Trade])
 void main() {
   final mockSecureStorageProvider = MockSecureStorage();
   final mockBinanceApiProvider = MockBinanceApi();
   final mockSpotProvider = MockSpot();
   final mockMarketProvider = MockMarket();
   final mockTradeProvider = MockTrade();
+  const fakeApiConnection =
+      ApiConnection(url: 'fake_url', apiSecret: 'secret', apiKey: 'key');
   late ProviderContainer container;
   var wallet = TestWallet([]);
   var orderBook = TestOrderBook.create(orders: [], getPriceStrategy: () => 0.0);
@@ -30,34 +31,39 @@ void main() {
 
   const double startPrice = 100.0;
 
+  setUpAll(() {
+    registerFallbackValue(FakeCryptoSimbol());
+  });
+
   setUp(() async {
     // For initialize SecureStorage package
     WidgetsFlutterBinding.ensureInitialized();
     container = ProviderContainer(
       overrides: [
         secureStorageProvider.overrideWithValue(mockSecureStorageProvider),
-        binanceApiProvider().overrideWithValue(mockBinanceApiProvider),
+        binanceApiProvider(fakeApiConnection)
+            .overrideWithValue(mockBinanceApiProvider),
       ],
     );
-
     // Setup API providers
-    when(mockBinanceApiProvider.spot).thenReturn(mockSpotProvider);
-    when(mockSpotProvider.market).thenReturn(mockMarketProvider);
-    when(mockSpotProvider.trade).thenReturn(mockTradeProvider);
+    when(() => mockBinanceApiProvider.spot).thenReturn(mockSpotProvider);
+    when(() => mockSpotProvider.market).thenReturn(mockMarketProvider);
+    when(() => mockSpotProvider.trade).thenReturn(mockTradeProvider);
 
     // Setup API calls
 
-    when(mockMarketProvider.getAveragePrice(any)).thenAnswer((_) async =>
-        ApiResponse(AveragePrice(1, orderBook.getPriceStrategy()), 200));
+    when(() => mockMarketProvider.getAveragePrice(any())).thenAnswer(
+        (_) async =>
+            ApiResponse(AveragePrice(1, orderBook.getPriceStrategy()), 200));
 
-    when(mockTradeProvider.getAccountInformation()).thenAnswer((_) async =>
-        ApiResponse(
+    when(() => mockTradeProvider.getAccountInformation()).thenAnswer(
+        (_) async => ApiResponse(
             AccountInformation(0, 0, 0, 0, true, false, false, clock.now(),
                 'SPOT', wallet.balances.toList(), ['SPOT']),
             200));
 
-    when(mockTradeProvider.newLimitOrder(any, OrderSides.BUY, any, any))
-        .thenAnswer(
+    when(() => mockTradeProvider.newLimitOrder(
+        any(), OrderSides.BUY, any(), any())).thenAnswer(
       (i) async {
         final buyOrder = orderBook.addNewLimitOrder(
           wallet,
@@ -69,9 +75,8 @@ void main() {
       },
     );
 
-    when(mockTradeProvider.newStopLimitOrder(
-            any, OrderSides.SELL, any, any, any))
-        .thenAnswer(
+    when(() => mockTradeProvider.newStopLimitOrder(
+        any(), OrderSides.SELL, any(), any(), any())).thenAnswer(
       (i) async {
         final stopSellOrder = orderBook.addNewStopLimitOrder(
           wallet,
@@ -84,14 +89,14 @@ void main() {
       },
     );
 
-    when(mockTradeProvider.getQueryOrder(any, any)).thenAnswer(
+    when(() => mockTradeProvider.getQueryOrder(any(), any())).thenAnswer(
       (i) async {
         final order = orderBook.updateOrder(wallet, i.positionalArguments[2]);
         return ApiResponse(order, 201);
       },
     );
 
-    when(mockTradeProvider.cancelOrder(any, any)).thenAnswer(
+    when(() => mockTradeProvider.cancelOrder(any(), any())).thenAnswer(
       (i) async {
         final orderCancel =
             orderBook.cancelOrder(wallet, i.positionalArguments[2]);
@@ -101,7 +106,7 @@ void main() {
     );
   });
 
-  tearDown(() async {
+  tearDown(() {
     reset(mockSecureStorageProvider);
     reset(mockBinanceApiProvider);
     reset(mockSpotProvider);
@@ -195,7 +200,7 @@ void main() {
       final testAsset = wallet.findBalanceByAsset('USDT');
       expect(TestUtils.approxPriceToFloor(testAsset.free), 1042);
       expect(testAsset.locked, 0);
-      // There should not be any locked asset
+      // There should not be any() locked asset
       expect(getAllLockedAssetFromWallet(), 0);
     });
   });
@@ -246,7 +251,7 @@ void main() {
       final testAsset = wallet.findBalanceByAsset('USDT');
       expect(TestUtils.approxPriceToFloor(testAsset.free), 986);
       expect(testAsset.locked, 0);
-      // There should not be any locked asset
+      // There should not be any() locked asset
       expect(getAllLockedAssetFromWallet(), 0);
     });
   });
@@ -304,10 +309,10 @@ void main() {
       // Approximation
       expect(TestUtils.approxPriceToFloor(testAsset.free), 1009.63);
       expect(testAsset.locked, 0);
-      // There should not be any locked asset
+      // There should not be any() locked asset
       expect(getAllLockedAssetFromWallet(), 0);
 
-      verify(mockTradeProvider.cancelOrder(any, any)).called(2);
+      verify(() => mockTradeProvider.cancelOrder(any(), any())).called(2);
     });
   });
 
@@ -356,14 +361,15 @@ void main() {
       final testAsset = wallet.findBalanceByAsset('USDT');
       expect(TestUtils.approxPriceToFloor(testAsset.free), 986);
       expect(testAsset.locked, 0);
-      // There should not be any locked asset
+      // There should not be any() locked asset
       expect(getAllLockedAssetFromWallet(), 0);
 
-      verify(mockMarketProvider.getAveragePrice(any));
-      verify(mockTradeProvider.newLimitOrder(any, any, any, any));
-      verify(mockTradeProvider.newStopLimitOrder(any, any, any, any, any));
-      verify(mockTradeProvider.getQueryOrder(any, any));
-      verify(mockTradeProvider.getAccountInformation());
+      verify(() => mockMarketProvider.getAveragePrice(any()));
+      verify(() => mockTradeProvider.newLimitOrder(any(), any(), any(), any()));
+      verify(() => mockTradeProvider.newStopLimitOrder(
+          any(), any(), any(), any(), any()));
+      verify(() => mockTradeProvider.getQueryOrder(any(), any()));
+      verify(() => mockTradeProvider.getAccountInformation());
       verifyNoMoreInteractions(mockMarketProvider);
       verifyNoMoreInteractions(mockTradeProvider);
 
@@ -467,7 +473,7 @@ void main() {
       final testAsset = wallet.findBalanceByAsset('USDT');
       expect(TestUtils.approxPriceToFloor(testAsset.free), 1028);
       expect(testAsset.locked, 0);
-      // There should not be any locked asset
+      // There should not be any() locked asset
       expect(getAllLockedAssetFromWallet(), 0);
     });
   });
@@ -519,11 +525,11 @@ void main() {
       final testAsset = wallet.findBalanceByAsset('USDT');
       expect(TestUtils.approxPriceToFloor(testAsset.free), 1046);
       expect(testAsset.locked, 0);
-      // There should not be any locked asset
+      // There should not be any() locked asset
       expect(getAllLockedAssetFromWallet(), 0);
       // 2 cancel orders: one cancelled at 7th lap and the other at 9th lap
       // Cancelled to moving the sell order higher
-      verify(mockTradeProvider.cancelOrder(any, any)).called(2);
+      verify(() => mockTradeProvider.cancelOrder(any(), any())).called(2);
     });
   });
 
@@ -553,9 +559,9 @@ void main() {
       expect(pipeline.bot.data.counter, 1);
       expect(pipeline.bot.data.ordersHistory.cancelledOrders.length, 0);
       expect(pipeline.bot.data.ordersHistory.runOrders.length, 0);
-      // There should not be any locked asset
+      // There should not be any() locked asset
       expect(getAllLockedAssetFromWallet(), 0);
-      verify(mockTradeProvider.getAccountInformation()).called(1);
+      verify(() => mockTradeProvider.getAccountInformation()).called(1);
       verifyNoMoreInteractions(mockMarketProvider);
       verifyNoMoreInteractions(mockTradeProvider);
       expect(pipeline.bot.data.status.reason,
@@ -644,7 +650,7 @@ void main() {
       final testAsset = wallet.findBalanceByAsset('USDT');
       expect(TestUtils.approxPriceToFloor(testAsset.free), 1032);
       expect(testAsset.locked, 0);
-      // There should not be any locked asset
+      // There should not be any() locked asset
       expect(getAllLockedAssetFromWallet(), 0);
     });
   });
@@ -733,7 +739,7 @@ void main() {
       final testAsset = wallet.findBalanceByAsset('USDT');
       expect(TestUtils.approxPriceToFloor(testAsset.free), 1007);
       expect(testAsset.locked, 0);
-      // There should not be any locked asset
+      // There should not be any() locked asset
       expect(getAllLockedAssetFromWallet(), 0);
     });
   });

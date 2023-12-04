@@ -1,7 +1,10 @@
+import 'package:binander/src/features/bot/domain/bot_tile_notifier.dart';
+import 'package:binander/src/features/bot/domain/bots/bot_phases.dart';
+import 'package:binander/src/features/bot/domain/order_kinds.dart';
 import 'package:binander/src/features/bot/presentation/bot_tile/bot_tile.dart';
 import 'package:binander/src/features/bot/presentation/bot_tile_controller.dart';
 import 'package:binander/src/features/bot/presentation/crypto_info_container/crypto_info_container.dart';
-import 'package:binander/src/features/bot/presentation/pipeline_provider.dart';
+import 'package:binander/src/features/bot/presentation/pipeline_controller.dart';
 import 'package:binander/src/routing/app_router.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -45,7 +48,22 @@ class DashboardScreen extends ConsumerWidget {
               ((_, i) {
                 return ProviderScope(
                   overrides: [
-                    currentPipelineProvider.overrideWithValue(pipelines[i]),
+                    currentBotTileControllerProvider.overrideWith((ref) {
+                      final pipeline = pipelines[i];
+                      final botTileNotifier = BotTileNotifier(
+                        pipeline: pipeline,
+                        hasToStart: pipeline.bot.data.status.phase ==
+                                BotPhases.offline ||
+                            pipeline.bot.data.status.phase == BotPhases.error,
+                        isStartButtonDisabled: pipeline.bot.data.status.phase ==
+                            BotPhases.stopping,
+                        isPauseButtonDisabled: pipeline.bot.data.status.phase ==
+                                BotPhases.stopping ||
+                            pipeline.bot.data.status.phase == BotPhases.offline,
+                        selectedOrder: OrderKinds.dateNewest,
+                      );
+                      return BotTileController(botTileNotifier);
+                    }),
                   ],
                   child: const BotTile(),
                 );

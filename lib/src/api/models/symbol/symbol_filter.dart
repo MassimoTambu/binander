@@ -1,4 +1,4 @@
-part of api;
+part of '../../api.dart';
 
 @Freezed(unionKey: 'filterType')
 class SymbolFilter with _$SymbolFilter {
@@ -43,6 +43,16 @@ class SymbolFilter with _$SymbolFilter {
     bool applyToMarket,
     int avgPriceMins,
   ) = _SymbolFilterMinNotional;
+
+  @FreezedUnionValue('NOTIONAL')
+  const factory SymbolFilter.notional(
+    SymbolFilterTypes filterType,
+    String minNotional,
+    String maxNotional,
+    bool applyMinToMarket,
+    bool applyMaxToMarket,
+    int avgPriceMins,
+  ) = _SymbolFilterNotional;
 
   @FreezedUnionValue('ICEBERG_PARTS')
   const factory SymbolFilter.icebergParts(
@@ -90,6 +100,24 @@ class SymbolFilter with _$SymbolFilter {
     int minTrailingBelowDelta,
     int maxTrailingBelowDelta,
   ) = _SymbolFilterTrailingDelta;
+
+  @FreezedUnionValue('EXCHANGE_MAX_NUM_ORDERS')
+  const factory SymbolFilter.exchangeMaxNumOrders(
+    SymbolFilterTypes filterType,
+    int maxNumOrders,
+  ) = _SymbolFilterExchangeMaxNumOrders;
+
+  @FreezedUnionValue('EXCHANGE_MAX_NUM_ALGO_ORDERS')
+  const factory SymbolFilter.exchangeMaxNumAlgoOrders(
+    SymbolFilterTypes filterType,
+    int maxNumAlgoOrders,
+  ) = _SymbolFilterExchangeMaxNumAlgoOrders;
+
+  @FreezedUnionValue('EXCHANGE_MAX_NUM_ICEBERG_ORDERS')
+  const factory SymbolFilter.exchangeMaxNumIcebergOrders(
+    SymbolFilterTypes filterType,
+    int maxNumIcebergOrders,
+  ) = _SymbolFilterExchangeMaxNumIcebergOrders;
 
   factory SymbolFilter.fromJson(Map<String, dynamic> json) =>
       _$SymbolFilterFromJson(json);

@@ -1,6 +1,7 @@
 import 'package:binander/src/api/api.dart';
 import 'package:binander/src/features/settings/presentation/exchange_info_networks_provider.dart';
 import 'package:binander/src/models/exchange_info_networks.dart';
+import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'exchange_info_provider.g.dart';
@@ -9,6 +10,14 @@ part 'exchange_info_provider.g.dart';
 ExchangeInfoProvider? exchangeInfo(ExchangeInfoRef ref) =>
     ref.watch(exchangeInfoNetworksProvider).whenOrNull(
           data: (data) => ExchangeInfoProvider(data),
+          error: (e, __) {
+            if (e is ParallelWaitError) {
+              debugPrint(e.errors.toString());
+            } else {
+              debugPrint(e.toString());
+            }
+            return null;
+          },
         );
 
 class ExchangeInfoProvider {

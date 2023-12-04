@@ -1,6 +1,6 @@
 import 'package:binander/src/features/bot/domain/bots/bot.dart';
 import 'package:binander/src/features/bot/domain/bots/bot_types.dart';
-import 'package:binander/src/features/bot/presentation/create_bot_provider.dart';
+import 'package:binander/src/features/bot/presentation/create_bot_controller.dart';
 import 'package:binander/src/features/bot/presentation/create_minimize_losses.dart';
 import 'package:binander/src/utils/media_query_utils.dart';
 

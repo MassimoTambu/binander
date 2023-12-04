@@ -1,4 +1,4 @@
-part of api;
+part of 'api.dart';
 
 final _apiUtilsProvider = Provider<ApiUtils>((ref) {
   return const ApiUtils();
@@ -81,12 +81,15 @@ class ApiUtils {
     return signature.toString();
   }
 
-  ApiException buildApiException(String method, DioError error) {
-    return ApiException(
-      method,
-      error.response?.statusCode,
-      error.response?.statusMessage,
-      error.response?.data,
-    );
+  ApiException buildApiException(String method, Object error) {
+    if (error is DioError) {
+      return ApiException(
+        method,
+        error.response?.statusCode,
+        error.response?.statusMessage,
+        error.response?.data,
+      );
+    }
+    return ApiException(method, null, error.toString(), null);
   }
 }

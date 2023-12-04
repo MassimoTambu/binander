@@ -1,4 +1,4 @@
-part of api;
+part of '../../api.dart';
 
 @Freezed(makeCollectionsUnmodifiable: false)
 class AccountInformation with _$AccountInformation {
@@ -10,8 +10,9 @@ class AccountInformation with _$AccountInformation {
     bool canTrade,
     bool canWithdraw,
     bool canDeposit,
-    @JsonKey(fromJson: ParseUtils.unixToDateTime, toJson: ParseUtils.dateTimeToUnix)
-        DateTime updateTime,
+    @JsonKey(
+        fromJson: ParseUtils.unixToDateTime, toJson: ParseUtils.dateTimeToUnix)
+    DateTime updateTime,
     String accountType,
     List<AccountBalance> balances,
     List<String> permissions,

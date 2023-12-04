@@ -1,4 +1,4 @@
-import 'package:binander/src/common_widgets/crypto_info/crypto_info.dart';
+import 'package:binander/src/common_widgets/crypto_info/crypto_info_widget.dart';
 import 'package:binander/src/features/bot/presentation/crypto_info_container/crypto_info_title.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -28,7 +28,7 @@ class CryptoInfoContainer extends ConsumerWidget {
                   SizedBox(
                     width: MediaQuery.of(context).size.width / 2,
                     height: MediaQuery.of(context).size.height / 3,
-                    child: const CryptoInfo(),
+                    child: const CryptoInfoWidget(),
                   ),
                 ],
               ),
@@ -42,7 +42,7 @@ class CryptoInfoContainer extends ConsumerWidget {
                   SizedBox(
                     width: MediaQuery.of(context).size.width / 2,
                     height: MediaQuery.of(context).size.height / 3,
-                    child: const CryptoInfo(),
+                    child: const CryptoInfoWidget(),
                   ),
                 ],
               ),

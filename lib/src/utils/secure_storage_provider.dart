@@ -5,6 +5,10 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'secure_storage_provider.g.dart';
 
 class SecureStorage {
+  // TODO FOR ANDROID https://pub.dev/packages/flutter_secure_storage
+  // encryptedSharedPreferences
+  const SecureStorage();
+
   final _secureStorage = const FlutterSecureStorage();
 
   Future<String?> read(SecureStorageKeys key) {
@@ -29,7 +33,7 @@ class SecureStorage {
 }
 
 @Riverpod(keepAlive: true)
-SecureStorage secureStorage(SecureStorageRef ref) => SecureStorage();
+SecureStorage secureStorage(SecureStorageRef ref) => const SecureStorage();
 
 @Riverpod(keepAlive: true)
 Future<Map<String, String>> secureStorageReadAllFuture(

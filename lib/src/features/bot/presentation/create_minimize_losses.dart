@@ -1,9 +1,9 @@
 import 'package:binander/src/api/api.dart';
 import 'package:binander/src/features/bot/domain/bots/minimize_losses/minimize_losses_config.dart';
 import 'package:binander/src/features/bot/domain/create_minimize_losses_params.dart';
-import 'package:binander/src/features/bot/presentation/create_bot_provider.dart';
+import 'package:binander/src/features/bot/presentation/create_bot_controller.dart';
 import 'package:binander/src/features/bot/presentation/create_minimize_losses_provider.dart';
-import 'package:binander/src/features/bot/presentation/pipeline_provider.dart';
+import 'package:binander/src/features/bot/presentation/pipeline_controller.dart';
 import 'package:binander/src/features/settings/presentation/exchange_info_provider.dart';
 import 'package:binander/src/models/crypto_symbol.dart';
 import 'package:flutter/material.dart';

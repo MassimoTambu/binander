@@ -6,12 +6,13 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-part 'settings_provider.g.dart';
+part 'settings_storage_provider.g.dart';
 
 @riverpod
 class SettingsStorage extends _$SettingsStorage {
   @override
-  Future<Settings> build() async {
+  Settings build() {
+    //TODO why read?
     final data = ref.read(memoryStorageProvider);
 
     final pubNetConnection = ApiConnection(
@@ -34,7 +35,7 @@ class SettingsStorage extends _$SettingsStorage {
   static const testNetUrl = 'https://testnet.binance.vision';
 
   void updateThemeMode(ThemeMode themeMode) {
-    state = AsyncData(state.requireValue.copyWith(themeMode: themeMode));
+    state = state.copyWith(themeMode: themeMode);
 
     ref
         .read(memoryStorageProvider.notifier)
@@ -47,7 +48,7 @@ class SettingsStorage extends _$SettingsStorage {
     required String? testNetApiKey,
     required String? testNetApiSecret,
   }) {
-    state = AsyncData(state.requireValue.copyWith(
+    state = state.copyWith(
       pubNetConnection: ApiConnection(
         url: pubNetUrl,
         apiKey: pubNetApiKey ?? '',
@@ -58,7 +59,7 @@ class SettingsStorage extends _$SettingsStorage {
         apiKey: testNetApiKey ?? '',
         apiSecret: testNetApiSecret ?? '',
       ),
-    ));
+    );
 
     if (pubNetApiKey != null && pubNetApiKey.isNotEmpty) {
       ref

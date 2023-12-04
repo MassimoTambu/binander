@@ -1,30 +1,30 @@
-import 'package:binander/src/common_widgets/crypto_info/crypto_info_tile.dart';
-import 'package:binander/src/common_widgets/detailed_error_box.dart';
+import 'package:binander/src/common_widgets/crypto_info/crypto_info_tile_widget.dart';
+import 'package:binander/src/common_widgets/detailed_error_box_widget.dart';
 import 'package:binander/src/features/settings/domain/api_connection.dart';
 import 'package:binander/src/features/settings/presentation/binance_account_information_provider.dart';
-import 'package:binander/src/features/settings/presentation/settings_provider.dart';
+import 'package:binander/src/features/settings/presentation/settings_storage_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-part 'crypto_info.g.dart';
+part 'crypto_info_widget.g.dart';
 
 @riverpod
 bool isTestNet(ref) => throw UnimplementedError();
 
-class CryptoInfo extends ConsumerWidget {
-  const CryptoInfo({super.key});
+class CryptoInfoWidget extends ConsumerWidget {
+  const CryptoInfoWidget({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     late final ApiConnection apiConn;
 
     if (ref.watch(isTestNetProvider)) {
-      apiConn = ref.watch(settingsStorageProvider
-          .select((p) => p.requireValue.testNetConnection));
+      apiConn =
+          ref.watch(settingsStorageProvider.select((p) => p.testNetConnection));
     } else {
-      apiConn = ref.watch(settingsStorageProvider
-          .select((p) => p.requireValue.pubNetConnection));
+      apiConn =
+          ref.watch(settingsStorageProvider.select((p) => p.pubNetConnection));
     }
 
     final res = ref.watch(binanceAccountInformationProvider(apiConn));
@@ -39,13 +39,13 @@ class CryptoInfo extends ConsumerWidget {
                 currentAccountBalance
                     .overrideWithValue(data.body.balances[index])
               ],
-              child: const CryptoInfoTile(),
+              child: const CryptoInfoTileWidget(),
             );
           }),
         );
       },
       error: (error, stackTrace) {
-        return DetailedErrorBox(error, stackTrace);
+        return DetailedErrorBoxWidget(error, stackTrace);
       },
       loading: () {
         return const Center(

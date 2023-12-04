@@ -13,7 +13,7 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:uuid/uuid.dart';
 
-part 'pipeline_provider.g.dart';
+part 'pipeline_controller.g.dart';
 
 @riverpod
 class PipelineController extends _$PipelineController {
@@ -22,10 +22,22 @@ class PipelineController extends _$PipelineController {
     ref.listen<Map<String, dynamic>>(
         fileStorageProvider.select((p) => p.requireValue), (previous, next) {
       // We can prevent reloading by storing the hashCode in json and then analyze them
-      _loadBotsFromFile(next);
+      state = addBots(_readBotsFromFile(next));
     });
 
-    _loadBotsFromFile(ref.watch(fileStorageProvider).requireValue);
+    return _loadBots(
+        _readBotsFromFile(ref.watch(fileStorageProvider).requireValue));
+  }
+
+  List<Bot> _readBotsFromFile(Map<String, dynamic> data) {
+    if (data.containsKey('bots')) {
+      final List<Bot> bots = [];
+      for (final bot in data['bots'] as List) {
+        bots.add(Bot.fromJson(bot));
+      }
+
+      return bots;
+    }
 
     return [];
   }
@@ -81,23 +93,27 @@ class PipelineController extends _$PipelineController {
     return bot;
   }
 
-  void addBots(List<Bot> bots) {
+  List<Pipeline> _loadBots(List<Bot> bots) {
+    return bots.map(_createBotPipeline).toList();
+  }
+
+  List<Pipeline> addBots(List<Bot> bots) {
+    final List<Pipeline> newBots = [...state];
     for (final b in bots) {
       var found = false;
-      for (var i = 0; i < state.length; i++) {
-        if (state[i].bot.uuid == b.uuid) {
-          state[i] = _createBotPipeline(b);
+      for (var i = 0; i < newBots.length; i++) {
+        if (newBots[i].bot.uuid == b.uuid) {
+          newBots[i] = _createBotPipeline(b);
           found = true;
         }
       }
 
       if (found == false) {
         final pipeline = _createBotPipeline(b);
-        state.add(pipeline);
+        newBots.add(pipeline);
       }
     }
-
-    state = [...state];
+    return newBots;
   }
 
   MinimizeLossesBot createMinimizeLossesBot({
@@ -157,17 +173,6 @@ class PipelineController extends _$PipelineController {
     ref
         .read(fileStorageProvider.notifier)
         .removeBots(pipelines.map((p) => p.bot).toList());
-  }
-
-  void _loadBotsFromFile(Map<String, dynamic> data) {
-    if (data.containsKey('bots')) {
-      final List<Bot> bots = [];
-      for (final bot in data['bots'] as List) {
-        bots.add(Bot.fromJson(bot));
-      }
-
-      addBots(bots);
-    }
   }
 
   Pipeline _createBotPipeline(Bot bot) {

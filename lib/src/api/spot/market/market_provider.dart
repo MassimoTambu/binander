@@ -1,4 +1,4 @@
-part of api;
+part of '../../api.dart';
 
 @riverpod
 Market _market(_MarketRef ref, ApiConnection apiConnection) {
@@ -32,7 +32,7 @@ class Market {
           queryParameters: secureQuery);
       return ApiResponse(
           AveragePrice.fromJson(response.data!), response.statusCode!);
-    } on DioError catch (e) {
+    } catch (e) {
       return Future.error(
           _ref.read(_apiUtilsProvider).buildApiException('getAveragePrice', e));
     }
@@ -60,7 +60,7 @@ class Market {
           queryParameters: secureQuery);
       return ApiResponse(
           ExchangeInfo.fromJson(response.data!), response.statusCode!);
-    } on DioError catch (e) {
+    } catch (e) {
       return Future.error(
           _ref.read(_apiUtilsProvider).buildApiException('getExchangeInfo', e));
     }

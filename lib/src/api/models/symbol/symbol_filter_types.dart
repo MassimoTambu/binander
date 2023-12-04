@@ -1,6 +1,6 @@
 // ignore_for_file: constant_identifier_names
 
-part of api;
+part of '../../api.dart';
 
 enum SymbolFilterTypes {
   PRICE_FILTER,
@@ -8,6 +8,7 @@ enum SymbolFilterTypes {
   PERCENT_PRICE_BY_SIDE,
   LOT_SIZE,
   MIN_NOTIONAL,
+  NOTIONAL,
   ICEBERG_PARTS,
   MARKET_LOT_SIZE,
   MAX_NUM_ORDERS,
@@ -15,4 +16,7 @@ enum SymbolFilterTypes {
   MAX_NUM_ICEBERG_ORDERS,
   MAX_POSITION,
   TRAILING_DELTA,
+  EXCHANGE_MAX_NUM_ORDERS,
+  EXCHANGE_MAX_NUM_ALGO_ORDERS,
+  EXCHANGE_MAX_NUM_ICEBERG_ORDERS,
 }

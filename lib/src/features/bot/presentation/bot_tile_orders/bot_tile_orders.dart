@@ -11,7 +11,7 @@ class BotTileOrders extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final allOrders = ref
-        .watch(botTileControllerProvider)
+        .watch(currentBotTileControllerProvider)
         .pipeline
         .bot
         .data
@@ -37,13 +37,13 @@ class BotTileOrders extends ConsumerWidget {
                   child: Text(kv.keys.first),
                 );
               }).toList(),
-              value: ref.watch(botTileControllerProvider).selectedOrder,
+              value: ref.watch(currentBotTileControllerProvider).selectedOrder,
               hint: const Text('Sort by'),
               icon: const Icon(Icons.sort),
               onChanged: (OrderKinds? ordersOrder) {
                 if (ordersOrder != null) {
                   ref
-                      .read(botTileControllerProvider.notifier)
+                      .read(currentBotTileControllerProvider.notifier)
                       .orderBy(ordersOrder);
                 }
               },
