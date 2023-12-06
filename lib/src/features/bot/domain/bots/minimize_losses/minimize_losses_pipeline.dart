@@ -22,7 +22,9 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 part 'minimize_losses_pipeline.freezed.dart';
 
 @freezed
-class MinimizeLossesPipeline with _$MinimizeLossesPipeline implements Pipeline {
+class MinimizeLossesPipeline
+    with _$MinimizeLossesPipeline
+    implements AbsMinimizeLossesPipeline {
   const MinimizeLossesPipeline._();
 
   const factory MinimizeLossesPipeline(Ref ref, MinimizeLossesBot bot) =

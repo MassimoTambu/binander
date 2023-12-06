@@ -1,7 +1,7 @@
 import 'package:binander/src/features/bot/domain/bots/bot.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-abstract class Pipeline {
+sealed class Pipeline {
   final Ref ref;
   final Bot bot;
 
@@ -11,3 +11,5 @@ abstract class Pipeline {
   void pause();
   Future<void> shutdown({String reason = ''});
 }
+
+abstract interface class AbsMinimizeLossesPipeline implements Pipeline {}

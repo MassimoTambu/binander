@@ -25,6 +25,10 @@ linter:
     # avoid_print: false  # Uncomment to disable the `avoid_print` rule
     # prefer_single_quotes: true  # Uncomment to enable the `prefer_single_quotes` rule
     - use_super_parameters
+    - matching_super_parameters
+    - type_literal_in_constant_pattern
+    - unnecessary_breaks
+    - no_literal_bool_comparisons
 
 # Additional information about this file can be found at
 # https://dart.dev/guides/language/analysis-options

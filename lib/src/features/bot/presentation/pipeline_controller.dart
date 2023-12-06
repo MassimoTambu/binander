@@ -69,7 +69,6 @@ class PipelineController extends _$PipelineController {
           ),
           autoRestart: fields[MinimizeLossesConfig.autoRestartName]!.value,
         );
-        break;
       default:
         bot = createMinimizeLossesBot(
           name: fields[Bot.botNameName]!.value,
@@ -108,7 +107,7 @@ class PipelineController extends _$PipelineController {
         }
       }
 
-      if (found == false) {
+      if (!found) {
         final pipeline = _createBotPipeline(b);
         newBots.add(pipeline);
       }
