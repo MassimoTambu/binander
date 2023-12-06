@@ -1,5 +1,5 @@
 import 'package:binander/src/api/api.dart';
-import 'package:binander/src/features/bot/presentation/bot_tile_orders/order_status_indicator.dart';
+import 'package:binander/src/features/bot/presentation/bot_tile/bot_tile_orders/order_status_indicator.dart';
 import 'package:binander/src/routing/app_router.dart';
 import 'package:binander/src/utils/date_formatter.dart';
 import 'package:flutter/material.dart';

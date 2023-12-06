@@ -113,7 +113,6 @@ class BotConfigContainer extends ConsumerWidget {
     switch (ref.watch(createBotControllerProvider).botTypes) {
       case BotTypes.minimizeLosses:
         form = const CreateMinimizeLosses();
-        break;
       default:
         form = const CreateMinimizeLosses();
         break;

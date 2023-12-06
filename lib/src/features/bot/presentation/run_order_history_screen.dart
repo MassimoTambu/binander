@@ -1,5 +1,5 @@
 import 'package:binander/src/features/bot/domain/run_orders.dart';
-import 'package:binander/src/features/bot/presentation/bot_tile_orders/order_container.dart';
+import 'package:binander/src/features/bot/presentation/bot_tile/bot_tile_orders/order_container.dart';
 import 'package:binander/src/utils/group_by_iterables.dart';
 import 'package:flutter/material.dart';
 

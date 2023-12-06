@@ -1,4 +1,4 @@
-import 'package:binander/src/features/bot/presentation/bot_tile_controller.dart';
+import 'package:binander/src/features/bot/presentation/bot_tile/bot_tile.dart';
 import 'package:binander/src/features/bot/presentation/pipeline_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -9,7 +9,7 @@ class BotTileButtons extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final botTile = ref.watch(currentBotTileControllerProvider);
+    final botTile = ref.watch(currentBotTileNotifierProvider);
     final isStartDisabled = botTile.isStartButtonDisabled;
     final isPauseDisabled = botTile.isPauseButtonDisabled;
     final isStarted = !botTile.hasToStart;

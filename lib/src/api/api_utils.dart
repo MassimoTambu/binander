@@ -18,7 +18,6 @@ class ApiUtils {
       case API_SECURITY_TYPES.userData:
         _addTimestamp(query);
         _addSignature(apiSecret, query);
-        break;
       // No security query needed for none, userStream and marketData types
       default:
         break;
@@ -40,9 +39,6 @@ class ApiUtils {
       case API_SECURITY_TYPES.marketData:
         headers.addAll(
             {'Content-Type': 'application/json', 'X-MBX-APIKEY': apiKey});
-
-        break;
-
       // No security header needed for none type
       default:
         break;

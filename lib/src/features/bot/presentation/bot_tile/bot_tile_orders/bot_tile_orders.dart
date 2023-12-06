@@ -1,7 +1,8 @@
 import 'package:binander/src/features/bot/domain/order_kinds.dart';
 import 'package:binander/src/features/bot/presentation/bot_order_tile_provider.dart';
-import 'package:binander/src/features/bot/presentation/bot_tile_controller.dart';
-import 'package:binander/src/features/bot/presentation/bot_tile_orders/bot_tile_run_orders.dart';
+import 'package:binander/src/features/bot/presentation/bot_tile/bot_tile.dart';
+import 'package:binander/src/features/bot/presentation/bot_tile/bot_tile_controller.dart';
+import 'package:binander/src/features/bot/presentation/bot_tile/bot_tile_orders/bot_tile_run_orders.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -10,13 +11,10 @@ class BotTileOrders extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final allOrders = ref
-        .watch(currentBotTileControllerProvider)
-        .pipeline
-        .bot
-        .data
-        .ordersHistory
-        .runOrders;
+    final botTile = ref.watch(currentBotTileNotifierProvider);
+    final botTileController = ref.watch(currentBotTileController(botTile));
+    final allOrders =
+        botTileController.pipeline.bot.data.ordersHistory.runOrders;
     const items = [
       {'Date (newer)': OrderKinds.dateNewest},
       {'Date (oldest)': OrderKinds.dateOldest},
@@ -37,13 +35,13 @@ class BotTileOrders extends ConsumerWidget {
                   child: Text(kv.keys.first),
                 );
               }).toList(),
-              value: ref.watch(currentBotTileControllerProvider).selectedOrder,
+              value: botTileController.selectedOrder,
               hint: const Text('Sort by'),
               icon: const Icon(Icons.sort),
               onChanged: (OrderKinds? ordersOrder) {
                 if (ordersOrder != null) {
                   ref
-                      .read(currentBotTileControllerProvider.notifier)
+                      .read(currentBotTileController(botTile).notifier)
                       .orderBy(ordersOrder);
                 }
               },

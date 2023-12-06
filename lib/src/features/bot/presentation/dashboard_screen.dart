@@ -1,14 +1,14 @@
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+
 import 'package:binander/src/features/bot/domain/bot_tile_notifier.dart';
 import 'package:binander/src/features/bot/domain/bots/bot_phases.dart';
 import 'package:binander/src/features/bot/domain/order_kinds.dart';
 import 'package:binander/src/features/bot/presentation/bot_tile/bot_tile.dart';
-import 'package:binander/src/features/bot/presentation/bot_tile_controller.dart';
 import 'package:binander/src/features/bot/presentation/crypto_info_container/crypto_info_container.dart';
 import 'package:binander/src/features/bot/presentation/pipeline_controller.dart';
 import 'package:binander/src/routing/app_router.dart';
-import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
@@ -46,11 +46,11 @@ class DashboardScreen extends ConsumerWidget {
           SliverList(
             delegate: SliverChildBuilderDelegate(
               ((_, i) {
+                final pipeline = pipelines[i];
                 return ProviderScope(
                   overrides: [
-                    currentBotTileControllerProvider.overrideWith((ref) {
-                      final pipeline = pipelines[i];
-                      final botTileNotifier = BotTileNotifier(
+                    currentBotTileNotifierProvider.overrideWithValue(
+                      BotTileNotifier(
                         pipeline: pipeline,
                         hasToStart: pipeline.bot.data.status.phase ==
                                 BotPhases.offline ||
@@ -60,10 +60,9 @@ class DashboardScreen extends ConsumerWidget {
                         isPauseButtonDisabled: pipeline.bot.data.status.phase ==
                                 BotPhases.stopping ||
                             pipeline.bot.data.status.phase == BotPhases.offline,
-                        selectedOrder: OrderKinds.dateNewest,
-                      );
-                      return BotTileController(botTileNotifier);
-                    }),
+                        selectedOrder: OrderKinds.dateOldest,
+                      ),
+                    )
                   ],
                   child: const BotTile(),
                 );
