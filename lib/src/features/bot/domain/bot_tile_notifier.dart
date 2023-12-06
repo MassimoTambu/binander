@@ -11,6 +11,6 @@ class BotTileNotifier with _$BotTileNotifier {
     required bool hasToStart,
     required bool isStartButtonDisabled,
     required bool isPauseButtonDisabled,
-    required OrderKinds selectedOrder,
+    @Default(OrderKinds.dateOldest) OrderKinds selectedOrder,
   }) = _BotTileNotifier;
 }

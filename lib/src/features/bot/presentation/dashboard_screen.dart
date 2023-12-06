@@ -60,7 +60,6 @@ class DashboardScreen extends ConsumerWidget {
                         isPauseButtonDisabled: pipeline.bot.data.status.phase ==
                                 BotPhases.stopping ||
                             pipeline.bot.data.status.phase == BotPhases.offline,
-                        selectedOrder: OrderKinds.dateOldest,
                       ),
                     )
                   ],
