@@ -13,7 +13,7 @@ part 'minimize_losses_pipeline_data.g.dart';
 @unfreezed
 class MinimizeLossesPipelineData
     with _$MinimizeLossesPipelineData
-    implements PipelineData {
+    implements AbsMinimizeLossesPipelineData {
   static const tolerance = 0.4;
 
   factory MinimizeLossesPipelineData({

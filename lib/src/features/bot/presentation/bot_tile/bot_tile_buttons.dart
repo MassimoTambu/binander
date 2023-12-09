@@ -1,15 +1,18 @@
-import 'package:binander/src/features/bot/presentation/bot_tile/bot_tile.dart';
+import 'package:binander/src/features/bot/domain/bot_tile_data.dart';
+import 'package:binander/src/features/bot/presentation/bot_tile/bot_tile_notifier.dart';
 import 'package:binander/src/features/bot/presentation/pipeline_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class BotTileButtons extends ConsumerWidget {
-  const BotTileButtons({super.key});
+  const BotTileButtons({required this.botTileData, super.key});
+
+  final BotTileData botTileData;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final botTile = ref.watch(currentBotTileNotifierProvider);
+    final botTile = ref.watch(currentBotTileNotifierProvider(botTileData));
     final isStartDisabled = botTile.isStartButtonDisabled;
     final isPauseDisabled = botTile.isPauseButtonDisabled;
     final isStarted = !botTile.hasToStart;

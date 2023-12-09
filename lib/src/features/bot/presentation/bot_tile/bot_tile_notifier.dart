@@ -1,11 +1,14 @@
-import 'package:hooks_riverpod/hooks_riverpod.dart';
-
-import 'package:binander/src/features/bot/domain/bot_tile_notifier.dart';
+import 'package:binander/src/features/bot/domain/bot_tile_data.dart';
 import 'package:binander/src/features/bot/domain/order_kinds.dart';
 import 'package:binander/src/features/bot/domain/run_orders.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-class BotTileController extends StateNotifier<BotTileNotifier> {
-  BotTileController(super._state);
+part 'bot_tile_notifier.g.dart';
+
+@riverpod
+class CurrentBotTileNotifier extends _$CurrentBotTileNotifier {
+  @override
+  BotTileData build(BotTileData botTileData) => botTileData;
 
   void orderBy(OrderKinds orderFactor) {
     final runOrders = state.pipeline.bot.data.ordersHistory.runOrders;
@@ -37,9 +40,3 @@ class BotTileController extends StateNotifier<BotTileNotifier> {
     return aTime.compareTo(bTime);
   }
 }
-
-final currentBotTileController = StateNotifierProvider.autoDispose
-    .family<BotTileController, BotTileNotifier, BotTileNotifier>(
-        (ref, botTile) {
-  return BotTileController(botTile);
-});

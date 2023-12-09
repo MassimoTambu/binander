@@ -1,11 +1,13 @@
 import 'package:binander/src/features/bot/domain/bots/bot.dart';
 import 'package:binander/src/features/bot/domain/bots/bot_status.dart';
 import 'package:binander/src/features/bot/domain/bots/bot_types.dart';
+import 'package:binander/src/features/bot/domain/bots/minimize_losses/minimize_losses_bot.dart';
 import 'package:binander/src/features/bot/domain/bots/minimize_losses/minimize_losses_config.dart';
 import 'package:binander/src/features/bot/domain/bots/minimize_losses/minimize_losses_pipeline.dart';
 import 'package:binander/src/features/bot/domain/bots/minimize_losses/minimize_losses_pipeline_data.dart';
 import 'package:binander/src/features/bot/domain/orders_history.dart';
 import 'package:binander/src/features/bot/domain/pipeline.dart';
+import 'package:binander/src/features/bot/domain/pipeline_data.dart';
 import 'package:binander/src/features/settings/presentation/exchange_info_provider.dart';
 import 'package:binander/src/models/crypto_symbol.dart';
 import 'package:binander/src/utils/file_storage_provider.dart';
@@ -25,15 +27,44 @@ class PipelineController extends _$PipelineController {
       state = addBots(_readBotsFromFile(next));
     });
 
-    return _loadBots(
-        _readBotsFromFile(ref.watch(fileStorageProvider).requireValue));
+    return [];
+  }
+
+  List<Pipeline> addBots(List<Bot> bots) {
+    final List<Pipeline> newBots = [...state];
+    for (final b in bots) {
+      var found = false;
+      for (var i = 0; i < newBots.length; i++) {
+        if (newBots[i].bot.uuid == b.uuid) {
+          newBots[i] = _createBotPipeline(b);
+          found = true;
+        }
+      }
+
+      if (!found) {
+        final pipeline = _createBotPipeline(b);
+        newBots.add(pipeline);
+      }
+    }
+    return newBots;
+  }
+
+  Pipeline _createBotPipeline(Bot bot) {
+    return switch (bot) {
+      AbsMinimizeLossesBot() =>
+        MinimizeLossesPipeline(ref, bot as MinimizeLossesBot),
+    };
   }
 
   List<Bot> _readBotsFromFile(Map<String, dynamic> data) {
     if (data.containsKey('bots')) {
       final List<Bot> bots = [];
       for (final bot in data['bots'] as List) {
-        bots.add(Bot.fromJson(bot));
+        final botType = bot['type'];
+        if (botType == BotTypes.minimizeLosses.name) {
+          bots.add(MinimizeLossesBot.fromJson(bot));
+          continue;
+        }
       }
 
       return bots;
@@ -42,8 +73,25 @@ class PipelineController extends _$PipelineController {
     return [];
   }
 
+  void updateBotData(String uuid, PipelineData data) {
+    state = [
+      for (final pipeline in state)
+        if (pipeline.bot.uuid == uuid)
+          switch (pipeline) {
+            AbsMinimizeLossesPipeline() =>
+              (pipeline as MinimizeLossesPipeline).copyWith(
+                bot: pipeline.bot
+                    .copyWith(data: data as MinimizeLossesPipelineData),
+              ),
+          }
+        else
+          pipeline
+    ];
+  }
+
   void updateBotStatus(String uuid, BotStatus status) {
-    state.firstWhere((p) => p.bot.uuid == uuid).bot.data.status = status;
+    state.where((p) => p.bot.uuid == uuid).firstOrNull?.bot.data.status =
+        status;
     state = [...state];
   }
 
@@ -90,29 +138,6 @@ class PipelineController extends _$PipelineController {
     }
 
     return bot;
-  }
-
-  List<Pipeline> _loadBots(List<Bot> bots) {
-    return bots.map(_createBotPipeline).toList();
-  }
-
-  List<Pipeline> addBots(List<Bot> bots) {
-    final List<Pipeline> newBots = [...state];
-    for (final b in bots) {
-      var found = false;
-      for (var i = 0; i < newBots.length; i++) {
-        if (newBots[i].bot.uuid == b.uuid) {
-          newBots[i] = _createBotPipeline(b);
-          found = true;
-        }
-      }
-
-      if (!found) {
-        final pipeline = _createBotPipeline(b);
-        newBots.add(pipeline);
-      }
-    }
-    return newBots;
   }
 
   MinimizeLossesBot createMinimizeLossesBot({
@@ -172,12 +197,5 @@ class PipelineController extends _$PipelineController {
     ref
         .read(fileStorageProvider.notifier)
         .removeBots(pipelines.map((p) => p.bot).toList());
-  }
-
-  Pipeline _createBotPipeline(Bot bot) {
-    return bot.map(
-      minimizeLosses: (minimizeLosses) =>
-          MinimizeLossesPipeline(ref, minimizeLosses),
-    );
   }
 }

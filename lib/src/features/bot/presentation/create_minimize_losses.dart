@@ -1,5 +1,6 @@
 import 'package:binander/src/api/api.dart';
 import 'package:binander/src/features/bot/domain/bots/minimize_losses/minimize_losses_config.dart';
+import 'package:binander/src/features/bot/domain/bots/minimize_losses/minimize_losses_pipeline.dart';
 import 'package:binander/src/features/bot/domain/create_minimize_losses_params.dart';
 import 'package:binander/src/features/bot/presentation/create_bot_controller.dart';
 import 'package:binander/src/features/bot/presentation/create_minimize_losses_provider.dart';
@@ -94,7 +95,9 @@ class CreateMinimizeLosses extends ConsumerWidget {
               if (val == null) return null;
               final botCount = ref
                   .read(pipelineControllerProvider)
-                  .where((p) => p.bot.config.symbol!.symbol == val)
+                  .where((p) =>
+                      p is MinimizeLossesPipeline &&
+                      p.bot.config.symbol!.symbol == val)
                   .length;
 
               final maxAlgoFilter = symbols

@@ -1,10 +1,10 @@
 import 'dart:async';
 
 import 'package:binander/src/api/api.dart';
-import 'package:binander/src/features/bot/domain/bots/bot.dart';
 import 'package:binander/src/features/bot/domain/bots/bot_limit.dart';
 import 'package:binander/src/features/bot/domain/bots/bot_phases.dart';
 import 'package:binander/src/features/bot/domain/bots/bot_status.dart';
+import 'package:binander/src/features/bot/domain/bots/minimize_losses/minimize_losses_bot.dart';
 import 'package:binander/src/features/bot/domain/bots/minimize_losses/minimize_losses_pipeline_data.dart';
 import 'package:binander/src/features/bot/domain/pipeline.dart';
 import 'package:binander/src/features/bot/domain/roi.dart';
@@ -71,6 +71,9 @@ class MinimizeLossesPipeline
       }
 
       bot.data.lastAveragePrice = await _getCurrentCryptoPrice();
+      ref
+          .read(pipelineControllerProvider.notifier)
+          .updateBotData(bot.uuid, bot.data);
 
       final double rightPairQty = getRightPairQty(accBalances.first);
 

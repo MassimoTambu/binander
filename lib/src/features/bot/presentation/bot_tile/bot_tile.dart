@@ -1,31 +1,25 @@
+import 'package:binander/src/features/bot/presentation/bot_tile/bot_tile_info_dialog.dart';
+import 'package:binander/src/features/bot/presentation/bot_tile/bot_tile_notifier.dart';
+import 'package:binander/src/utils/string_capitalize.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import 'package:binander/src/features/bot/domain/bot_tile_notifier.dart';
-import 'package:binander/src/features/bot/domain/bots/minimize_losses/minimize_losses_config.dart';
+import 'package:binander/src/features/bot/domain/bot_tile_data.dart';
 import 'package:binander/src/features/bot/domain/bots/minimize_losses/minimize_losses_pipeline.dart';
 import 'package:binander/src/features/bot/domain/bots/minimize_losses/minimize_losses_pipeline_data.dart';
 import 'package:binander/src/features/bot/presentation/bot_tile/bot_tile_buttons.dart';
-import 'package:binander/src/features/bot/presentation/bot_tile/bot_tile_controller.dart';
 import 'package:binander/src/features/bot/presentation/bot_tile/bot_tile_orders/bot_tile_orders.dart';
 import 'package:binander/src/features/bot/presentation/total_gains_chip.dart';
 import 'package:binander/src/utils/floor_to_double_with_decimals.dart';
-import 'package:binander/src/utils/string_capitalize.dart';
-
-part 'bot_tile.g.dart';
-
-@riverpod
-BotTileNotifier currentBotTileNotifier(CurrentBotTileNotifierRef ref) =>
-    throw UnimplementedError();
 
 class BotTile extends ConsumerWidget {
-  const BotTile({super.key});
+  const BotTile({required this.botTileData, super.key});
+
+  final BotTileData botTileData;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final botTile = ref.watch(
-        currentBotTileController(ref.watch(currentBotTileNotifierProvider)));
+    final botTile = ref.watch(currentBotTileNotifierProvider(botTileData));
 
     final pipeline = botTile.pipeline;
     final bot = pipeline.bot;
@@ -47,43 +41,9 @@ class BotTile extends ConsumerWidget {
                 color: Theme.of(context).colorScheme.onSecondary),
             splashRadius: 20,
             onPressed: () => showDialog<void>(
-                context: context,
-                builder: (context) {
-                  return AlertDialog(
-                    title: Text('Bot ${bot.name} info'),
-                    content: SizedBox(
-                      width: MediaQuery.of(context).size.width / 3,
-                      height: MediaQuery.of(context).size.height / 3,
-                      child: Column(children: [
-                        const SizedBox(height: 20),
-                        Expanded(
-                          child: Text(
-                              '${MinimizeLossesConfig.dailyLossSellOrdersPublicName}: ${bot.config.dailyLossSellOrders}'),
-                        ),
-                        Expanded(
-                          child: Text(
-                              '${MinimizeLossesConfig.maxInvestmentPerOrderPublicName}: ${bot.config.maxInvestmentPerOrder}'),
-                        ),
-                        Expanded(
-                          child: Text(
-                              '${MinimizeLossesConfig.percentageSellOrderPublicName}: ${bot.config.percentageSellOrder}'),
-                        ),
-                        Expanded(
-                          child: Text(
-                              '${MinimizeLossesConfig.symbolPublicName}: ${bot.config.symbol}'),
-                        ),
-                        Expanded(
-                          child: Text(
-                              '${MinimizeLossesConfig.timerBuyOrderPublicName}: ${bot.config.timerBuyOrder?.inMinutes} minutes'),
-                        ),
-                        Expanded(
-                          child: Text(
-                              '${MinimizeLossesConfig.autoRestartPublicName}: ${bot.config.autoRestart}'),
-                        ),
-                      ]),
-                    ),
-                  );
-                }),
+              context: context,
+              builder: (context) => BotTileInfoDialog(botTileData: botTile),
+            ),
           ),
           Chip(
             avatar: CircleAvatar(
@@ -173,9 +133,9 @@ class BotTile extends ConsumerWidget {
                 Theme.of(context).textTheme.bodyMedium?.copyWith(fontSize: 15),
           ),
         ),
-        const BotTileButtons(),
+        BotTileButtons(botTileData: botTile),
         const SizedBox(height: 16),
-        const BotTileOrders(),
+        BotTileOrders(botTileData: botTile),
       ],
     );
   }
