@@ -1,5 +1,5 @@
 import 'package:binander/src/api/api.dart';
-import 'package:binander/src/features/bot/domain/bots/bot.dart';
+import 'package:binander/src/features/bot/domain/bots/minimize_losses/minimize_losses_bot.dart';
 import 'package:binander/src/features/bot/domain/bots/minimize_losses/minimize_losses_config.dart';
 import 'package:binander/src/features/bot/domain/bots/minimize_losses/minimize_losses_pipeline_data.dart';
 import 'package:binander/src/features/bot/domain/orders_history.dart';

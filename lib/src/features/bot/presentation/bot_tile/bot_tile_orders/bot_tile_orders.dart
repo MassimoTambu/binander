@@ -1,18 +1,20 @@
+import 'package:binander/src/features/bot/domain/bot_tile_data.dart';
 import 'package:binander/src/features/bot/domain/order_kinds.dart';
 import 'package:binander/src/features/bot/presentation/bot_order_tile_provider.dart';
-import 'package:binander/src/features/bot/presentation/bot_tile/bot_tile.dart';
-import 'package:binander/src/features/bot/presentation/bot_tile/bot_tile_controller.dart';
+import 'package:binander/src/features/bot/presentation/bot_tile/bot_tile_notifier.dart';
 import 'package:binander/src/features/bot/presentation/bot_tile/bot_tile_orders/bot_tile_run_orders.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class BotTileOrders extends ConsumerWidget {
-  const BotTileOrders({super.key});
+  const BotTileOrders({required this.botTileData, super.key});
+
+  final BotTileData botTileData;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final botTile = ref.watch(currentBotTileNotifierProvider);
-    final botTileController = ref.watch(currentBotTileController(botTile));
+    final botTileController =
+        ref.watch(currentBotTileNotifierProvider(botTileData));
     final allOrders =
         botTileController.pipeline.bot.data.ordersHistory.runOrders;
     const items = [
@@ -41,7 +43,8 @@ class BotTileOrders extends ConsumerWidget {
               onChanged: (OrderKinds? ordersOrder) {
                 if (ordersOrder != null) {
                   ref
-                      .read(currentBotTileController(botTile).notifier)
+                      .read(
+                          currentBotTileNotifierProvider(botTileData).notifier)
                       .orderBy(ordersOrder);
                 }
               },

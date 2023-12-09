@@ -1,6 +1,6 @@
 import 'package:binander/src/features/settings/domain/api_connection.dart';
 import 'package:binander/src/models/config_field.dart';
-import 'package:binander/src/models/interfaces/config.dart';
+import 'package:binander/src/models/config.dart';
 
 class SettingsConfig implements Config {
   ApiConnection pubNetConnection;

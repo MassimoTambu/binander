@@ -5,7 +5,7 @@ import 'package:binander/src/features/bot/domain/bots/bot_phases.dart';
 import 'package:binander/src/features/bot/domain/bots/bot_status.dart';
 import 'package:binander/src/features/bot/domain/orders_history.dart';
 
-abstract class PipelineData {
+sealed class PipelineData {
   final OrdersHistory ordersHistory;
   var status = const BotStatus(BotPhases.offline, 'offline');
   Timer? timer;
@@ -19,3 +19,6 @@ abstract class PipelineData {
             ? ordersHistory = OrdersHistory([])
             : ordersHistory = ordersHistory;
 }
+
+abstract interface class AbsMinimizeLossesPipelineData
+    implements PipelineData {}
