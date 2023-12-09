@@ -1,5 +1,5 @@
-import 'package:binander/src/features/bot/domain/bot_tile_data.dart';
 import 'package:binander/src/features/bot/domain/order_kinds.dart';
+import 'package:binander/src/features/bot/domain/pipeline.dart';
 import 'package:binander/src/features/bot/presentation/bot_order_tile_provider.dart';
 import 'package:binander/src/features/bot/presentation/bot_tile/bot_tile_notifier.dart';
 import 'package:binander/src/features/bot/presentation/bot_tile/bot_tile_orders/bot_tile_run_orders.dart';
@@ -7,14 +7,14 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class BotTileOrders extends ConsumerWidget {
-  const BotTileOrders({required this.botTileData, super.key});
+  const BotTileOrders({required this.pipeline, super.key});
 
-  final BotTileData botTileData;
+  final Pipeline pipeline;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final botTileController =
-        ref.watch(currentBotTileNotifierProvider(botTileData));
+        ref.watch(currentBotTileNotifierProvider(pipeline));
     final allOrders =
         botTileController.pipeline.bot.data.ordersHistory.runOrders;
     const items = [
@@ -43,8 +43,7 @@ class BotTileOrders extends ConsumerWidget {
               onChanged: (OrderKinds? ordersOrder) {
                 if (ordersOrder != null) {
                   ref
-                      .read(
-                          currentBotTileNotifierProvider(botTileData).notifier)
+                      .read(currentBotTileNotifierProvider(pipeline).notifier)
                       .orderBy(ordersOrder);
                 }
               },
