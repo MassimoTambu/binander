@@ -1,30 +1,30 @@
-import 'package:binander/src/features/bot/presentation/bot_tile/bot_tile_info_dialog.dart';
-import 'package:binander/src/features/bot/presentation/bot_tile/bot_tile_notifier.dart';
-import 'package:binander/src/utils/string_capitalize.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import 'package:binander/src/features/bot/domain/bot_tile_data.dart';
 import 'package:binander/src/features/bot/domain/bots/minimize_losses/minimize_losses_pipeline.dart';
 import 'package:binander/src/features/bot/domain/bots/minimize_losses/minimize_losses_pipeline_data.dart';
+import 'package:binander/src/features/bot/domain/pipeline.dart';
 import 'package:binander/src/features/bot/presentation/bot_tile/bot_tile_buttons.dart';
+import 'package:binander/src/features/bot/presentation/bot_tile/bot_tile_info_dialog.dart';
+import 'package:binander/src/features/bot/presentation/bot_tile/bot_tile_notifier.dart';
 import 'package:binander/src/features/bot/presentation/bot_tile/bot_tile_orders/bot_tile_orders.dart';
 import 'package:binander/src/features/bot/presentation/total_gains_chip.dart';
 import 'package:binander/src/utils/floor_to_double_with_decimals.dart';
+import 'package:binander/src/utils/string_capitalize.dart';
 
 class BotTile extends ConsumerWidget {
-  const BotTile({required this.botTileData, super.key});
+  const BotTile({required this.pipeline, super.key});
 
-  final BotTileData botTileData;
+  final Pipeline pipeline;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final botTile = ref.watch(currentBotTileNotifierProvider(botTileData));
+    final botTileData = ref.watch(currentBotTileNotifierProvider(pipeline));
 
-    final pipeline = botTile.pipeline;
-    final bot = pipeline.bot;
-    final botStatus = botTile.pipeline.bot.data.status;
-    final testNet = botTile.pipeline.bot.testNet;
+    final bPipeline = botTileData.pipeline;
+    final bot = botTileData.pipeline.bot;
+    final botStatus = botTileData.pipeline.bot.data.status;
+    final testNet = botTileData.pipeline.bot.testNet;
 
     return ExpansionTile(
       title: Wrap(
@@ -42,7 +42,7 @@ class BotTile extends ConsumerWidget {
             splashRadius: 20,
             onPressed: () => showDialog<void>(
               context: context,
-              builder: (context) => BotTileInfoDialog(botTileData: botTile),
+              builder: (context) => BotTileInfoDialog(pipeline: bPipeline),
             ),
           ),
           Chip(
@@ -91,7 +91,7 @@ class BotTile extends ConsumerWidget {
             ),
           ),
           if (bot.data.ordersHistory.lastNotEndedRunOrders?.sellOrder != null &&
-              pipeline is MinimizeLossesPipeline) ...[
+              bPipeline is MinimizeLossesPipeline) ...[
             Chip(
               label: Text(
                 'Stop: ${bot.data.ordersHistory.lastNotEndedRunOrders?.sellOrder?.stopPrice?.floorToDoubleWithDecimals(bot.data.orderPrecision)}',
@@ -103,7 +103,7 @@ class BotTile extends ConsumerWidget {
             ),
             Chip(
               label: Text(
-                'New Stop: ${pipeline.calculateNewOrderStopPriceWithProperties().floorToDoubleWithDecimals(bot.data.orderPrecision)}',
+                'New Stop: ${bPipeline.calculateNewOrderStopPriceWithProperties().floorToDoubleWithDecimals(bot.data.orderPrecision)}',
                 style: Theme.of(context)
                     .textTheme
                     .labelLarge!
@@ -112,7 +112,7 @@ class BotTile extends ConsumerWidget {
             ),
             Chip(
               label: Text(
-                'T: ${pipeline.calculatePercentageOfDifference().floorToDoubleWithDecimals(bot.data.orderPrecision)}/${MinimizeLossesPipelineData.tolerance}',
+                'T: ${bPipeline.calculatePercentageOfDifference().floorToDoubleWithDecimals(bot.data.orderPrecision)}/${MinimizeLossesPipelineData.tolerance}',
                 style: Theme.of(context)
                     .textTheme
                     .labelLarge!
@@ -133,9 +133,9 @@ class BotTile extends ConsumerWidget {
                 Theme.of(context).textTheme.bodyMedium?.copyWith(fontSize: 15),
           ),
         ),
-        BotTileButtons(botTileData: botTile),
+        BotTileButtons(pipeline: bPipeline),
         const SizedBox(height: 16),
-        BotTileOrders(botTileData: botTile),
+        BotTileOrders(pipeline: bPipeline),
       ],
     );
   }

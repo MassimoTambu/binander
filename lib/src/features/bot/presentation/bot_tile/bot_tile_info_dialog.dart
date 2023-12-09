@@ -1,19 +1,19 @@
-import 'package:binander/src/features/bot/domain/bot_tile_data.dart';
 import 'package:binander/src/features/bot/domain/bots/bot.dart';
 import 'package:binander/src/features/bot/domain/bots/minimize_losses/minimize_losses_config.dart';
+import 'package:binander/src/features/bot/domain/pipeline.dart';
 import 'package:binander/src/features/bot/presentation/bot_tile/bot_tile_notifier.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class BotTileInfoDialog extends ConsumerWidget {
-  const BotTileInfoDialog({required this.botTileData, super.key});
+  const BotTileInfoDialog({required this.pipeline, super.key});
 
-  final BotTileData botTileData;
+  final Pipeline pipeline;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final bot = ref.watch(currentBotTileNotifierProvider(botTileData)
-        .select((v) => v.pipeline.bot));
+    final bot = ref.watch(
+        currentBotTileNotifierProvider(pipeline).select((v) => v.pipeline.bot));
     return switch (bot) {
       AbsMinimizeLossesBot() => AlertDialog(
           title: Text('Bot ${bot.name} info'),

@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import 'package:binander/src/features/bot/domain/bot_tile_data.dart';
-import 'package:binander/src/features/bot/domain/bots/bot_phases.dart';
 import 'package:binander/src/features/bot/presentation/bot_tile/bot_tile.dart';
 import 'package:binander/src/features/bot/presentation/crypto_info_container/crypto_info_container.dart';
 import 'package:binander/src/features/bot/presentation/pipeline_controller.dart';
@@ -44,21 +42,7 @@ class DashboardScreen extends ConsumerWidget {
           )),
           SliverList(
             delegate: SliverChildBuilderDelegate(
-              ((_, i) {
-                final pipeline = pipelines[i];
-                final botTileData = BotTileData(
-                  pipeline: pipeline,
-                  hasToStart:
-                      pipeline.bot.data.status.phase == BotPhases.offline ||
-                          pipeline.bot.data.status.phase == BotPhases.error,
-                  isStartButtonDisabled:
-                      pipeline.bot.data.status.phase == BotPhases.stopping,
-                  isPauseButtonDisabled:
-                      pipeline.bot.data.status.phase == BotPhases.stopping ||
-                          pipeline.bot.data.status.phase == BotPhases.offline,
-                );
-                return BotTile(botTileData: botTileData);
-              }),
+              ((_, i) => BotTile(pipeline: pipelines[i])),
               childCount: pipelines.length,
             ),
           ),

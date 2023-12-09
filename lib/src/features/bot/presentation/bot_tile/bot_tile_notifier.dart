@@ -1,5 +1,7 @@
 import 'package:binander/src/features/bot/domain/bot_tile_data.dart';
+import 'package:binander/src/features/bot/domain/bots/bot_phases.dart';
 import 'package:binander/src/features/bot/domain/order_kinds.dart';
+import 'package:binander/src/features/bot/domain/pipeline.dart';
 import 'package:binander/src/features/bot/domain/run_orders.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -8,7 +10,17 @@ part 'bot_tile_notifier.g.dart';
 @riverpod
 class CurrentBotTileNotifier extends _$CurrentBotTileNotifier {
   @override
-  BotTileData build(BotTileData botTileData) => botTileData;
+  BotTileData build(Pipeline pipeline) =>
+      BotTileData(pipeline: pipeline, selectedOrder: OrderKinds.dateOldest);
+
+  bool get hasToStart =>
+      state.pipeline.bot.data.status.phase == BotPhases.offline ||
+      state.pipeline.bot.data.status.phase == BotPhases.error;
+  bool get isStartButtonDisabled =>
+      state.pipeline.bot.data.status.phase == BotPhases.stopping;
+  bool get isPauseButtonDisabled =>
+      state.pipeline.bot.data.status.phase == BotPhases.stopping ||
+      state.pipeline.bot.data.status.phase == BotPhases.offline;
 
   void orderBy(OrderKinds orderFactor) {
     final runOrders = state.pipeline.bot.data.ordersHistory.runOrders;
