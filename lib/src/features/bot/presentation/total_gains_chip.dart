@@ -22,26 +22,21 @@ class TotalGainsChip extends StatelessWidget {
       label: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          totalGains.isNegative && totalGains <= -30
-              ? const Icon(Icons.keyboard_double_arrow_down, color: Colors.red)
-              : totalGains.isNegative
-                  ? const Icon(Icons.keyboard_arrow_down_rounded,
-                      color: Colors.red)
-                  : totalGains >= 500
-                      ? const Icon(Icons.dark_mode,
-                          color: Colors.amber, size: 20)
-                      : totalGains >= 60
-                          ? const Icon(Icons.rocket_launch_rounded,
-                              color: Colors.yellow, size: 20)
-                          : totalGains >= 30
-                              ? const Icon(
-                                  Icons.keyboard_double_arrow_up_rounded,
-                                  color: Colors.green)
-                              : totalGains == 0
-                                  ? const Icon(Icons.drag_handle,
-                                      color: Colors.yellow)
-                                  : const Icon(Icons.keyboard_arrow_up_rounded,
-                                      color: Colors.green),
+          switch (totalGains) {
+            < -30 =>
+              const Icon(Icons.keyboard_double_arrow_down, color: Colors.red),
+            < 0 =>
+              const Icon(Icons.keyboard_arrow_down_rounded, color: Colors.red),
+            >= 500 =>
+              const Icon(Icons.dark_mode, color: Colors.amber, size: 20),
+            >= 60 => const Icon(Icons.rocket_launch_rounded,
+                color: Colors.yellow, size: 20),
+            >= 30 => const Icon(Icons.keyboard_double_arrow_up_rounded,
+                color: Colors.green),
+            > 0 =>
+              const Icon(Icons.keyboard_arrow_up_rounded, color: Colors.green),
+            _ => const Icon(Icons.drag_handle, color: Colors.yellow),
+          },
           const SizedBox(width: 5),
           Text(
             '${totalGains.abs()} ${_runOrders.isEmpty ? '-' : _runOrders.first.buyOrder!.symbol}',

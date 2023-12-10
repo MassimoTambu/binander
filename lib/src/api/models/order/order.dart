@@ -2,6 +2,7 @@ part of '../../api.dart';
 
 @freezed
 class Order with _$Order {
+  const Order._();
   const factory Order.data(
     String symbol,
     int orderId,
@@ -117,6 +118,9 @@ class Order with _$Order {
     OrderSides side,
     SelfTradePreventionMode selfTradePreventionMode,
   ) = OrderCancel;
+
+  /// Is the average price the order has been filled
+  double get cummulativeQuotePrice => cummulativeQuoteQty / executedQty;
 
   factory Order.fromJson(Map<String, dynamic> json) => _$OrderFromJson(json);
 }
