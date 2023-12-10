@@ -37,7 +37,9 @@ class BotTileButtons extends ConsumerWidget {
                   }
                 },
           child: Text(isStarted ? 'Stop' : 'Start',
-              style: const TextStyle(fontWeight: FontWeight.bold)),
+              style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: isStarted ? null : Colors.black)),
         ),
         const SizedBox(width: 8),
         ElevatedButton(
@@ -55,8 +57,11 @@ class BotTileButtons extends ConsumerWidget {
                     botTile.pipeline.pause();
                   }
                 },
-          child: const Text('Pause',
-              style: TextStyle(fontWeight: FontWeight.bold)),
+          child: Text('Pause',
+              style: Theme.of(context)
+                  .textTheme
+                  .labelLarge
+                  ?.copyWith(fontWeight: FontWeight.bold, color: Colors.black)),
         ),
         const Expanded(child: SizedBox()),
         ElevatedButton(
@@ -97,8 +102,11 @@ class BotTileButtons extends ConsumerWidget {
                   .removeBots([botTile.pipeline.bot.uuid]);
             }
           },
-          child: const Text('Remove',
-              style: TextStyle(fontWeight: FontWeight.bold)),
+          child: Text('Remove',
+              style: Theme.of(context)
+                  .textTheme
+                  .labelLarge
+                  ?.copyWith(fontWeight: FontWeight.bold)),
         ),
       ],
     );
