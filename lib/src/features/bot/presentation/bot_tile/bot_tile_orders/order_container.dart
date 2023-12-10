@@ -41,7 +41,8 @@ class OrderContainer extends StatelessWidget {
               switch (_order.status) {
                 OrderStatus.FILLED =>
                   Text('$textPhrase: ${_order.cummulativeQuotePrice}'),
-                _ => Text('$textPhrase: ${kDateFormatter.format(_order.time)}'),
+                _ => Text(
+                    '$textPhrase: ${kDateTimeNoSecondsFormatter.format(_order.time)}'),
               },
             ],
           ),
