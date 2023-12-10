@@ -1,6 +1,7 @@
 import 'package:binander/src/api/api.dart';
 import 'package:binander/src/features/bot/presentation/bot_tile/bot_tile_orders/order_status_indicator.dart';
 import 'package:binander/src/routing/app_router.dart';
+import 'package:binander/src/utils/date_formatter.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -37,7 +38,11 @@ class OrderContainer extends StatelessWidget {
             children: [
               OrderStatusIndicator(_order.status),
               const SizedBox(width: 5),
-              Text('$textPhrase: ${_order.price}'),
+              switch (_order.status) {
+                OrderStatus.FILLED =>
+                  Text('$textPhrase: ${_order.cummulativeQuotePrice}'),
+                _ => Text('$textPhrase: ${kDateFormatter.format(_order.time)}'),
+              },
             ],
           ),
         ),

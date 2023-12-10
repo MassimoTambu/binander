@@ -1,5 +1,6 @@
 import 'package:binander/src/api/api.dart';
 import 'package:binander/src/features/bot/domain/roi.dart';
+import 'package:binander/src/utils/floor_to_double_with_decimals.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'run_orders.freezed.dart';
@@ -34,14 +35,13 @@ class RunOrders with _$RunOrders {
 
   /// Check whether is a profit or a loss orders pair
   ROI get roi {
-    if ((buyOrder == null && sellOrder == null) ||
-        buyOrder == null ||
-        sellOrder == null) {
+    if (buyOrder == null ||
+        sellOrder == null ||
+        buyOrder!.cummulativeQuoteQty == sellOrder!.cummulativeQuoteQty) {
       return ROI.stable;
     }
 
-    if (sellOrder!.executedQty * sellOrder!.price >
-        buyOrder!.executedQty * buyOrder!.price) {
+    if (sellOrder!.cummulativeQuoteQty > buyOrder!.cummulativeQuoteQty) {
       return ROI.profit;
     }
 
@@ -54,7 +54,7 @@ class RunOrders with _$RunOrders {
     if (buyOrder == null || sellOrder == null) return 0;
 
     final gain = sellOrder!.cummulativeQuoteQty - buyOrder!.cummulativeQuoteQty;
-    return (gain * 100).floorToDouble() / 100;
+    return gain.floorToDoubleWithDecimals(2);
   }
 
   factory RunOrders.fromJson(Map<String, dynamic> json) =>
