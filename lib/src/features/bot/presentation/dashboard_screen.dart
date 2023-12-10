@@ -56,7 +56,7 @@ class DashboardScreen extends ConsumerWidget {
         foregroundColor: Theme.of(context).colorScheme.onPrimary,
         child: const Icon(Icons.add),
       ),
-      persistentFooterButtons: const [Text("v 1.0.0 🦝")],
+      persistentFooterButtons: const [Text("v 1.0.0 - Alpha 🦝")],
     );
   }
 }
