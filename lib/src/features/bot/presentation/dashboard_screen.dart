@@ -19,18 +19,20 @@ class DashboardScreen extends ConsumerWidget {
     final pipelines = ref.watch(pipelineControllerProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Dashboard'),
-        centerTitle: true,
-        actions: [
-          IconButton(
-            onPressed: () => context.pushNamed(AppRoute.settings.name),
-            icon: const Icon(Icons.settings),
-          ),
-        ],
-      ),
       body: CustomScrollView(
         slivers: [
+          SliverAppBar(
+            title: const Text('Dashboard'),
+            floating: true,
+            snap: true,
+            centerTitle: true,
+            actions: [
+              IconButton(
+                onPressed: () => context.pushNamed(AppRoute.settings.name),
+                icon: const Icon(Icons.settings),
+              ),
+            ],
+          ),
           const SliverToBoxAdapter(child: CryptoInfoContainer()),
           SliverToBoxAdapter(
               child: Padding(
