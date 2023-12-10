@@ -46,6 +46,7 @@ class Order with _$Order {
     @JsonKey(
         fromJson: ParseUtils.stringToDouble, toJson: ParseUtils.doubleToString)
     double origQuoteOrderQty,
+    SelfTradePreventionMode selfTradePreventionMode,
   ) = OrderData;
 
   const factory Order.newLimit(
@@ -78,6 +79,7 @@ class Order with _$Order {
     TimeInForce timeInForce,
     OrderTypes type,
     OrderSides side,
+    SelfTradePreventionMode selfTradePreventionMode,
     List<Fill> fills,
   ) = OrderNewLimit;
 
@@ -113,6 +115,7 @@ class Order with _$Order {
     TimeInForce timeInForce,
     OrderTypes type,
     OrderSides side,
+    SelfTradePreventionMode selfTradePreventionMode,
   ) = OrderCancel;
 
   factory Order.fromJson(Map<String, dynamic> json) => _$OrderFromJson(json);

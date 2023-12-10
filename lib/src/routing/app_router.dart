@@ -2,7 +2,7 @@ import 'package:binander/src/api/api.dart';
 import 'package:binander/src/features/bot/domain/run_orders.dart';
 import 'package:binander/src/features/bot/presentation/create_bot_screen.dart';
 import 'package:binander/src/features/bot/presentation/dashboard_screen.dart';
-import 'package:binander/src/features/bot/presentation/order_detail_screen.dart';
+import 'package:binander/src/features/bot/presentation/bot_tile/bot_tile_orders/order_detail_screen.dart';
 import 'package:binander/src/features/bot/presentation/run_order_history_screen.dart';
 import 'package:binander/src/features/settings/presentation/binance_api_settings_screen.dart';
 import 'package:binander/src/features/settings/presentation/settings_screen.dart';

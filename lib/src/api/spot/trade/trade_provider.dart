@@ -91,7 +91,7 @@ class Trade {
           OrderData.fromJson(response.data!), response.statusCode!);
     } catch (e) {
       return Future.error(
-          _ref.read(_apiUtilsProvider).buildApiException('_newOrder', e));
+          _ref.read(_apiUtilsProvider).buildApiException('getQueryOrder', e));
     }
   }
 
@@ -165,7 +165,7 @@ class Trade {
           OrderNewLimit.fromJson(response.data!), response.statusCode!);
     } catch (e) {
       return Future.error(
-          _ref.read(_apiUtilsProvider).buildApiException('_newOrder', e));
+          _ref.read(_apiUtilsProvider).buildApiException('newLimitOrder', e));
     }
   }
 
@@ -207,8 +207,9 @@ class Trade {
       return ApiResponse(
           OrderNewStopLimit.fromJson(response.data!), response.statusCode!);
     } catch (e) {
-      return Future.error(
-          _ref.read(_apiUtilsProvider).buildApiException('_newOrder', e));
+      return Future.error(_ref
+          .read(_apiUtilsProvider)
+          .buildApiException('newStopLimitOrder', e));
     }
   }
 }

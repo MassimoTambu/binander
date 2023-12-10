@@ -37,6 +37,7 @@ part 'models/order/order_response_types.dart';
 part 'models/order/order_sides.dart';
 part 'models/order/order_status.dart';
 part 'models/order/order_types.dart';
+part 'models/order/self_trade_prevention_mode.dart';
 part 'models/permissions.dart';
 part 'models/rate_limit/rate_limit.dart';
 part 'models/rate_limit/rate_limit_intervals.dart';
