@@ -1,11 +1,12 @@
-import 'package:binander/src/features/bot/presentation/bot_order_tile_provider.dart';
-import 'package:binander/src/features/bot/presentation/bot_tile/bot_tile_orders/bot_tile_run_orders_execution_date.dart';
-import 'package:binander/src/features/bot/presentation/bot_tile/bot_tile_orders/order_container.dart';
-import 'package:binander/src/features/bot/presentation/total_gains_chip.dart';
-import 'package:binander/src/routing/app_router.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+
+import 'package:binander/src/features/bot/presentation/bot_tile/bot_order_tile_provider.dart';
+import 'package:binander/src/features/bot/presentation/bot_tile/bot_tile_orders/bot_tile_run_orders_execution_date.dart';
+import 'package:binander/src/features/bot/presentation/bot_tile/bot_tile_orders/order_container.dart';
+import 'package:binander/src/features/bot/presentation/bot_tile/total_gains_chip.dart';
+import 'package:binander/src/routing/app_router.dart';
 
 class BotTileRunOrders extends ConsumerWidget {
   const BotTileRunOrders({super.key});

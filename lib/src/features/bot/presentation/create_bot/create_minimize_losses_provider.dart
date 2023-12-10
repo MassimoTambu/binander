@@ -1,13 +1,14 @@
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+
 import 'package:binander/src/api/api.dart';
 import 'package:binander/src/features/bot/domain/bots/minimize_losses/minimize_losses_pipeline.dart';
 import 'package:binander/src/features/bot/domain/create_minimize_losses.dart';
 import 'package:binander/src/features/bot/domain/create_minimize_losses_params.dart';
+import 'package:binander/src/features/bot/domain/crypto_symbol.dart';
 import 'package:binander/src/features/settings/domain/api_connection.dart';
 import 'package:binander/src/features/settings/presentation/exchange_info_provider.dart';
 import 'package:binander/src/features/settings/presentation/settings_storage_provider.dart';
-import 'package:binander/src/models/crypto_symbol.dart';
 import 'package:binander/src/utils/floor_to_double_with_decimals.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'create_minimize_losses_provider.g.dart';
 

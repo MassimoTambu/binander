@@ -1,4 +1,4 @@
-import 'package:binander/src/models/config_field.dart';
+import 'package:binander/src/features/settings/domain/config_field.dart';
 
 abstract class Config {
   final Map<String, ConfigField> configFields;

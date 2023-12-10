@@ -8,7 +8,7 @@ import 'package:binander/src/features/bot/presentation/bot_tile/bot_tile_buttons
 import 'package:binander/src/features/bot/presentation/bot_tile/bot_tile_info_dialog.dart';
 import 'package:binander/src/features/bot/presentation/bot_tile/bot_tile_notifier.dart';
 import 'package:binander/src/features/bot/presentation/bot_tile/bot_tile_orders/bot_tile_orders.dart';
-import 'package:binander/src/features/bot/presentation/total_gains_chip.dart';
+import 'package:binander/src/features/bot/presentation/bot_tile/total_gains_chip.dart';
 import 'package:binander/src/utils/floor_to_double_with_decimals.dart';
 import 'package:binander/src/utils/string_capitalize.dart';
 

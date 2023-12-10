@@ -1,5 +1,6 @@
-import 'package:binander/src/models/crypto_symbol.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+
+import 'package:binander/src/features/bot/domain/crypto_symbol.dart';
 
 part 'create_minimize_losses.freezed.dart';
 

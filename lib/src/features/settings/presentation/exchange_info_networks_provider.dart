@@ -1,7 +1,8 @@
-import 'package:binander/src/api/api.dart';
-import 'package:binander/src/features/settings/presentation/settings_storage_provider.dart';
-import 'package:binander/src/models/exchange_info_networks.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+import 'package:binander/src/api/api.dart';
+import 'package:binander/src/features/settings/domain/exchange_info_networks.dart';
+import 'package:binander/src/features/settings/presentation/settings_storage_provider.dart';
 
 part 'exchange_info_networks_provider.g.dart';
 

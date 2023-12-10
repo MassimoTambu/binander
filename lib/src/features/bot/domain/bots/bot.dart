@@ -1,7 +1,7 @@
 import 'package:binander/src/features/bot/domain/bots/bot_types.dart';
 import 'package:binander/src/features/bot/domain/bots/minimize_losses/minimize_losses_config.dart';
 import 'package:binander/src/features/bot/domain/pipeline_data.dart';
-import 'package:binander/src/models/config.dart';
+import 'package:binander/src/features/settings/domain/config.dart';
 
 sealed class Bot {
   static String botNameName = "bot_name";

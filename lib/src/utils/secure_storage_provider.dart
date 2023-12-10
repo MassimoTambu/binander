@@ -1,6 +1,7 @@
-import 'package:binander/src/models/secure_storage_key.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+import 'package:binander/src/features/settings/domain/secure_storage_key.dart';
 
 part 'secure_storage_provider.g.dart';
 
