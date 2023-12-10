@@ -23,8 +23,8 @@ class OrderDetailsScreen extends StatelessWidget {
       'Side: ${_order.side.name}',
       'Status: ${_order.status.name}',
       'Type: ${_order.type.name}',
-      'Time: ${kDateFormatter.format(_order.time)}',
-      'Updated time: ${kDateFormatter.format(_order.updateTime)}',
+      'Time: ${kDateTimeFormatter.format(_order.time)}',
+      'Updated time: ${kDateTimeFormatter.format(_order.updateTime)}',
     ];
 
     return Scaffold(

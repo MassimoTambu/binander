@@ -1,4 +1,5 @@
 import 'package:binander/src/features/bot/presentation/bot_order_tile_provider.dart';
+import 'package:binander/src/features/bot/presentation/bot_tile/bot_tile_orders/bot_tile_run_orders_execution_date.dart';
 import 'package:binander/src/features/bot/presentation/bot_tile/bot_tile_orders/order_container.dart';
 import 'package:binander/src/features/bot/presentation/total_gains_chip.dart';
 import 'package:binander/src/routing/app_router.dart';
@@ -15,6 +16,9 @@ class BotTileRunOrders extends ConsumerWidget {
 
     return Column(
       children: [
+        Align(
+            alignment: Alignment.centerLeft,
+            child: BotTileRunOrdersExecutionDate(runOrders: runOrders)),
         if (runOrders.sellOrder != null && runOrders.gains != 0)
           Padding(
             padding: const EdgeInsets.only(bottom: 8),
