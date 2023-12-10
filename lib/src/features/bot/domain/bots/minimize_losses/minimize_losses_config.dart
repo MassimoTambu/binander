@@ -1,7 +1,8 @@
-import 'package:binander/src/models/config_field.dart';
-import 'package:binander/src/models/crypto_symbol.dart';
-import 'package:binander/src/models/config.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+
+import 'package:binander/src/features/bot/domain/crypto_symbol.dart';
+import 'package:binander/src/features/settings/domain/config.dart';
+import 'package:binander/src/features/settings/domain/config_field.dart';
 
 part 'minimize_losses_config.g.dart';
 

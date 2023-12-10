@@ -1,10 +1,11 @@
-import 'package:binander/src/features/bot/domain/order_kinds.dart';
-import 'package:binander/src/features/bot/domain/pipeline.dart';
-import 'package:binander/src/features/bot/presentation/bot_order_tile_provider.dart';
-import 'package:binander/src/features/bot/presentation/bot_tile/bot_tile_notifier.dart';
-import 'package:binander/src/features/bot/presentation/bot_tile/bot_tile_orders/bot_tile_run_orders.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+
+import 'package:binander/src/features/bot/domain/order_kinds.dart';
+import 'package:binander/src/features/bot/domain/pipeline.dart';
+import 'package:binander/src/features/bot/presentation/bot_tile/bot_order_tile_provider.dart';
+import 'package:binander/src/features/bot/presentation/bot_tile/bot_tile_notifier.dart';
+import 'package:binander/src/features/bot/presentation/bot_tile/bot_tile_orders/bot_tile_run_orders.dart';
 
 class BotTileOrders extends ConsumerWidget {
   const BotTileOrders({required this.pipeline, super.key});

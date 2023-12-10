@@ -1,9 +1,10 @@
 import 'dart:async';
 
-import 'package:binander/src/models/secure_storage_key.dart';
-import 'package:binander/src/utils/secure_storage_provider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+import 'package:binander/src/features/settings/domain/secure_storage_key.dart';
+import 'package:binander/src/utils/secure_storage_provider.dart';
 
 part 'memory_storage_provider.g.dart';
 

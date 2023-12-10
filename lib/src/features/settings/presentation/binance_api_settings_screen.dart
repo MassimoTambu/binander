@@ -1,11 +1,12 @@
-import 'package:binander/src/features/settings/domain/settings_config.dart';
-import 'package:binander/src/features/settings/presentation/settings_storage_provider.dart';
-import 'package:binander/src/models/config_field.dart';
-import 'package:binander/src/utils/media_query_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+
+import 'package:binander/src/features/settings/domain/config_field.dart';
+import 'package:binander/src/features/settings/domain/settings_config.dart';
+import 'package:binander/src/features/settings/presentation/settings_storage_provider.dart';
+import 'package:binander/src/utils/media_query_utils.dart';
 
 class BinanceApiSettingsScreen extends ConsumerWidget {
   BinanceApiSettingsScreen({super.key});

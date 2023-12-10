@@ -1,13 +1,14 @@
-import 'package:binander/src/api/api.dart';
-import 'package:binander/src/features/settings/domain/api_connection.dart';
-import 'package:binander/src/features/settings/domain/settings.dart';
-import 'package:binander/src/features/settings/presentation/settings_storage_provider.dart';
-import 'package:binander/src/models/crypto_symbol.dart';
-import 'package:binander/src/models/secure_storage_key.dart';
-import 'package:binander/src/utils/secure_storage_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:mocktail/mocktail.dart';
+
+import 'package:binander/src/api/api.dart';
+import 'package:binander/src/features/bot/domain/crypto_symbol.dart';
+import 'package:binander/src/features/settings/domain/api_connection.dart';
+import 'package:binander/src/features/settings/domain/secure_storage_key.dart';
+import 'package:binander/src/features/settings/domain/settings.dart';
+import 'package:binander/src/features/settings/presentation/settings_storage_provider.dart';
+import 'package:binander/src/utils/secure_storage_provider.dart';
 
 class MockSecureStorage extends Mock implements SecureStorage {
   @override

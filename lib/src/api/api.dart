@@ -2,24 +2,24 @@ library api;
 
 import 'dart:convert';
 
-import 'package:binander/src/features/settings/domain/api_connection.dart';
 import 'package:crypto/crypto.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:freezed_annotation/freezed_annotation.dart';
-
-import 'package:binander/src/models/crypto_symbol.dart';
-import 'package:binander/src/utils/parse_utils.dart';
 import 'package:diox/diox.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-part 'api_exception.dart';
+import 'package:binander/src/features/bot/domain/crypto_symbol.dart';
+import 'package:binander/src/features/settings/domain/api_connection.dart';
+import 'package:binander/src/utils/parse_utils.dart';
+
 part 'api.freezed.dart';
 part 'api.g.dart';
-part 'binance_api_provider.dart';
 part 'api_constants.dart';
+part 'api_exception.dart';
 part 'api_response.dart';
 part 'api_security_types.dart';
 part 'api_utils.dart';
+part 'binance_api_provider.dart';
 part 'dio_provider.dart';
 part 'models/account/account_balance.dart';
 part 'models/account/account_information.dart';

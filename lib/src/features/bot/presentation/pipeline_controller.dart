@@ -1,3 +1,7 @@
+import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:uuid/uuid.dart';
+
 import 'package:binander/src/features/bot/domain/bots/bot.dart';
 import 'package:binander/src/features/bot/domain/bots/bot_status.dart';
 import 'package:binander/src/features/bot/domain/bots/bot_types.dart';
@@ -5,15 +9,12 @@ import 'package:binander/src/features/bot/domain/bots/minimize_losses/minimize_l
 import 'package:binander/src/features/bot/domain/bots/minimize_losses/minimize_losses_config.dart';
 import 'package:binander/src/features/bot/domain/bots/minimize_losses/minimize_losses_pipeline.dart';
 import 'package:binander/src/features/bot/domain/bots/minimize_losses/minimize_losses_pipeline_data.dart';
+import 'package:binander/src/features/bot/domain/crypto_symbol.dart';
 import 'package:binander/src/features/bot/domain/orders_history.dart';
 import 'package:binander/src/features/bot/domain/pipeline.dart';
 import 'package:binander/src/features/bot/domain/pipeline_data.dart';
 import 'package:binander/src/features/settings/presentation/exchange_info_provider.dart';
-import 'package:binander/src/models/crypto_symbol.dart';
 import 'package:binander/src/utils/file_storage_provider.dart';
-import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:uuid/uuid.dart';
 
 part 'pipeline_controller.g.dart';
 
