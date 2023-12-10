@@ -58,10 +58,9 @@ class BotTileButtons extends ConsumerWidget {
                   }
                 },
           child: Text('Pause',
-              style: Theme.of(context)
-                  .textTheme
-                  .labelLarge
-                  ?.copyWith(fontWeight: FontWeight.bold, color: Colors.black)),
+              style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: isPauseDisabled ? Colors.grey : Colors.black)),
         ),
         const Expanded(child: SizedBox()),
         ElevatedButton(

@@ -10,8 +10,13 @@ part 'bot_tile_notifier.g.dart';
 @riverpod
 class CurrentBotTileNotifier extends _$CurrentBotTileNotifier {
   @override
-  BotTileData build(Pipeline pipeline) =>
-      BotTileData(pipeline: pipeline, selectedOrder: OrderKinds.dateOldest);
+  BotTileData build(Pipeline pipeline) {
+    const selectedOrder = OrderKinds.dateNewest;
+    final runOrders =
+        _orderBy(pipeline.bot.data.ordersHistory.runOrders, selectedOrder);
+    pipeline.bot.data.ordersHistory.runOrders = runOrders;
+    return BotTileData(pipeline: pipeline, orderKind: selectedOrder);
+  }
 
   bool get hasToStart =>
       state.pipeline.bot.data.status.phase == BotPhases.offline ||
@@ -22,8 +27,14 @@ class CurrentBotTileNotifier extends _$CurrentBotTileNotifier {
       state.pipeline.bot.data.status.phase == BotPhases.stopping ||
       state.pipeline.bot.data.status.phase == BotPhases.offline;
 
-  void orderBy(OrderKinds orderFactor) {
-    final runOrders = state.pipeline.bot.data.ordersHistory.runOrders;
+  void orderBy(OrderKinds orderKind) {
+    _orderBy(state.pipeline.bot.data.ordersHistory.runOrders, orderKind);
+
+    state = state.copyWith(orderKind: orderKind);
+  }
+
+  static List<RunOrders> _orderBy(
+      List<RunOrders> runOrders, OrderKinds orderFactor) {
     switch (orderFactor) {
       case OrderKinds.dateNewest:
         runOrders.sort((a, b) => _sortByDate(a, b));
@@ -34,8 +45,7 @@ class CurrentBotTileNotifier extends _$CurrentBotTileNotifier {
       case OrderKinds.losses:
         runOrders.sort((a, b) => (a.gains - b.gains).ceil());
     }
-
-    state = state.copyWith(selectedOrder: orderFactor);
+    return runOrders;
   }
 
   static int _sortByDate(RunOrders a, RunOrders b, {bool newest = true}) {

@@ -37,7 +37,7 @@ class BotTileOrders extends ConsumerWidget {
                   child: Text(kv.keys.first),
                 );
               }).toList(),
-              value: botTileController.selectedOrder,
+              value: botTileController.orderKind,
               hint: const Text('Sort by'),
               icon: const Icon(Icons.sort),
               onChanged: (OrderKinds? ordersOrder) {

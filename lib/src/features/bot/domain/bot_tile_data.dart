@@ -8,6 +8,6 @@ part 'bot_tile_data.freezed.dart';
 class BotTileData with _$BotTileData {
   const factory BotTileData({
     required Pipeline pipeline,
-    @Default(OrderKinds.dateOldest) OrderKinds selectedOrder,
+    @Default(OrderKinds.dateOldest) OrderKinds orderKind,
   }) = _BotTileData;
 }
