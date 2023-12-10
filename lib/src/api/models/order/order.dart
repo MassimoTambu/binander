@@ -120,7 +120,12 @@ class Order with _$Order {
   ) = OrderCancel;
 
   /// Is the average price the order has been filled
-  double get cummulativeQuotePrice => cummulativeQuoteQty / executedQty;
+  double get cummulativeQuotePrice {
+    final value = cummulativeQuoteQty / executedQty;
+    if (value.isNaN) return 0;
+
+    return value;
+  }
 
   factory Order.fromJson(Map<String, dynamic> json) => _$OrderFromJson(json);
 }
