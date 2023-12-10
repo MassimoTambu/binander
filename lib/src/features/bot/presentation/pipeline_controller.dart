@@ -24,13 +24,13 @@ class PipelineController extends _$PipelineController {
     ref.listen<Map<String, dynamic>>(
         fileStorageProvider.select((p) => p.requireValue), (previous, next) {
       // We can prevent reloading by storing the hashCode in json and then analyze them
-      state = addBots(_readBotsFromFile(next));
+      addBots(_readBotsFromFile(next));
     });
 
     return [];
   }
 
-  List<Pipeline> addBots(List<Bot> bots) {
+  void addBots(List<Bot> bots) {
     final List<Pipeline> newBots = [...state];
     for (final b in bots) {
       var found = false;
@@ -46,7 +46,7 @@ class PipelineController extends _$PipelineController {
         newBots.add(pipeline);
       }
     }
-    return newBots;
+    state = newBots;
   }
 
   Pipeline _createBotPipeline(Bot bot) {

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:binander/src/models/secure_storage_key.dart';
 import 'package:binander/src/utils/secure_storage_provider.dart';
 import 'package:flutter/foundation.dart';
@@ -23,17 +25,17 @@ class MemoryStorage extends _$MemoryStorage {
   }
 
   void write(SecureStorageKeys key, String value) {
-    ref.watch(secureStorageProvider).write(key, value);
+    unawaited(ref.read(secureStorageProvider).write(key, value));
     state[key.name] = value;
   }
 
   String? delete(SecureStorageKeys key) {
-    ref.watch(secureStorageProvider).delete(key);
+    unawaited(ref.read(secureStorageProvider).delete(key));
     return state.remove(key.name);
   }
 
   void deleteAll() {
-    ref.watch(secureStorageProvider).deleteAll();
+    unawaited(ref.watch(secureStorageProvider).deleteAll());
     state = {};
   }
 }

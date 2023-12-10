@@ -70,6 +70,7 @@ class TestUtils {
         TimeInForce.GTC,
         OrderTypes.LIMIT,
         orderSides,
+        SelfTradePreventionMode.NONE,
         [Fill(price, origQty, 0, cryptoSymbol.quoteAsset, orderId)]);
   }
 
@@ -91,24 +92,26 @@ class TestUtils {
 
   static OrderData createOrderDataFromNewLimit(OrderNewLimit orderNew) =>
       OrderData(
-          orderNew.symbol,
-          orderNew.orderId,
-          orderNew.orderListId,
-          orderNew.clientOrderId,
-          orderNew.price,
-          null,
-          orderNew.origQty,
-          orderNew.executedQty,
-          orderNew.cummulativeQuoteQty,
-          orderNew.status,
-          orderNew.timeInForce,
-          orderNew.type,
-          orderNew.side,
-          0,
-          clock.now(),
-          clock.now(),
-          true,
-          0);
+        orderNew.symbol,
+        orderNew.orderId,
+        orderNew.orderListId,
+        orderNew.clientOrderId,
+        orderNew.price,
+        null,
+        orderNew.origQty,
+        orderNew.executedQty,
+        orderNew.cummulativeQuoteQty,
+        orderNew.status,
+        orderNew.timeInForce,
+        orderNew.type,
+        orderNew.side,
+        0,
+        clock.now(),
+        clock.now(),
+        true,
+        0,
+        SelfTradePreventionMode.NONE,
+      );
 
   static OrderData createOrderDataFromNewStopLimit(
     OrderNewStopLimit orderNew,
@@ -139,7 +142,8 @@ class TestUtils {
           clock.now(),
           clock.now(),
           true,
-          0);
+          0,
+          SelfTradePreventionMode.NONE);
 
   static OrderCancel createOrderCancel(OrderData order) => OrderCancel(
       order.symbol,
@@ -155,7 +159,8 @@ class TestUtils {
       OrderStatus.CANCELED,
       order.timeInForce,
       order.type,
-      order.side);
+      order.side,
+      SelfTradePreventionMode.NONE);
 
   static double approxPriceToFloor(double price) =>
       (price * 100).floorToDouble() / 100;

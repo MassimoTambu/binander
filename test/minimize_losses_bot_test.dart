@@ -1,15 +1,17 @@
-import 'package:binander/src/api/api.dart';
-import 'package:binander/src/features/bot/domain/bots/bot_phases.dart';
-import 'package:binander/src/features/bot/domain/bots/minimize_losses/minimize_losses_pipeline.dart';
-import 'package:binander/src/features/bot/presentation/pipeline_controller.dart';
-import 'package:binander/src/features/settings/domain/api_connection.dart';
-import 'package:binander/src/utils/secure_storage_provider.dart';
 import 'package:clock/clock.dart';
 import 'package:fake_async/fake_async.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
+
+import 'package:binander/src/api/api.dart';
+import 'package:binander/src/features/bot/domain/bots/bot_phases.dart';
+import 'package:binander/src/features/bot/domain/bots/minimize_losses/minimize_losses_pipeline.dart';
+import 'package:binander/src/features/bot/presentation/pipeline_controller.dart';
+import 'package:binander/src/features/settings/presentation/settings_storage_provider.dart';
+import 'package:binander/src/utils/secure_storage_provider.dart';
 
 import 'mocks.dart';
 import 'test_order_book.dart';
@@ -18,12 +20,11 @@ import 'test_wallet.dart';
 
 void main() {
   final mockSecureStorageProvider = MockSecureStorage();
+  final mockSettingsStorageProvider = MockSettingsStorage();
   final mockBinanceApiProvider = MockBinanceApi();
   final mockSpotProvider = MockSpot();
   final mockMarketProvider = MockMarket();
   final mockTradeProvider = MockTrade();
-  const fakeApiConnection =
-      ApiConnection(url: 'fake_url', apiSecret: 'secret', apiKey: 'key');
   late ProviderContainer container;
   var wallet = TestWallet([]);
   var orderBook = TestOrderBook.create(orders: [], getPriceStrategy: () => 0.0);
@@ -33,6 +34,8 @@ void main() {
 
   setUpAll(() {
     registerFallbackValue(FakeCryptoSimbol());
+    registerFallbackValue(OrderSides.BUY);
+    registerFallbackValue(OrderSides.SELL);
   });
 
   setUp(() async {
@@ -41,7 +44,8 @@ void main() {
     container = ProviderContainer(
       overrides: [
         secureStorageProvider.overrideWithValue(mockSecureStorageProvider),
-        binanceApiProvider(fakeApiConnection)
+        settingsStorageProvider.overrideWith(() => mockSettingsStorageProvider),
+        binanceApiProvider(MockSettingsStorage.fakeApiConnection)
             .overrideWithValue(mockBinanceApiProvider),
       ],
     );
@@ -67,8 +71,8 @@ void main() {
       (i) async {
         final buyOrder = orderBook.addNewLimitOrder(
           wallet,
-          price: i.positionalArguments[4],
-          origQty: i.positionalArguments[3],
+          price: i.positionalArguments[3],
+          origQty: i.positionalArguments[2],
         );
 
         return ApiResponse(buyOrder, 201);
@@ -80,9 +84,9 @@ void main() {
       (i) async {
         final stopSellOrder = orderBook.addNewStopLimitOrder(
           wallet,
-          price: i.positionalArguments[4],
-          stopPrice: i.positionalArguments[5],
-          origQty: i.positionalArguments[3],
+          price: i.positionalArguments[3],
+          stopPrice: i.positionalArguments[4],
+          origQty: i.positionalArguments[2],
         );
 
         return ApiResponse(stopSellOrder, 201);
@@ -91,7 +95,7 @@ void main() {
 
     when(() => mockTradeProvider.getQueryOrder(any(), any())).thenAnswer(
       (i) async {
-        final order = orderBook.updateOrder(wallet, i.positionalArguments[2]);
+        final order = orderBook.updateOrder(wallet, i.positionalArguments[1]);
         return ApiResponse(order, 201);
       },
     );
@@ -99,7 +103,7 @@ void main() {
     when(() => mockTradeProvider.cancelOrder(any(), any())).thenAnswer(
       (i) async {
         final orderCancel =
-            orderBook.cancelOrder(wallet, i.positionalArguments[2]);
+            orderBook.cancelOrder(wallet, i.positionalArguments[1]);
 
         return ApiResponse(orderCancel, 201);
       },
