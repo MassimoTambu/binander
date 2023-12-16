@@ -39,4 +39,4 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: build/windows/x64/runner/Release/binander.exe
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.PUBLISH_TO_RELEASE }}
