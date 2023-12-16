@@ -38,3 +38,6 @@ jobs:
       - name: Build Windows
         run: flutter build windows
 
+      - uses: actions/upload-artifact@v4
+        with:
+          path: build\windows\x64\runner\Release\binander.exe
