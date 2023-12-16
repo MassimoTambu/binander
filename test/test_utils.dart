@@ -7,8 +7,16 @@ import 'package:binander/src/features/bot/domain/bots/minimize_losses/minimize_l
 import 'package:binander/src/features/bot/domain/bots/minimize_losses/minimize_losses_pipeline_data.dart';
 import 'package:binander/src/features/bot/domain/crypto_symbol.dart';
 import 'package:binander/src/features/bot/domain/orders_history.dart';
+import 'package:binander/src/features/settings/domain/api_connection.dart';
+import 'package:binander/src/features/settings/domain/secure_storage_key.dart';
 
 class TestUtils {
+  static const apiConnection =
+      ApiConnection(url: 'fake_url', apiSecret: 'secret', apiKey: 'key');
+  static final Map<String, String> memoryStorageData = {
+    SecureStorageKeys.testNetApiKey.name: apiConnection.apiKey,
+    SecureStorageKeys.testNetApiSecret.name: apiConnection.apiSecret,
+  };
   static const defaultSymbol = 'BNB-USDT';
 
   static List<AccountBalance> fillWalletWithAccountBalances() => [

@@ -1,3 +1,4 @@
+import 'package:binander/src/features/settings/presentation/settings_storage_provider.dart';
 import 'package:clock/clock.dart';
 import 'package:fake_async/fake_async.dart';
 import 'package:flutter/material.dart';
@@ -10,7 +11,7 @@ import 'package:binander/src/api/api.dart';
 import 'package:binander/src/features/bot/domain/bots/bot_phases.dart';
 import 'package:binander/src/features/bot/domain/bots/minimize_losses/minimize_losses_pipeline.dart';
 import 'package:binander/src/features/bot/presentation/pipeline_controller.dart';
-import 'package:binander/src/features/settings/presentation/settings_storage_provider.dart';
+import 'package:binander/src/utils/memory_storage_provider.dart';
 import 'package:binander/src/utils/secure_storage_provider.dart';
 
 import 'mocks.dart';
@@ -20,7 +21,6 @@ import 'test_wallet.dart';
 
 void main() {
   final mockSecureStorageProvider = MockSecureStorage();
-  final mockSettingsStorageProvider = MockSettingsStorage();
   final mockBinanceApiProvider = MockBinanceApi();
   final mockSpotProvider = MockSpot();
   final mockMarketProvider = MockMarket();
@@ -44,11 +44,19 @@ void main() {
     container = ProviderContainer(
       overrides: [
         secureStorageProvider.overrideWithValue(mockSecureStorageProvider),
-        settingsStorageProvider.overrideWith(() => mockSettingsStorageProvider),
-        binanceApiProvider(MockSettingsStorage.fakeApiConnection)
+        binanceApiProvider(TestUtils.apiConnection)
             .overrideWithValue(mockBinanceApiProvider),
       ],
     );
+    // Setup memory and settings storage
+    container
+        .read(memoryStorageProvider.notifier)
+        .load(TestUtils.memoryStorageData);
+    container.read(settingsStorageProvider.notifier).state = container
+        .read(settingsStorageProvider.notifier)
+        .state
+        .copyWith(testNetConnection: TestUtils.apiConnection);
+
     // Setup API providers
     when(() => mockBinanceApiProvider.spot).thenReturn(mockSpotProvider);
     when(() => mockSpotProvider.market).thenReturn(mockMarketProvider);
