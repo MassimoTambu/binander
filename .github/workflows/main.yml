@@ -41,4 +41,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.PUBLISH_TO_RELEASE }}
         with:
           tag_name: windows_release
-          files: build/windows/x64/runner/Release
+          files: |
+            build/windows/x64/runner/Release/binander.exe
+            build/windows/x64/runner/Release/flutter_secure_storage_windows_plugin.dll
+            build/windows/x64/runner/Release/flutter_windows.dll
