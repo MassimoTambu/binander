@@ -38,5 +38,6 @@ jobs:
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
+          tag_name: windows_release
           files: build/windows/x64/runner/Release/binander.exe
           token: ${{ secrets.PUBLISH_TO_RELEASE }}
