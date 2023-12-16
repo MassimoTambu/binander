@@ -37,6 +37,8 @@ jobs:
 
       - name: Release
         uses: softprops/action-gh-release@v1
+        env:
+          PUBLISH_TO_RELEASE: ${{ secrets.PUBLISH_TO_RELEASE }}
         with:
           token: ${{ secrets.PUBLISH_TO_RELEASE }}
           tag_name: windows_release
